@@ -1,0 +1,233 @@
+---
+title: "getting_started"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyselect)
+library(ggplot2)
+library(broom)
+library(dplyr)
+library(corrplot)
+library(kableExtra)
+library(knitr)
+library(Hmisc)
+library(infer)
+library(plotly) 
+library(skimr)
+library(stringr)
+library(reshape2)
+library(som)
+library(readxl)
+library(manipulate)
+library(lavaan)
+library(semPlot)
+library(FactoMineR)
+library(factoextra)
+library(readxl)
+```
+
+```{r}
+ffostare_corrected <- read_excel("ffostare_corrected_spssout_full.xlsx")
+View(ffostare_corrected)
+
+selected_ffostare <- ffostare_corrected %>%
+  select(- Observations, - ResultContainers, - Intervals, - no_sec_behav_ffosta)
+
+znormed_ffostare_v1 <- read_excel("composite_variables/znormed_ffostare_v1.xlsx")
+skim(znormed_ffostare_v1)
+
+selected_norms_ffostare_v1 <- znormed_ffostare_v1 %>%
+  select(-Observations, - ResultContainers, - Intervals, - Zno_sec_behav_ffosta)
+```
+
+
+```{r}
+corr_selected_ffostare_v1 <- cor(selected_ffostare)
+melted_corr_selected_ffostare_v1 <- melt(corr_selected_ffostare_v1)
+write.csv(corr_selected_ffostare_v1, "corr_selected_ffostare_v1.csv")
+
+corrnorm_selected_ffostare_v1 <- cor(selected_norms_ffostare_v1)   
+melted_corrnorm_selected_ffostare_v1 <- melt(corrnorm_selected_ffostare_v1)
+write.csv(corrnorm_selected_ffostare_v1, "corrnorm_selected_ffostare_v1.csv")
+```
+
+storage
+selected_norms_ffostare_v1$Zstationary_middle_percent_butters , selected_norms_ffostare_v1$Zlocomotion_percent_butters , selected_norms_ffostare_v1$Zhanging_behaviors_butters , selected_norms_ffostare_v1$Ztactile_exploration_butters , selected_norms_ffostare_v1$Zmo_manip_apple_butters , selected_norms_ffostare_v1$Zstation_fr_ffostare , selected_norms_ffostare_v1$Zstation_mid_ffosta , selected_norms_ffostare_v1$Zlocomote_ffosta , selected_norms_ffostare_v1$Zmovement_ffosta , selected_norms_ffostare_v1$Ztac_expl_ffosta , selected_norms_ffostare_v1$Zstereo_ffosta , selected_norms_ffostare_v1$Zteethgrind_ffosta , selected_norms_ffostare_v1$Zlipsmack_ffosta , selected_norms_ffostare_v1$Ztouch_app_ffosta , selected_norms_ffostare_v1$Zmouth_app_ffosta , selected_norms_ffostare_v1$Zmanip_app_ffosta , selected_norms_ffostare_v1$Zeat_app_ffosta , selected_norms_ffostare_v1$Znonvigi_ffosta , selected_norms_ffostare_v1$Zdir_eye_contact_ffosta
+
+
+```{r}
+selected_norms_ffostare_v1$comp_1 <- selected_norms_ffostare_v1$Zstationary_middle_percent_butters + selected_norms_ffostare_v1$Zlocomotion_percent_butters + selected_norms_ffostare_v1$Zhanging_behaviors_butters + selected_norms_ffostare_v1$Ztactile_exploration_butters + selected_norms_ffostare_v1$Zmo_manip_apple_butters + selected_norms_ffostare_v1$Zstation_fr_ffostare + selected_norms_ffostare_v1$Zstation_mid_ffosta + selected_norms_ffostare_v1$Zlocomote_ffosta + selected_norms_ffostare_v1$Zmovement_ffosta + selected_norms_ffostare_v1$Ztac_expl_ffosta + selected_norms_ffostare_v1$Zstereo_ffosta + selected_norms_ffostare_v1$Zteethgrind_ffosta + selected_norms_ffostare_v1$Zlipsmack_ffosta + selected_norms_ffostare_v1$Ztouch_app_ffosta + selected_norms_ffostare_v1$Zmouth_app_ffosta + selected_norms_ffostare_v1$Zmanip_app_ffosta + selected_norms_ffostare_v1$Zeat_app_ffosta + selected_norms_ffostare_v1$Znonvigi_ffosta + selected_norms_ffostare_v1$Zdir_eye_contact_ffosta
+
+#comp_1 <- selected_norms_ffostare_v1 %>%
+  #select(Zstationary_middle_percent_butters , Zlocomotion_percent_butters , Zhanging_behaviors_butters , Ztactile_exploration_butters , Zmo_manip_apple_butters , Zstation_fr_ffostare , Zstation_mid_ffosta , Zlocomote_ffosta , Zmovement_ffosta , Ztac_expl_ffosta , Zstereo_ffosta , Zteethgrind_ffosta , Zlipsmack_ffosta , Ztouch_app_ffosta , Zmouth_app_ffosta , Zmanip_app_ffosta , Zeat_app_ffosta , Znonvigi_ffosta , Zdir_eye_contact_ffosta)
+
+View(comp_1)
+  
+  
+selected_norms_ffostare_v1$comp_2 <- selected_norms_ffostare_v1$ZStationary_back_butters + selected_norms_ffostare_v1$Zstereotypy_butters + selected_norms_ffostare_v1$Zvigilant_percent_butters + selected_norms_ffostare_v1$Zstation_back_ffostare + selected_norms_ffostare_v1$Zself_gro_ffosta + selected_norms_ffostare_v1$Zthreat_stranger_ffosta + selected_norms_ffostare_v1$Zfreeze_back_ffosta 
+  
+selected_norms_ffostare_v1$comp_3 <- selected_norms_ffostare_v1$Zstationary_front_percent_butters + selected_norms_ffostare_v1$Zmovement_percent_butters + selected_norms_ffostare_v1$Ztouch_butters_percent + selected_norms_ffostare_v1$Zcrouching_butters + selected_norms_ffostare_v1$Znonvigilant_percent_butters + selected_norms_ffostare_v1$Zcrouching_ffosta + selected_norms_ffostare_v1$Zvigi_ffosta + selected_norms_ffostare_v1$Zno_response_ffosta
+  
+selected_norms_ffostare_v1$comp_4 <- selected_norms_ffostare_v1$Zself_groom_percent_butters + selected_norms_ffostare_v1$Zmouth_butters_percent + selected_norms_ffostare_v1$Zoral_exploration_butters 
+
+View(selected_norms_ffostare_v1)
+
+#write.csv(selected_norms_ffostare_v1, "selected_norms_composites_demgraf_v1.csv")
+```
+
+```{r}
+selected_norms_composites_demgraf_v1 <- read_excel("composite_variables/selected_norms_composites_demgraf_v1.xlsx")
+View(selected_norms_composites_demgraf_v1)
+
+composite_scores_withgroups <- selected_norms_composites_demgraf_v1 %>%
+  select(Observations, sex, initial_diet, new_diet, comp_1, comp_2, comp_3, comp_4)
+
+composite_scores_withgroups$initial_diet <- as.factor(composite_scores_withgroups$initial_diet)
+composite_scores_withgroups$new_diet <- as.factor(composite_scores_withgroups$new_diet)
+skim(composite_scores_withgroups)
+
+```
+
+```{r}
+#visuals of maternal diet
+ggplot(composite_scores_withgroups, aes(x=Observations, y=comp_1, color=initial_diet)) +
+  geom_histogram(stat = "identity", binwidth = 30)
+
+ggplot(composite_scores_withgroups, aes(x=Observations, y=comp_2, color=initial_diet)) +
+  geom_histogram(stat = "identity", binwidth = 30)
+
+comp1_wilcoxtest <- wilcox.test(composite_scores_withgroups$comp_1~composite_scores_withgroups$initial_diet)
+
+comp1_wilcoxtest$p.value
+
+ggplot(composite_scores_withgroups, aes(x=Observations, y=comp_3, color=initial_diet)) +
+  geom_histogram(stat = "identity", binwidth = 30)
+
+ggplot(composite_scores_withgroups, aes(x=Observations, y=comp_4, color=initial_diet)) +
+  geom_histogram(stat = "identity", binwidth = 30)
+
+```
+
+```{r}
+#matdiet filtered = filtering out all subjects with a new diet value of 2. This eliminates the effects of the new diet
+
+head(composite_scores_withgroups)
+
+matdiet_filtered <- composite_scores_withgroups %>%
+  filter(!new_diet == 2)
+
+matdiet_filtered$initial_diet <- as.factor(matdiet_filtered$initial_diet)
+
+skim(matdiet_filtered) #removing new_diet = 2 removes 15 subjects
+matdiet_filtered_wiltest_comp1 <- wilcox.test(matdiet_filtered$comp_1~matdiet_filtered$initial_diet)
+matdiet_filtered_wiltest_comp2 <- wilcox.test(matdiet_filtered$comp_2~matdiet_filtered$initial_diet)
+matdiet_filtered_wiltest_comp3 <- wilcox.test(matdiet_filtered$comp_3~matdiet_filtered$initial_diet)
+matdiet_filtered_wiltest_comp4 <- wilcox.test(matdiet_filtered$comp_4~matdiet_filtered$initial_diet)
+matdiet_filtered_wiltest_comp1$p.value
+
+head(matdiet_filtered)
+
+ggplot(matdiet_filtered, aes(x=initial_diet, y=comp_1)) +
+  geom_boxplot()
+```
+
+
+```{r}
+#visuals of postnatal diet
+ggplot(composite_scores_withgroups, aes(x=Observations, y=comp_1, color=new_diet)) +
+  geom_histogram(stat = "identity", binwidth = 30)
+
+ggplot(composite_scores_withgroups, aes(x=Observations, y=comp_2, color=new_diet)) +
+  geom_histogram(stat = "identity", binwidth = 30)
+
+ggplot(composite_scores_withgroups, aes(x=Observations, y=comp_3, color=new_diet)) +
+  geom_histogram(stat = "identity", binwidth = 30)
+
+ggplot(composite_scores_withgroups, aes(x=Observations, y=comp_4, color=new_diet)) +
+  geom_histogram(stat = "identity", binwidth = 30)
+
+#need to do a pca on community 1
+
+```
+
+```{r}
+#sex differences
+ggplot(composite_scores_withgroups, aes(x=Observations, y=comp_1, color=sex)) +
+  geom_histogram(stat = "identity", binwidth = 30)
+
+ggplot(composite_scores_withgroups, aes(x=Observations, y=comp_2, color=sex)) +
+  geom_histogram(stat = "identity", binwidth = 30)
+
+ggplot(composite_scores_withgroups, aes(x=Observations, y=comp_3, color=sex)) +
+  geom_histogram(stat = "identity", binwidth = 30)
+
+ggplot(composite_scores_withgroups, aes(x=Observations, y=comp_4, color=sex)) +
+  geom_histogram(stat = "identity", binwidth = 30)
+```
+
+
+```{r}
+princi_comp1 <- prcomp(comp_1)
+
+summary(princi_comp1)
+
+fviz_eig(princi_comp1)
+```
+
+```{r}
+#creating new composite variables to investigate the groupings
+
+comp1_indi <- selected_norms_ffostare_v1 %>%
+  select(Zstationary_middle_percent_butters, Zlocomotion_percent_butters, Zhanging_behaviors_butters, Ztactile_exploration_butters, Zmo_manip_apple_butters, Zstation_fr_ffostare,  Zstation_mid_ffosta, Zlocomote_ffosta, Zmovement_ffosta, Ztac_expl_ffosta,  Zstereo_ffosta, Zteethgrind_ffosta, Zlipsmack_ffosta, Ztouch_app_ffosta, Zmouth_app_ffosta, Zmanip_app_ffosta, Zeat_app_ffosta, Znonvigi_ffosta, Zdir_eye_contact_ffosta)
+
+comp2_indi <- selected_norms_ffostare_v1 %>%
+  select(ZStationary_back_butters, Zstereotypy_butters, Zvigilant_percent_butters, Zstation_back_ffostare, Zself_gro_ffosta, Zthreat_stranger_ffosta, Zfreeze_back_ffosta)
+
+comp3_indi <- selected_norms_ffostare_v1 %>%
+  select(Zstationary_front_percent_butters, Zmovement_percent_butters, Ztouch_butters_percent, Zcrouching_butters, Znonvigilant_percent_butters, Zcrouching_ffosta, Zvigi_ffosta, Zno_response_ffosta)
+
+comp4_indi <- selected_norms_ffostare_v1 %>%
+  select(Zself_groom_percent_butters, Zmouth_butters_percent, Zoral_exploration_butters)
+
+
+```
+
+
+
+```{r}
+#here i need to run a PCA for Damien and Lavaan for Elinor
+
+princi_comp1 <- prcomp(comp1_indi)
+summary(princi_comp1)
+princi_comp1$sdev
+fviz_eig(princi_comp1)
+
+princi_comp2 <- prcomp(comp2_indi)
+summary(princi_comp2)
+fviz_eig(princi_comp2)
+
+princi_comp3 <- prcomp(comp3_indi)
+summary(princi_comp3)
+fviz_eig(princi_comp3)
+
+princi_comp4 <- prcomp(comp4_indi)
+summary(princi_comp4)
+fviz_eig(princi_comp4)
+```
+
+```{r}
+SEM_comp1 <- 
+  
+SEM_comp2 <-
+  
+SEM_comp3 <- 
+  
+SEM_comp4 <- 
+
+
+```
