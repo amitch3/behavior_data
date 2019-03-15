@@ -38,7 +38,7 @@ View(ffostare_corrected)
 selected_ffostare <- ffostare_corrected %>%
   select(- Observations, - ResultContainers, - Intervals, - no_sec_behav_ffosta)
 
-znormed_ffostare_v1 <- read_excel("composite_variables/znormed_ffostare_v1.xlsx")
+znormed_ffostare_v1 <- read_excel("znormed_ffostare_v1.xlsx")
 skim(znormed_ffostare_v1)
 
 selected_norms_ffostare_v1 <- znormed_ffostare_v1 %>%
@@ -81,7 +81,7 @@ View(selected_norms_ffostare_v1)
 ```
 
 ```{r}
-selected_norms_composites_demgraf_v1 <- read_excel("composite_variables/selected_norms_composites_demgraf_v1.xlsx")
+selected_norms_composites_demgraf_v1 <- read_excel("selected_norms_composites_demgraf_v1.xlsx")
 View(selected_norms_composites_demgraf_v1)
 
 composite_scores_withgroups <- selected_norms_composites_demgraf_v1 %>%
@@ -172,11 +172,11 @@ ggplot(composite_scores_withgroups, aes(x=Observations, y=comp_4, color=sex)) +
 
 
 ```{r}
-princi_comp1 <- prcomp(comp_1)
+#princi_comp1 <- prcomp(comp_1)
 
-summary(princi_comp1)
+#summary(princi_comp1)
 
-fviz_eig(princi_comp1)
+#fviz_eig(princi_comp1)
 ```
 
 ```{r}
@@ -221,13 +221,13 @@ fviz_eig(princi_comp4)
 ```
 
 ```{r}
-SEM_comp1 <- 
+#SEM_comp1 <- 
   
-SEM_comp2 <-
+#SEM_comp2 <-
   
-SEM_comp3 <- 
+#SEM_comp3 <- 
   
-SEM_comp4 <- 
+#SEM_comp4 <- 
 
 
 ```
