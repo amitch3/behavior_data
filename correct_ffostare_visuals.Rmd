@@ -188,6 +188,14 @@ ggplot(composite_scores_withgroups, aes(x=Observations, y=comp_3, color=sex)) +
 
 ggplot(composite_scores_withgroups, aes(x=Observations, y=comp_4, color=sex)) +
   geom_histogram(stat = "identity", binwidth = 30)
+
+matdiet_sex_wiltest_comp1 <- wilcox.test(matdiet_filtered$comp_1~matdiet_filtered$sex)
+matdiet_sex_wiltest_comp2 <- wilcox.test(matdiet_filtered$comp_2~matdiet_filtered$sex)
+matdiet_sex_wiltest_comp3 <- wilcox.test(matdiet_filtered$comp_3~matdiet_filtered$sex)
+matdiet_sex_wiltest_comp4 <- wilcox.test(matdiet_filtered$comp_4~matdiet_filtered$sex)
+
+matdiet_sex_wiltest_comp4$p.value
+
 ```
 
 
