@@ -257,13 +257,26 @@ princ4_ploty <- ggplotly(fviz_eig(princi_comp4, main = 'variance explained: comp
 ```
 
 ```{r}
-SEM_comp1 <- 
+SEM_comp1 <- 'latemod_comp1 =~ Zstationary_middle_percent_butters + Zlocomotion_percent_butters + Zhanging_behaviors_butters + Ztactile_exploration_butters + Zmo_manip_apple_butters + Zstation_fr_ffostare + Zstation_mid_ffosta + Zlocomote_ffosta + Zmovement_ffosta + Ztac_expl_ffosta + Zstereo_ffosta + Zteethgrind_ffosta + Zlipsmack_ffosta + Ztouch_app_ffosta + Zmouth_app_ffosta + Zmanip_app_ffosta + Zeat_app_ffosta + Znonvigi_ffosta + Zdir_eye_contact_ffosta'
+
+SEM_comp1_fit <- cfa(model = SEM_comp1, estimator = "MLR", data = selected_norms_ffostare_v1)
+summary(SEM_comp1_fit, standardize = TRUE, fit.measures = TRUE)  
+
+
+SEM_comp2 <- 'latemod_comp2 =~ ZStationary_back_butters + Zstereotypy_butters + Zvigilant_percent_butters + Zstation_back_ffostare + Zself_gro_ffosta + Zthreat_stranger_ffosta + Zfreeze_back_ffosta'
+
+SEM_comp2_fit <- cfa(model = SEM_comp2, estimator = "MLR", data = selected_norms_ffostare_v1)
+summary(SEM_comp2_fit, standardize = TRUE, fit.measures = TRUE)
   
-SEM_comp2 <-
+SEM_comp3 <- 'latemod_comp3 =~ Zstationary_front_percent_butters + Zmovement_percent_butters + Ztouch_butters_percent + Zcrouching_butters + Znonvigilant_percent_butters + Zcrouching_ffosta + Zvigi_ffosta + Zno_response_ffosta'
+
+SEM_comp3_fit <- cfa(model = SEM_comp3, estimator = "MLR", data = selected_norms_ffostare_v1)
+summary(SEM_comp3_fit, standardize = TRUE, fit.measures = TRUE)
   
-SEM_comp3 <- 
-  
-SEM_comp4 <- 
+SEM_comp4 <- 'latemod_comp4 =~ Zself_groom_percent_butters + Zmouth_butters_percent + Zoral_exploration_butters'
+
+SEM_comp4_fit <- cfa(model = SEM_comp4, estimator = "MLR", data = selected_norms_ffostare_v1)
+summary(SEM_comp4_fit, standardize = TRUE, fit.measures = TRUE)
 
 
 ```
