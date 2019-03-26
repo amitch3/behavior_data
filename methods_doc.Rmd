@@ -35,6 +35,7 @@ library(FactoMineR)
 library(factoextra)
 library(readxl)
 library(formattable)
+library(DT)
 ```
 
 Below is a the first few rows of the normalized, raw data. Notice that the descriptive variables such as animal ID, interval time, etc have been removed in order to calculate correlations.
@@ -140,6 +141,21 @@ matdiet_composite_difference <- data.frame(composite_frame_matdietpval, matdiet_
 
 kable(matdiet_composite_difference, format = "html", align=rep('l', 5)) %>%
   kable_styling(bootstrap_options = c("condensed", "striped"))
+
+
+bold_pvals <- formatter("span",
+                        style = x ~ style("font-weight" = ifelse(x<.05, "bold", NA)))
+
+formattable(matdiet_composite_difference, list(
+  matdiet_pvals = bold_pvals
+))
+
+as.datatable(formattable(matdiet_composite_difference,
+                         align = c("l", "l"),
+                         list(matdiet_pvals = bold_pvals)
+                         ))
+
+xtable::
 #make a data table here!
 ```
 
@@ -151,6 +167,9 @@ ggcomp2 <- ggplot(matdiet_filtered, aes(x=Observations, y=comp_2, color=initial_
   geom_bar(stat = "identity", width = 20, position = position_dodge())
 
 ggcompl1_ly <- ggplotly(ggcomp1)
+
+ggcompl1_ly$
+
 ggcompl2_ly <- ggplotly(ggcomp2)
 ```
 
