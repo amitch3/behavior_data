@@ -51,6 +51,17 @@ corr_selected_ffostare_v1 <- cor(selected_ffostare)
 melted_corr_selected_ffostare_v1 <- melt(corr_selected_ffostare_v1)
 write.csv(corr_selected_ffostare_v1, "corr_selected_ffostare_v1.csv")
 
+ggplot(melted_corr_selected_ffostare_v1, aes(x=Var2, y=Var1, fill=value)) +
+  ggtitle("Combined Behavioral Correlations") +
+  geom_tile() +
+  scale_fill_gradient(low = "dark blue", high = "yellow") + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45,
+                                   vjust = 1,
+                                   size = 9,
+                                   hjust = 1)
+  )
+
 corrnorm_selected_ffostare_v1 <- cor(selected_norms_ffostare_v1)   
 melted_corrnorm_selected_ffostare_v1 <- melt(corrnorm_selected_ffostare_v1)
 write.csv(corrnorm_selected_ffostare_v1, "corrnorm_selected_ffostare_v1.csv")
@@ -128,7 +139,7 @@ matdiet_filtered_wiltest_comp1 <- wilcox.test(matdiet_filtered$comp_1~matdiet_fi
 matdiet_filtered_wiltest_comp2 <- wilcox.test(matdiet_filtered$comp_2~matdiet_filtered$initial_diet)
 matdiet_filtered_wiltest_comp3 <- wilcox.test(matdiet_filtered$comp_3~matdiet_filtered$initial_diet)
 matdiet_filtered_wiltest_comp4 <- wilcox.test(matdiet_filtered$comp_4~matdiet_filtered$initial_diet)
-matdiet_filtered_wiltest_comp1$p.value
+
 
 head(matdiet_filtered)
 
@@ -139,17 +150,26 @@ ggplot(matdiet_filtered, aes(x=initial_diet, y=comp_1)) +
 
 ```{r}
 #visuals of postnatal diet
-ggplot(composite_scores_withgroups, aes(x=Observations, y=comp_1, color=new_diet)) +
-  geom_histogram(stat = "identity", binwidth = 30)
+ggcomp1 <- ggplot(matdiet_filtered, aes(x=Observations, y=comp_1, color=initial_diet, fill=initial_diet)) +
+  geom_bar(stat = "identity", width = 20, position = position_dodge())
 
-ggplot(composite_scores_withgroups, aes(x=Observations, y=comp_2, color=new_diet)) +
-  geom_histogram(stat = "identity", binwidth = 30)
+ggplot(matdiet_filtered, aes(x=Observations, y=comp_1, color=initial_diet, fill=initial_diet)) +
+  geom_bar(stat = "identity", width = 20, position = position_dodge())
+
+ggcompl1_ly <- ggplotly(ggcomp1)
+
+ggcompl1_ly
+
+plot_ly(matdiet_filtered, x = ~Observations, y=~comp_1, type = "bar", name = "Individual Component 1 Scores",colors="")
+
+ggplot(matdiet_filtered, aes(x=Observations, y=comp_2, color=initial_diet, fill=initial_diet)) +
+  geom_histogram(stat = "identity")
 
 ggplot(composite_scores_withgroups, aes(x=Observations, y=comp_3, color=new_diet)) +
-  geom_histogram(stat = "identity", binwidth = 30)
+  geom_histogram(stat = "identity", width = 30)
 
 ggplot(composite_scores_withgroups, aes(x=Observations, y=comp_4, color=new_diet)) +
-  geom_histogram(stat = "identity", binwidth = 30)
+  geom_histogram(stat = "identity", width = 30)
 
 #need to do a pca on community 1
 
@@ -168,6 +188,14 @@ ggplot(composite_scores_withgroups, aes(x=Observations, y=comp_3, color=sex)) +
 
 ggplot(composite_scores_withgroups, aes(x=Observations, y=comp_4, color=sex)) +
   geom_histogram(stat = "identity", binwidth = 30)
+
+matdiet_sex_wiltest_comp1 <- wilcox.test(matdiet_filtered$comp_1~matdiet_filtered$sex)
+matdiet_sex_wiltest_comp2 <- wilcox.test(matdiet_filtered$comp_2~matdiet_filtered$sex)
+matdiet_sex_wiltest_comp3 <- wilcox.test(matdiet_filtered$comp_3~matdiet_filtered$sex)
+matdiet_sex_wiltest_comp4 <- wilcox.test(matdiet_filtered$comp_4~matdiet_filtered$sex)
+
+matdiet_sex_wiltest_comp4$p.value
+
 ```
 
 
@@ -205,22 +233,31 @@ comp4_indi <- selected_norms_ffostare_v1 %>%
 princi_comp1 <- prcomp(comp1_indi)
 summary(princi_comp1)
 princi_comp1$sdev
-fviz_eig(princi_comp1)
+princ1_ploty  <- ggplotly(fviz_eig(princi_comp1, main = "variance explained: components of comp_1"))
+
+princ1_ploty
 
 princi_comp2 <- prcomp(comp2_indi)
 summary(princi_comp2)
-fviz_eig(princi_comp2)
+fviz_eig(princi_comp2, main = 'variance explained: components of comp_2')
+
+princ2_ploty <- ggplotly(fviz_eig(princi_comp2, main = 'variance explained: components of comp_2'))
 
 princi_comp3 <- prcomp(comp3_indi)
 summary(princi_comp3)
-fviz_eig(princi_comp3)
+fviz_eig(princi_comp3, main = "variance explained: components of comp_3")
+
+princ3_ploty <- ggplotly(fviz_eig(princi_comp3, main = 'variance explained: components of comp_3'))
 
 princi_comp4 <- prcomp(comp4_indi)
 summary(princi_comp4)
-fviz_eig(princi_comp4)
+fviz_eig(princi_comp4, main = "variance explained: components of comp_4")
+
+princ4_ploty <- ggplotly(fviz_eig(princi_comp4, main = 'variance explained: components of comp_4'))
 ```
 
 ```{r}
+<<<<<<< HEAD
 #SEM_comp1 <- 
   
 #SEM_comp2 <-
@@ -228,6 +265,32 @@ fviz_eig(princi_comp4)
 #SEM_comp3 <- 
   
 #SEM_comp4 <- 
+=======
+#new behavior variable for removing composites
+selected_behaviors_latemods <- selected_norms_ffostare_v1 %>%
+  select(- comp_1, - comp_2, - comp_3, - comp_4)
+
+SEM_comp1 <- 'latemod_comp1 =~ Zstationary_middle_percent_butters + Zlocomotion_percent_butters + Zhanging_behaviors_butters + Ztactile_exploration_butters + Zmo_manip_apple_butters + Zstation_fr_ffostare + Zstation_mid_ffosta + Zlocomote_ffosta + Zmovement_ffosta + Ztac_expl_ffosta + Zstereo_ffosta + Zteethgrind_ffosta + Zlipsmack_ffosta + Ztouch_app_ffosta + Zmouth_app_ffosta + Zmanip_app_ffosta + Zeat_app_ffosta + Znonvigi_ffosta + Zdir_eye_contact_ffosta'
+
+SEM_comp1_fit <- cfa(model = SEM_comp1, estimator = "MLR", data = selected_behaviors_latemods)
+summary(SEM_comp1_fit, standardize = TRUE, fit.measures = TRUE)  
+
+
+SEM_comp2 <- 'latemod_comp2 =~ ZStationary_back_butters + Zstereotypy_butters + Zvigilant_percent_butters + Zstation_back_ffostare + Zself_gro_ffosta + Zthreat_stranger_ffosta + Zfreeze_back_ffosta'
+
+SEM_comp2_fit <- cfa(model = SEM_comp2, estimator = "MLR", data = selected_behaviors_latemods)
+summary(SEM_comp2_fit, standardize = TRUE, fit.measures = TRUE)
+  
+SEM_comp3 <- 'latemod_comp3 =~ Zstationary_front_percent_butters + Zmovement_percent_butters + Ztouch_butters_percent + Zcrouching_butters + Znonvigilant_percent_butters + Zcrouching_ffosta + Zvigi_ffosta + Zno_response_ffosta'
+
+SEM_comp3_fit <- cfa(model = SEM_comp3, estimator = "MLR", data = selected_behaviors_latemods)
+summary(SEM_comp3_fit, standardize = TRUE, fit.measures = TRUE)
+  
+SEM_comp4 <- 'latemod_comp4 =~ Zself_groom_percent_butters + Zmouth_butters_percent + Zoral_exploration_butters'
+
+SEM_comp4_fit <- cfa(model = SEM_comp4, estimator = "MLR", data = selected_behaviors_latemods)
+summary(SEM_comp4_fit, standardize = TRUE, fit.measures = TRUE)
+>>>>>>> c188c1eb439f10218daaa2834bada6fd1acf0820
 
 
 ```
