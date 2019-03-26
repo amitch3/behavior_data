@@ -140,7 +140,7 @@ matdiet_composite_difference <- data.frame(composite_frame_matdietpval, matdiet_
 
 kable(matdiet_composite_difference, format = "html", align=rep('l', 5)) %>%
   kable_styling(bootstrap_options = c("condensed", "striped"))
-#make a data table here
+#make a data table here!
 ```
 
 ```{r visulizations of significant composites for maternal diet, echo=FALSE}
