@@ -155,7 +155,6 @@ as.datatable(formattable(matdiet_composite_difference,
                          list(matdiet_pvals = bold_pvals)
                          ))
 
-xtable::
 #make a data table here!
 ```
 
