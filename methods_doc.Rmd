@@ -9,8 +9,6 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-The purpose of this document is to outline of the methods used to contruct composite variables from the raw behaviors collected form the Human Intruder Task. The data include the **Stare, Familiar Food Offer, and Novel Object** epochs.
-
 
 ```{r, warning=FALSE, message=FALSE, echo=FALSE}
 library(tidyselect)
@@ -36,18 +34,21 @@ library(factoextra)
 library(readxl)
 library(formattable)
 library(DT)
+library(xtable)
 ```
+
+The purpose of this document is to outline of the methods used to contruct composite variables from the raw behaviors collected form the Human Intruder Task. The data include the **Stare, Familiar Food Offer, and Novel Object** epochs and a total of 37 behaviors were included in the analysis. 
 
 Below is a the first few rows of the normalized, raw data. Notice that the descriptive variables such as animal ID, interval time, etc have been removed in order to calculate correlations.
 
 ```{r loading the data, echo=FALSE}
 znormed_ffostare_v1 <- read_excel("znormed_ffostare_v1.xlsx")
-skim(znormed_ffostare_v1)
+#skim(znormed_ffostare_v1)
 
 selected_norms_ffostare_v1 <- znormed_ffostare_v1 %>%
   select(-Observations, - ResultContainers, - Intervals, - Zno_sec_behav_ffosta)
          
-head(selected_norms_ffostare_v1)         
+#head(selected_norms_ffostare_v1)         
 ```
 
 Below is the correlation output for the data. 
@@ -56,11 +57,6 @@ Below is the correlation output for the data.
 corrnorm_selected_ffostare_v1 <- cor(selected_norms_ffostare_v1)   
 melted_corrnorm_selected_ffostare_v1 <- melt(corrnorm_selected_ffostare_v1)
 
-
-# this head output in a kabletable
-kable(melted_corrnorm_selected_ffostare_v1, caption = "comm2") %>%
-  kable_styling(bootstrap_options = c("hover", "condensed", "striped")) %>% 
-  scroll_box(width = "1000px", height = "400px")
 
 ggplot(melted_corrnorm_selected_ffostare_v1, aes(x=Var2, y=Var1, fill=value)) +
   ggtitle("Combined Behavioral Correlations") +
@@ -71,6 +67,17 @@ ggplot(melted_corrnorm_selected_ffostare_v1, aes(x=Var2, y=Var1, fill=value)) +
                                    vjust = 1,
                                    size = 9,
                                    hjust = 1))
+
+
+melted_corrnorm_selected_ffostare_v1_reduced <- melted_corrnorm_selected_ffostare_v1[order(melted_corrnorm_selected_ffostare_v1$value, decreasing = TRUE),] %>%
+  filter(value <= .99)
+
+#kable(melted_corrnorm_selected_ffostare_v1_reduced) %>%
+  #kable_styling(bootstrap_options = c("hover", "condensed", "striped")) %>% 
+  #scroll_box(width = "1000px", height = "400px")
+
+as.datatable(formattable(melted_corrnorm_selected_ffostare_v1_reduced,
+                         align = c("l", "l")))
 ```
 
 From correlational values above were used to investigate the relationships amongst the behaviors. Specifically, how behaviors cluster together. To do this, an empirical approach was chosen that used community detection algorithm to determin which behaviors were clustering together. 
@@ -87,8 +94,6 @@ selected_norms_ffostare_v1$comp_2 <- selected_norms_ffostare_v1$ZStationary_back
 selected_norms_ffostare_v1$comp_3 <- selected_norms_ffostare_v1$Zstationary_front_percent_butters + selected_norms_ffostare_v1$Zmovement_percent_butters + selected_norms_ffostare_v1$Ztouch_butters_percent + selected_norms_ffostare_v1$Zcrouching_butters + selected_norms_ffostare_v1$Znonvigilant_percent_butters + selected_norms_ffostare_v1$Zcrouching_ffosta + selected_norms_ffostare_v1$Zvigi_ffosta + selected_norms_ffostare_v1$Zno_response_ffosta
   
 selected_norms_ffostare_v1$comp_4 <- selected_norms_ffostare_v1$Zself_groom_percent_butters + selected_norms_ffostare_v1$Zmouth_butters_percent + selected_norms_ffostare_v1$Zoral_exploration_butters 
-
-formattable(selected_norms_ffostare_v1)
 ```
 
 The output below represents the composite scores for the individual animals. 
@@ -97,16 +102,16 @@ Composite scores were created by taking the value of each individual behavior fr
 
 ```{r inserting demographic infomation, echo=FALSE}
 selected_norms_composites_demgraf_v1 <- read_excel("selected_norms_composites_demgraf_v1.xlsx")
-View(selected_norms_composites_demgraf_v1)
+#View(selected_norms_composites_demgraf_v1)
 
-composite_scores_withgroups <- selected_norms_composites_demgraf_v1 %>%
-  select(Observations, sex, initial_diet, new_diet, comp_1, comp_2, comp_3, comp_4)
+composite_scores_withgroups <- selected_norms_composites_demgraf_v1[order(selected_norms_composites_demgraf_v1$initial_diet),]  %>%
+  select(Observations, sex, initial_diet, new_diet, comp_1, comp_2, comp_3, comp_4) 
 
 composite_scores_withgroups$initial_diet <- as.factor(composite_scores_withgroups$initial_diet)
 composite_scores_withgroups$new_diet <- as.factor(composite_scores_withgroups$new_diet)
 composite_scores_withgroups$sex <- as.factor(composite_scores_withgroups$sex)
 
-glimpse(composite_scores_withgroups)
+#glimpse(composite_scores_withgroups)
 
 kable(composite_scores_withgroups, "html") %>%
   kable_styling(bootstrap_options = c("hover", "condensed", "striped"),
@@ -124,55 +129,78 @@ matdiet_filtered <- composite_scores_withgroups %>%
   filter(!new_diet == 2)
 ```
 
-```{r t test for effects of maternal diet}
+Below are the Pvalues for each of the composite groups. These values were calculated using the Wilcoxon rank sum test after failing the normality test. Only Composite Variable 1 and Composite Variable 2 displayed a significant effect of diet group.
+
+These data have had all *new_diet* animals removed in order to only look at the effects of maternal diet on temperament. 
+
+```{r t test for effects of maternal diet, echo=FALSE, warning = FALSE, mesage = FALSE}
 matdiet_filtered_wiltest_comp1 <- wilcox.test(matdiet_filtered$comp_1~matdiet_filtered$initial_diet)
 matdiet_filtered_wiltest_comp2 <- wilcox.test(matdiet_filtered$comp_2~matdiet_filtered$initial_diet)
 matdiet_filtered_wiltest_comp3 <- wilcox.test(matdiet_filtered$comp_3~matdiet_filtered$initial_diet)
 matdiet_filtered_wiltest_comp4 <- wilcox.test(matdiet_filtered$comp_4~matdiet_filtered$initial_diet)
+
 
 matdiet_pvals <- c(matdiet_filtered_wiltest_comp1$p.value, matdiet_filtered_wiltest_comp2$p.value, matdiet_filtered_wiltest_comp3$p.value, matdiet_filtered_wiltest_comp4$p.value)
 composite_frame_matdietpval <- c("Composite 1 P-value",
                                  "Composite 2 P-value",
                                  "Composite 3 P-value",
                                  "Composite 4 P-value")
-View(matdiet_composite_difference)
 
 matdiet_composite_difference <- data.frame(composite_frame_matdietpval, matdiet_pvals)
 
-kable(matdiet_composite_difference, format = "html", align=rep('l', 5)) %>%
-  kable_styling(bootstrap_options = c("condensed", "striped"))
+#kable(matdiet_composite_difference, format = "html", align=rep('l', 5)) %>%
+  #kable_styling(bootstrap_options = c("condensed", "striped"))
 
 
 bold_pvals <- formatter("span",
                         style = x ~ style("font-weight" = ifelse(x<.05, "bold", NA)))
 
-formattable(matdiet_composite_difference, list(
-  matdiet_pvals = bold_pvals
-))
+#formattable(matdiet_composite_difference, list(
+  #matdiet_pvals = bold_pvals
+#))
 
 as.datatable(formattable(matdiet_composite_difference,
                          align = c("l", "l"),
                          list(matdiet_pvals = bold_pvals)
                          ))
 
+#xtab1 <- xtable(summary(matdiet_filtered_wiltest_comp2))
+#View(xtab1)
+
 #make a data table here!
 ```
 
-```{r visulizations of significant composites for maternal diet, echo=FALSE}
+```{r visulizations of significant composites for maternal diet, echo=FALSE, warning = FALSE}
 ggcomp1 <- ggplot(matdiet_filtered, aes(x=Observations, y=comp_1, color=initial_diet, fill=initial_diet)) +
   geom_bar(stat = "identity", width = 20, position = position_dodge())
 
 ggcomp2 <- ggplot(matdiet_filtered, aes(x=Observations, y=comp_2, color=initial_diet, fill=initial_diet)) +
   geom_bar(stat = "identity", width = 20, position = position_dodge())
 
-ggcompl1_ly <- ggplotly(ggcomp1)
-
-ggcompl1_ly$
+dotplotly_comp2 <- ggplot(matdiet_filtered, aes(x=Observations, y=comp_2, color=initial_diet, fill=initial_diet)) +
+  geom_point(stat = "identity") + 
+  geom_smooth(method = "lm", se = FALSE)
 
 ggcompl2_ly <- ggplotly(ggcomp2)
+ggcompl2_ly
+
+ggdotcomp2_ly <- ggplotly(dotplotly_comp2)
+ggdotcomp2_ly
+
+dotplotly_comp1 <- ggplot(matdiet_filtered, aes(x=Observations, y=comp_1, color=initial_diet, fill=initial_diet)) +
+  geom_point(stat = "identity") + 
+  geom_smooth(method = "lm", se = FALSE)
+
+ggcompl1_ly <- ggplotly(ggcomp1)
+
+ggcompl1_ly
+
+ggdotcomp1_ly <- ggplotly(dotplotly_comp1)
+
+ggdotcomp1_ly
 ```
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, warning=FALSE}
 matdiet_sex_wiltest_comp1 <- wilcox.test(matdiet_filtered$comp_1~matdiet_filtered$sex)
 matdiet_sex_wiltest_comp2 <- wilcox.test(matdiet_filtered$comp_2~matdiet_filtered$sex)
 matdiet_sex_wiltest_comp3 <- wilcox.test(matdiet_filtered$comp_3~matdiet_filtered$sex)
