@@ -29,6 +29,7 @@ library(semPlot)
 library(FactoMineR)
 library(factoextra)
 library(readxl)
+library(xtable)
 ```
 
 ```{r}
@@ -235,6 +236,8 @@ summary(princi_comp1)
 princi_comp1$sdev
 princ1_ploty  <- ggplotly(fviz_eig(princi_comp1, main = "variance explained: components of comp_1"))
 
+xtable(princi_comp2)
+
 princ1_ploty
 
 princi_comp2 <- prcomp(comp2_indi)
@@ -290,7 +293,7 @@ SEM_comp4 <- 'latemod_comp4 =~ Zself_groom_percent_butters + Zmouth_butters_perc
 
 SEM_comp4_fit <- cfa(model = SEM_comp4, estimator = "MLR", data = selected_behaviors_latemods)
 summary(SEM_comp4_fit, standardize = TRUE, fit.measures = TRUE)
->>>>>>> c188c1eb439f10218daaa2834bada6fd1acf0820
+
 
 
 ```
