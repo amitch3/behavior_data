@@ -48,7 +48,7 @@ znormed_ffostare_v1 <- read_excel("znormed_ffostare_v1.xlsx")
 selected_norms_ffostare_v1 <- znormed_ffostare_v1 %>%
   select(-Observations, - ResultContainers, - Intervals, - Zno_sec_behav_ffosta)
          
-#head(selected_norms_ffostare_v1)         
+glimpse(selected_norms_ffostare_v1)         
 ```
 
 Below is the correlation output for the data. 
@@ -98,6 +98,7 @@ selected_norms_ffostare_v1$comp_4 <- selected_norms_ffostare_v1$Zself_groom_perc
 
 
 ```{r no response groups}
+#took two variables from composite 2 and add them to composite 3. 
 selected_norms_ffostare_v1$comp_2.2 <- selected_norms_ffostare_v1$Zstereotypy_butters + selected_norms_ffostare_v1$Zstation_back_ffostare + selected_norms_ffostare_v1$Zself_gro_ffosta + selected_norms_ffostare_v1$Zthreat_stranger_ffosta + selected_norms_ffostare_v1$Zfreeze_back_ffosta
 
 
@@ -115,10 +116,9 @@ Composite scores were created by taking the value of each individual behavior fr
 selected_norms_composites_demgraf_v1.2 <- read.csv("selected_norms_composites_demgraf_v1.csv")
 View(selected_norms_composites_demgraf_v1.2)
 
-composite_scores_withgroups <- selected_norms_composites_demgraf_v1.2[order(selected_norms_composites_demgraf_v1$initial_diet),]  %>%
-  select(Observations, sex, initial_diet, new_diet, comp_1, comp_2, comp_3, comp_4) 
-
-View(composite_scores_withgroups)
+composite_scores_withgroups <- selected_norms_composites_demgraf_v1.2[order(selected_norms_composites_demgraf_v1.2$initial_diet),]  %>%
+  select(Observations, sex, initial_diet, new_diet, comp_1, comp_2, comp_3, comp_4, comp_3.2, comp_2.2) 
+glimpse(composite_scores_withgroups)
 
 composite_scores_withgroups$initial_diet <- as.factor(composite_scores_withgroups$initial_diet)
 composite_scores_withgroups$new_diet <- as.factor(composite_scores_withgroups$new_diet)
@@ -126,20 +126,19 @@ composite_scores_withgroups$sex <- as.factor(composite_scores_withgroups$sex)
 
 #glimpse(composite_scores_withgroups)
 
-kable(composite_scores_withgroups, "html") %>%
+kable(composite_scores_withgroups) %>%
   kable_styling(bootstrap_options = c("hover", "condensed", "striped"),
-                row_label_position = l,
                 full_width = F,
                 position = "center") %>%
-  add_header_above(c(" " = 2, "Diet Groups" = 2, "Composite Scores" = 4))
+  add_header_above(c(" " = 2, "Diet Groups" = 2, "Composite Scores" = 6))
 
-  
-  
 ```
 
 ```{r filtering out individuals with postnatal diet group 2, echo=FALSE}
-matdiet_filtered <- composite_scores_withgroups %>%
+matdiet_filtered_v2 <- composite_scores_withgroups %>%
   filter(!new_diet == 2)
+
+View(matdiet_filtered_v2)
 ```
 
 Below are the Pvalues for each of the composite groups. These values were calculated using the Wilcoxon rank sum test after failing the normality test. Only Composite Variable 1 and Composite Variable 2 displayed a significant effect of diet group.
@@ -151,15 +150,23 @@ matdiet_filtered_wiltest_comp1 <- wilcox.test(matdiet_filtered$comp_1~matdiet_fi
 matdiet_filtered_wiltest_comp2 <- wilcox.test(matdiet_filtered$comp_2~matdiet_filtered$initial_diet)
 matdiet_filtered_wiltest_comp3 <- wilcox.test(matdiet_filtered$comp_3~matdiet_filtered$initial_diet)
 matdiet_filtered_wiltest_comp4 <- wilcox.test(matdiet_filtered$comp_4~matdiet_filtered$initial_diet)
+matdiet_filtered_wiltest_comp3.2 <- wilcox.test(matdiet_filtered_v2$comp_3.2~matdiet_filtered$initial_diet)
+matdiet_filtered_wiltest_comp2.2 <- wilcox.test(matdiet_filtered_v2$comp_2.2~matdiet_filtered$initial_diet)
+matdiet_filtered_wiltest_comp1_check <- wilcox.test(matdiet_filtered_v2$comp_1~matdiet_filtered$initial_diet)
 
 
-matdiet_pvals <- c(matdiet_filtered_wiltest_comp1$p.value, matdiet_filtered_wiltest_comp2$p.value, matdiet_filtered_wiltest_comp3$p.value, matdiet_filtered_wiltest_comp4$p.value)
+
+matdiet_pvals <- c(matdiet_filtered_wiltest_comp1$p.value, matdiet_filtered_wiltest_comp2$p.value, matdiet_filtered_wiltest_comp2.2$p.value, matdiet_filtered_wiltest_comp3$p.value, matdiet_filtered_wiltest_comp3.2$p.value, matdiet_filtered_wiltest_comp4$p.value)
 composite_frame_matdietpval <- c("Composite 1 P-value",
                                  "Composite 2 P-value",
+                                 "Composite 2.2 P-value",
                                  "Composite 3 P-value",
+                                 "Composite 3.2 P-value",
                                  "Composite 4 P-value")
 
 matdiet_composite_difference <- data.frame(composite_frame_matdietpval, matdiet_pvals)
+
+View(matdiet_composite_difference)
 
 #kable(matdiet_composite_difference, format = "html", align=rep('l', 5)) %>%
   #kable_styling(bootstrap_options = c("condensed", "striped"))
@@ -183,6 +190,8 @@ as.datatable(formattable(matdiet_composite_difference,
 #make a data table here!
 ```
 
+Below are scatterplots and bar plots of individual scores relating to the significant composite behaviors. Bar plots can provide insight into specific cohort differences whereas the scatterplots let you see the visualize the overall difference in performance. 
+
 ```{r visulizations of significant composites for maternal diet, echo=FALSE, warning = FALSE}
 ggcomp1 <- ggplot(matdiet_filtered, aes(x=Observations, y=comp_1, color=initial_diet, fill=initial_diet)) +
   geom_bar(stat = "identity", width = 20, position = position_dodge())
@@ -190,7 +199,14 @@ ggcomp1 <- ggplot(matdiet_filtered, aes(x=Observations, y=comp_1, color=initial_
 ggcomp2 <- ggplot(matdiet_filtered, aes(x=Observations, y=comp_2, color=initial_diet, fill=initial_diet)) +
   geom_bar(stat = "identity", width = 20, position = position_dodge())
 
+ggcomp2.2 <- ggplot(matdiet_filtered_v2, aes(x=Observations, y=comp_2.2, color=initial_diet, fill=initial_diet)) +
+  geom_bar(stat = "identity", width = 20, position = position_dodge())
+
 dotplotly_comp2 <- ggplot(matdiet_filtered, aes(x=Observations, y=comp_2, color=initial_diet, fill=initial_diet)) +
+  geom_point(stat = "identity") + 
+  geom_smooth(method = "lm", se = FALSE)
+
+dotplotly_comp2.2 <- ggplot(matdiet_filtered_v2, aes(x=Observations, y=comp_2.2, color=initial_diet, fill=initial_diet)) +
   geom_point(stat = "identity") + 
   geom_smooth(method = "lm", se = FALSE)
 
@@ -199,6 +215,13 @@ ggcompl2_ly
 
 ggdotcomp2_ly <- ggplotly(dotplotly_comp2)
 ggdotcomp2_ly
+
+ggcompl2.2_ly <- ggplotly(ggcomp2.2)
+ggcompl2.2_ly
+
+ggdotcomp2.2_ly <- ggplotly(dotplotly_comp2.2)
+ggdotcomp2.2_ly
+
 
 dotplotly_comp1 <- ggplot(matdiet_filtered, aes(x=Observations, y=comp_1, color=initial_diet, fill=initial_diet)) +
   geom_point(stat = "identity") + 
@@ -213,14 +236,186 @@ ggdotcomp1_ly <- ggplotly(dotplotly_comp1)
 ggdotcomp1_ly
 ```
 
-```{r, echo=FALSE, warning=FALSE}
+```{r, echo=FALSE, warning=FALSE, message=FALSE}
 matdiet_sex_wiltest_comp1 <- wilcox.test(matdiet_filtered$comp_1~matdiet_filtered$sex)
 matdiet_sex_wiltest_comp2 <- wilcox.test(matdiet_filtered$comp_2~matdiet_filtered$sex)
 matdiet_sex_wiltest_comp3 <- wilcox.test(matdiet_filtered$comp_3~matdiet_filtered$sex)
 matdiet_sex_wiltest_comp4 <- wilcox.test(matdiet_filtered$comp_4~matdiet_filtered$sex)
+matdiet_sex_wiltest_comp3.2 <- wilcox.test(matdiet_filtered_v2$comp_3.2~matdiet_filtered$sex)
+matdiet_sex_wiltest_comp2.2 <- wilcox.test(matdiet_filtered_v2$comp_2.2~matdiet_filtered$sex)
 
+matdiet_sex_wiltest_comp3.2$p.value
 
+matdiet_sex_pvals <- c(matdiet_sex_wiltest_comp1$p.value, matdiet_sex_wiltest_comp2$p.value, matdiet_sex_wiltest_comp2.2$p.value, matdiet_sex_wiltest_comp3$p.value, matdiet_sex_wiltest_comp3.2$p.value, matdiet_sex_wiltest_comp4$p.value)
+composite_sexframe_matdietpval <- c("Composite 1 P-value ",
+                                 "Composite 2 P-value",
+                                 "Composite 2.2 P-value",
+                                 "Composite 3 P-value",
+                                 "Composite 3.2 P-value",
+                                 "Composite 4 P-value")
+
+matdiet_composite_difference_sex <- data.frame(composite_sexframe_matdietpval, matdiet_sex_pvals)
+
+as.datatable(formattable(matdiet_composite_difference_sex,
+                         align = c("l", "l")
+                         ))
 ```
 
 
+```{r filtering out individuals with materal diet group 1, echo=FALSE, warning=FALSE, message=FALSE}
+#for shits and giggles, here i'm filitering down to subjects that had both matdiet2 and post2 vs matdiet1 and matdiet1
 
+glimpse(composite_scores_withgroups)
+
+
+
+newdiet_filtered <- composite_scores_withgroups %>%
+  filter(Observations %in% c(30586, 30637, 30639, 30726, 31266, 30155, 30181, 30397, 30398, 31177, 31347, 31347, 31479, 31480, 31700))
+
+newdiet_differences_wiltest_comp1 <- wilcox.test(newdiet_filtered$comp_1~newdiet_filtered$new_diet)
+newdiet_differences_wiltest_comp2 <- wilcox.test(newdiet_filtered$comp_2~newdiet_filtered$new_diet)
+newdiet_differences_wiltest_comp2.2 <- wilcox.test(newdiet_filtered$comp_2.2~newdiet_filtered$new_diet)
+newdiet_differences_wiltest_comp3 <- wilcox.test(newdiet_filtered$comp_3~newdiet_filtered$new_diet)
+newdiet_differences_wiltest_comp3.2 <- wilcox.test(newdiet_filtered$comp_3.2~newdiet_filtered$new_diet)
+newdiet_differences_wiltest_comp4 <- wilcox.test(newdiet_filtered$comp_4~newdiet_filtered$new_diet)
+
+newdiet_differences_wiltest_comp4$p.value
+
+newdiet_pvals <- c(newdiet_differences_wiltest_comp1$p.value, newdiet_differences_wiltest_comp2$p.value, newdiet_differences_wiltest_comp2.2$p.value, newdiet_differences_wiltest_comp3$p.value, newdiet_differences_wiltest_comp3.2$p.value, newdiet_differences_wiltest_comp4$p.value)
+newdiet_titles <- c("Composite 1 P-value ",
+                    "Composite 2 P-value",
+                    "Composite 2.2 P-value",
+                    "Composite 3 P-value",
+                    "Composite 3.2 P-value",
+                    "Composite 4 P-value")
+newdiet_pvals_df <- data.frame(newdiet_titles, newdiet_pvals)
+View(newdiet_pvals_df)
+```
+
+Below is the pca from the composite behaviors
+
+
+```{r creating individual composites for pca and sem, echo=FALSE, warning=FALSE, message=TRUE}
+comp1_indi <- selected_norms_ffostare_v1 %>%
+  select(Zstationary_middle_percent_butters, Zlocomotion_percent_butters, Zhanging_behaviors_butters, Ztactile_exploration_butters, Zmo_manip_apple_butters, Zstation_fr_ffostare,  Zstation_mid_ffosta, Zlocomote_ffosta, Zmovement_ffosta, Ztac_expl_ffosta,  Zstereo_ffosta, Zteethgrind_ffosta, Zlipsmack_ffosta, Ztouch_app_ffosta, Zmouth_app_ffosta, Zmanip_app_ffosta, Zeat_app_ffosta, Znonvigi_ffosta, Zdir_eye_contact_ffosta)
+
+comp2_indi <- selected_norms_ffostare_v1 %>%
+  select(ZStationary_back_butters, Zstereotypy_butters, Zvigilant_percent_butters, Zstation_back_ffostare, Zself_gro_ffosta, Zthreat_stranger_ffosta, Zfreeze_back_ffosta)
+
+comp2.2_indi <- selected_norms_ffostare_v1 %>%
+  select(Zstereotypy_butters, Zstation_back_ffostare, Zself_gro_ffosta, Zthreat_stranger_ffosta, Zfreeze_back_ffosta)
+
+comp3_indi <- selected_norms_ffostare_v1 %>%
+  select(Zstationary_front_percent_butters, Zmovement_percent_butters, Ztouch_butters_percent, Zcrouching_butters, Znonvigilant_percent_butters, Zcrouching_ffosta, Zvigi_ffosta, Zno_response_ffosta)
+
+comp3.2_indi <- selected_norms_ffostare_v1 %>%
+  select(ZStationary_back_butters, Zstationary_front_percent_butters, Zmovement_percent_butters, Zvigilant_percent_butters, Ztouch_butters_percent, Zcrouching_butters, Znonvigilant_percent_butters, Zcrouching_ffosta, Zvigi_ffosta, Zno_response_ffosta)
+
+comp4_indi <- selected_norms_ffostare_v1 %>%
+  select(Zself_groom_percent_butters, Zmouth_butters_percent, Zoral_exploration_butters)
+
+```
+
+```{r, echo=FALSE, warning = FALSE, message = FALSE}
+princi_comp1 <- prcomp(comp1_indi)
+summary(princi_comp1)
+#princi_comp1$sdev
+princ1_ploty  <- ggplotly(fviz_eig(princi_comp1, main = "variance explained: components of comp_1"))
+
+#xtable(princi_comp1)
+
+princ1_ploty
+
+princi_comp2 <- prcomp(comp2_indi)
+summary(princi_comp2)
+fviz_eig(princi_comp2, main = 'variance explained: components of comp_2')
+
+xtable(princi_comp2)
+
+princ2_ploty <- ggplotly(fviz_eig(princi_comp2, main = 'variance explained: components of comp_2'))
+
+princ2_ploty
+
+princi_comp2.2 <- prcomp(comp2.2_indi)
+summary(princi_comp2.2)
+fviz_eig(princi_comp2.2, main = 'variance explained: components of comp_2.2')
+
+#xtable
+
+princ2.2_ploty <- ggplotly(fviz_eig(princi_comp2.2, main = 'variance explained: components of comp_2.2'))
+
+princ2.2_ploty
+
+princi_comp3 <- prcomp(comp3_indi)
+summary(princi_comp3)
+fviz_eig(princi_comp3, main = "variance explained: components of comp_3")
+
+#xtable
+
+princ3_ploty <- ggplotly(fviz_eig(princi_comp3, main = 'variance explained: components of comp_3'))
+
+princ3_ploty
+
+princi_comp3.2 <- prcomp(comp3.2_indi)
+summary(princi_comp3.2)
+fviz_eig(princi_comp3.2, main = 'variance explained: components of comp_3.2')
+
+#xtable
+
+princ3.2_ploty <- ggplotly(fviz_eig(princi_comp3.2, main = 'variance explained: components of comp_3.2'))
+
+princ3.2_ploty
+
+princi_comp4 <- prcomp(comp4_indi)
+summary(princi_comp4)
+fviz_eig(princi_comp4, main = "variance explained: components of comp_4")
+
+#xtable
+
+princ4_ploty <- ggplotly(fviz_eig(princi_comp4, main = 'variance explained: components of comp_4'))
+
+princ4_ploty
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+selected_behaviors_latemods <- selected_norms_ffostare_v1 %>%
+  select(- comp_1, - comp_2, - comp_3, - comp_4, -comp_2.2, -comp_3.2)
+
+SEM_comp1 <- 'latemod_comp1 =~ Zstationary_middle_percent_butters + Zlocomotion_percent_butters + Zhanging_behaviors_butters + Ztactile_exploration_butters + Zmo_manip_apple_butters + Zstation_fr_ffostare + Zstation_mid_ffosta + Zlocomote_ffosta + Zmovement_ffosta + Ztac_expl_ffosta + Zstereo_ffosta + Zteethgrind_ffosta + Zlipsmack_ffosta + Ztouch_app_ffosta + Zmouth_app_ffosta + Zmanip_app_ffosta + Zeat_app_ffosta + Znonvigi_ffosta + Zdir_eye_contact_ffosta'
+
+SEM_comp1_fit <- cfa(model = SEM_comp1, estimator = "MLR", data = selected_behaviors_latemods)
+summary(SEM_comp1_fit, standardize = TRUE, fit.measures = TRUE)  
+
+
+SEM_comp2 <- 'latemod_comp2 =~ ZStationary_back_butters + Zstereotypy_butters + Zvigilant_percent_butters + Zstation_back_ffostare + Zself_gro_ffosta + Zthreat_stranger_ffosta + Zfreeze_back_ffosta'
+
+SEM_comp2_fit <- cfa(model = SEM_comp2, estimator = "MLR", data = selected_behaviors_latemods)
+summary(SEM_comp2_fit, standardize = TRUE, fit.measures = TRUE)
+
+xtable(SEM_comp2_fit)
+
+SEM_comp2.2 <- 'latemod_comp2 =~ Zstereotypy_butters + Zstation_back_ffostare + Zself_gro_ffosta + Zthreat_stranger_ffosta + Zfreeze_back_ffosta'
+
+SEM_comp2.2_fit <- cfa(model = SEM_comp2.2, estimator = "MLR", data = selected_behaviors_latemods)
+summary(SEM_comp2_fit, standardize = TRUE, fit.measures = TRUE)
+
+xtable(SEM_comp2.2)
+  
+SEM_comp3 <- 'latemod_comp3 =~ Zstationary_front_percent_butters + Zmovement_percent_butters + Ztouch_butters_percent + Zcrouching_butters + Znonvigilant_percent_butters + Zcrouching_ffosta + Zvigi_ffosta + Zno_response_ffosta'
+
+SEM_comp3_fit <- cfa(model = SEM_comp3, estimator = "MLR", data = selected_behaviors_latemods)
+summary(SEM_comp3_fit, standardize = TRUE, fit.measures = TRUE)
+
+SEM_comp3.2 <- 'latemod_comp3.2 =~ Zstationary_front_percent_butters + ZStationary_back_butters + Zmovement_percent_butters + Ztouch_butters_percent + Zvigilant_percent_butters + Zcrouching_butters + Znonvigilant_percent_butters + Zcrouching_ffosta + Zvigi_ffosta + Zno_response_ffosta'
+
+SEM_comp3.2_fit <- cfa(model = SEM_comp3.2, estimator = "MLR", data = selected_behaviors_latemods)
+summary(SEM_comp3_fit, standardize = TRUE, fit.measures = TRUE)
+  
+SEM_comp4 <- 'latemod_comp4 =~ Zself_groom_percent_butters + Zmouth_butters_percent + Zoral_exploration_butters'
+
+SEM_comp4_fit <- cfa(model = SEM_comp4, estimator = "MLR", data = selected_behaviors_latemods)
+summary(SEM_comp4_fit, standardize = TRUE, fit.measures = TRUE)
+
+
+```
