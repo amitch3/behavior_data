@@ -96,16 +96,29 @@ selected_norms_ffostare_v1$comp_3 <- selected_norms_ffostare_v1$Zstationary_fron
 selected_norms_ffostare_v1$comp_4 <- selected_norms_ffostare_v1$Zself_groom_percent_butters + selected_norms_ffostare_v1$Zmouth_butters_percent + selected_norms_ffostare_v1$Zoral_exploration_butters 
 ```
 
+
+```{r no response groups}
+selected_norms_ffostare_v1$comp_2.2 <- selected_norms_ffostare_v1$Zstereotypy_butters + selected_norms_ffostare_v1$Zstation_back_ffostare + selected_norms_ffostare_v1$Zself_gro_ffosta + selected_norms_ffostare_v1$Zthreat_stranger_ffosta + selected_norms_ffostare_v1$Zfreeze_back_ffosta
+
+
+selected_norms_ffostare_v1$comp_3.2 <- selected_norms_ffostare_v1$Zstationary_front_percent_butters + selected_norms_ffostare_v1$Zmovement_percent_butters + selected_norms_ffostare_v1$Ztouch_butters_percent + selected_norms_ffostare_v1$Zcrouching_butters + selected_norms_ffostare_v1$Znonvigilant_percent_butters + selected_norms_ffostare_v1$Zcrouching_ffosta + selected_norms_ffostare_v1$Zvigi_ffosta + selected_norms_ffostare_v1$Zno_response_ffosta + selected_norms_ffostare_v1$ZStationary_back_butters + selected_norms_ffostare_v1$Zvigilant_percent_butters
+
+skim(selected_norms_ffostare_v1)
+
+write.csv(selected_norms_ffostare_v1, "selected_norms_composites_demgraf_v1.csv")
+```
 The output below represents the composite scores for the individual animals. 
 
 Composite scores were created by taking the value of each individual behavior from the output of community detection. Below represent the individual scores for each animal and their respective categorical groupings.
 
 ```{r inserting demographic infomation, echo=FALSE}
-selected_norms_composites_demgraf_v1 <- read_excel("selected_norms_composites_demgraf_v1.xlsx")
-#View(selected_norms_composites_demgraf_v1)
+selected_norms_composites_demgraf_v1.2 <- read.csv("selected_norms_composites_demgraf_v1.csv")
+View(selected_norms_composites_demgraf_v1.2)
 
-composite_scores_withgroups <- selected_norms_composites_demgraf_v1[order(selected_norms_composites_demgraf_v1$initial_diet),]  %>%
+composite_scores_withgroups <- selected_norms_composites_demgraf_v1.2[order(selected_norms_composites_demgraf_v1$initial_diet),]  %>%
   select(Observations, sex, initial_diet, new_diet, comp_1, comp_2, comp_3, comp_4) 
+
+View(composite_scores_withgroups)
 
 composite_scores_withgroups$initial_diet <- as.factor(composite_scores_withgroups$initial_diet)
 composite_scores_withgroups$new_diet <- as.factor(composite_scores_withgroups$new_diet)

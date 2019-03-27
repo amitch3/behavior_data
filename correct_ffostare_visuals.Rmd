@@ -89,7 +89,7 @@ selected_norms_ffostare_v1$comp_4 <- selected_norms_ffostare_v1$Zself_groom_perc
 
 View(selected_norms_ffostare_v1)
 
-#write.csv(selected_norms_ffostare_v1, "selected_norms_composites_demgraf_v1.csv")
+write.csv(selected_norms_ffostare_v1, "selected_norms_composites_demgraf_v1.csv")
 ```
 
 ```{r}
