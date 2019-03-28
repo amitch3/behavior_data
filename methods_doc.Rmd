@@ -87,10 +87,15 @@ as.datatable(formattable(melted_corrnorm_selected_ffostare_v1_reduced,
 ```
 
 
-The correlational values above were used to investigate the relationships amongst the behaviors. Specifically, how behaviors cluster together. To do this, an empirical approach was chosen that used community detection algorithm to determin which behaviors were clustering together. 
+The correlational values above were used to investigate the relationships amongst the behaviors. Specifically, how behaviors cluster together. To do this, an empirical approach was chosen that used community detection algorithm to determine which behaviors were clustering together. 
+
+The headers (l25_h6, l3_h6, etc..) respresent the parameter changes that were made for each output. So, l25_h6 means that the low edge density was set to .25 whereas the high edge density is set to .6. The high edge density is not set higher than .8 since the strongest connection about the correlation matrix is .75. As for the lower density, we do have correlation values below .25 but setting my edge density to .2 has crashed the detection algorithm the past. 
 
 
-![The outputs from the various parameter changes I ran. The final groups were based on a consensus approach, which means I kept the groupings that appeared the most. One note, is that the smallest community was kept because the behaviors make sense as a group. Behaviors that share the same color are within the same group.](comm_detec_groups.PNG)
+![The outputs from the various parameter changes I ran. The final groups were based on a consensus approach, which means I kept the groupings that appeared the most. There were more iterOne note, is that the smallest community was kept because the behaviors make sense as a group. Behaviors that share the same color are within the same group.](comm_detec_groups.PNG)
+
+
+![These are the communities. Again, want to move forward with Communities 2.2 and 3.2.](communities.PNG) 
 
 ##Inidividual Composite Scores##
 
