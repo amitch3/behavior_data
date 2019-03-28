@@ -233,10 +233,10 @@ comp4_indi <- selected_norms_ffostare_v1 %>%
 
 princi_comp1 <- prcomp(comp1_indi)
 summary(princi_comp1)
-princi_comp1$sdev
+#princi_comp1$sdev
 princ1_ploty  <- ggplotly(fviz_eig(princi_comp1, main = "variance explained: components of comp_1"))
 
-xtable(princi_comp2)
+xtable(princi_comp1)
 
 princ1_ploty
 

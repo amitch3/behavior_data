@@ -41,14 +41,14 @@ The purpose of this document is to outline of the methods used to contruct compo
 
 Below is a the first few rows of the normalized, raw data. Notice that the descriptive variables such as animal ID, interval time, etc have been removed in order to calculate correlations.
 
-```{r loading the data, echo=FALSE}
+```{r loading the data, echo=FALSE, warning=FALSE, message=FALSE}
 znormed_ffostare_v1 <- read_excel("znormed_ffostare_v1.xlsx")
 #skim(znormed_ffostare_v1)
 
 selected_norms_ffostare_v1 <- znormed_ffostare_v1 %>%
   select(-Observations, - ResultContainers, - Intervals, - Zno_sec_behav_ffosta)
          
-glimpse(selected_norms_ffostare_v1)         
+#glimpse(selected_norms_ffostare_v1)         
 ```
 
 Below is the correlation output for the data. 
@@ -97,28 +97,29 @@ selected_norms_ffostare_v1$comp_4 <- selected_norms_ffostare_v1$Zself_groom_perc
 ```
 
 
-```{r no response groups}
+```{r no response groups, echo=FALSE, warning=FALSE, message=FALSE}
 #took two variables from composite 2 and add them to composite 3. 
 selected_norms_ffostare_v1$comp_2.2 <- selected_norms_ffostare_v1$Zstereotypy_butters + selected_norms_ffostare_v1$Zstation_back_ffostare + selected_norms_ffostare_v1$Zself_gro_ffosta + selected_norms_ffostare_v1$Zthreat_stranger_ffosta + selected_norms_ffostare_v1$Zfreeze_back_ffosta
 
 
 selected_norms_ffostare_v1$comp_3.2 <- selected_norms_ffostare_v1$Zstationary_front_percent_butters + selected_norms_ffostare_v1$Zmovement_percent_butters + selected_norms_ffostare_v1$Ztouch_butters_percent + selected_norms_ffostare_v1$Zcrouching_butters + selected_norms_ffostare_v1$Znonvigilant_percent_butters + selected_norms_ffostare_v1$Zcrouching_ffosta + selected_norms_ffostare_v1$Zvigi_ffosta + selected_norms_ffostare_v1$Zno_response_ffosta + selected_norms_ffostare_v1$ZStationary_back_butters + selected_norms_ffostare_v1$Zvigilant_percent_butters
 
-skim(selected_norms_ffostare_v1)
+#skim(selected_norms_ffostare_v1)
 
-write.csv(selected_norms_ffostare_v1, "selected_norms_composites_demgraf_v1.csv")
+#write.csv(selected_norms_ffostare_v1, "selected_norms_composites_demgraf_v2.csv")
 ```
 The output below represents the composite scores for the individual animals. 
 
 Composite scores were created by taking the value of each individual behavior from the output of community detection. Below represent the individual scores for each animal and their respective categorical groupings.
 
+Need to have a 'what you are looking at here explanation'
+
 ```{r inserting demographic infomation, echo=FALSE}
-selected_norms_composites_demgraf_v1.2 <- read.csv("selected_norms_composites_demgraf_v1.csv")
-View(selected_norms_composites_demgraf_v1.2)
+selected_norms_composites_demgraf_v1.2 <- read.csv("selected_norms_composites_demgraf_v2.csv")
+#View(selected_norms_composites_demgraf_v1.2)
 
 composite_scores_withgroups <- selected_norms_composites_demgraf_v1.2[order(selected_norms_composites_demgraf_v1.2$initial_diet),]  %>%
   select(Observations, sex, initial_diet, new_diet, comp_1, comp_2, comp_3, comp_4, comp_3.2, comp_2.2) 
-glimpse(composite_scores_withgroups)
 
 composite_scores_withgroups$initial_diet <- as.factor(composite_scores_withgroups$initial_diet)
 composite_scores_withgroups$new_diet <- as.factor(composite_scores_withgroups$new_diet)
@@ -126,24 +127,32 @@ composite_scores_withgroups$sex <- as.factor(composite_scores_withgroups$sex)
 
 #glimpse(composite_scores_withgroups)
 
-kable(composite_scores_withgroups) %>%
-  kable_styling(bootstrap_options = c("hover", "condensed", "striped"),
-                full_width = F,
-                position = "center") %>%
-  add_header_above(c(" " = 2, "Diet Groups" = 2, "Composite Scores" = 6))
+#(composite_scores_withgroups)
+
+#kable(composite_scores_withgroups) %>%
+ # kable_styling(bootstrap_options = c("hover", "condensed", "striped"),
+                #full_width = F,
+                #position = "center") %>%
+  #add_header_above(c(" " = 2, "Diet Groups" = 2, "Composite Scores" = 6))
 
 ```
 
 ```{r filtering out individuals with postnatal diet group 2, echo=FALSE}
+matdiet_filtered <- composite_scores_withgroups %>%
+  filter(!new_diet == 2)
+
 matdiet_filtered_v2 <- composite_scores_withgroups %>%
   filter(!new_diet == 2)
 
-View(matdiet_filtered_v2)
+#View(matdiet_filtered_v2)
 ```
+
+
+##Wilcoxon Tests on effects of Maternal Diet, Sex, and Postnatal Diet##
 
 Below are the Pvalues for each of the composite groups. These values were calculated using the Wilcoxon rank sum test after failing the normality test. Only Composite Variable 1 and Composite Variable 2 displayed a significant effect of diet group.
 
-These data have had all *new_diet* animals removed in order to only look at the effects of maternal diet on temperament. 
+These data are void of subjects with a postnatal HFD diet in order to only look at the effects of maternal diet on temperament. 
 
 ```{r t test for effects of maternal diet, echo=FALSE, warning = FALSE, mesage = FALSE}
 matdiet_filtered_wiltest_comp1 <- wilcox.test(matdiet_filtered$comp_1~matdiet_filtered$initial_diet)
@@ -166,7 +175,7 @@ composite_frame_matdietpval <- c("Composite 1 P-value",
 
 matdiet_composite_difference <- data.frame(composite_frame_matdietpval, matdiet_pvals)
 
-View(matdiet_composite_difference)
+#View(matdiet_composite_difference)
 
 #kable(matdiet_composite_difference, format = "html", align=rep('l', 5)) %>%
   #kable_styling(bootstrap_options = c("condensed", "striped"))
@@ -190,7 +199,7 @@ as.datatable(formattable(matdiet_composite_difference,
 #make a data table here!
 ```
 
-Below are scatterplots and bar plots of individual scores relating to the significant composite behaviors. Bar plots can provide insight into specific cohort differences whereas the scatterplots let you see the visualize the overall difference in performance. 
+Below are scatterplots and bar plots of individual scores relating to the significant composite behaviors. Bar plots can provide insight into specific cohort differences whereas the scatterplots let you see the visualize the overall difference in performance. Only the results of the maternal diet were visualized. 
 
 ```{r visulizations of significant composites for maternal diet, echo=FALSE, warning = FALSE}
 ggcomp1 <- ggplot(matdiet_filtered, aes(x=Observations, y=comp_1, color=initial_diet, fill=initial_diet)) +
@@ -236,6 +245,8 @@ ggdotcomp1_ly <- ggplotly(dotplotly_comp1)
 ggdotcomp1_ly
 ```
 
+The table below describes differences observed based on sex. 
+
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 matdiet_sex_wiltest_comp1 <- wilcox.test(matdiet_filtered$comp_1~matdiet_filtered$sex)
 matdiet_sex_wiltest_comp2 <- wilcox.test(matdiet_filtered$comp_2~matdiet_filtered$sex)
@@ -261,11 +272,12 @@ as.datatable(formattable(matdiet_composite_difference_sex,
                          ))
 ```
 
+The table below describes the effect of postnatal diet only. Only subjects with prenatal HFD and postnatal HFD exposure were compared to pre/postnatal controls. 
 
 ```{r filtering out individuals with materal diet group 1, echo=FALSE, warning=FALSE, message=FALSE}
 #for shits and giggles, here i'm filitering down to subjects that had both matdiet2 and post2 vs matdiet1 and matdiet1
 
-glimpse(composite_scores_withgroups)
+#glimpse(composite_scores_withgroups)
 
 
 
@@ -289,10 +301,15 @@ newdiet_titles <- c("Composite 1 P-value ",
                     "Composite 3.2 P-value",
                     "Composite 4 P-value")
 newdiet_pvals_df <- data.frame(newdiet_titles, newdiet_pvals)
-View(newdiet_pvals_df)
+as.datatable(formattable(newdiet_pvals_df, 
+                         align = c("l", "l")
+                         ))
+#View(newdiet_pvals_df)
 ```
 
-Below is the pca from the composite behaviors
+##PCAs and Structural Models##
+
+Below is the pca from the composite behavior groups. Additionally, structural equation modeling has been used to look at the strength of the groupings. 
 
 
 ```{r creating individual composites for pca and sem, echo=FALSE, warning=FALSE, message=TRUE}
@@ -316,6 +333,8 @@ comp4_indi <- selected_norms_ffostare_v1 %>%
 
 ```
 
+**The text box will describe the scree plot output below.**
+
 ```{r, echo=FALSE, warning = FALSE, message = FALSE}
 princi_comp1 <- prcomp(comp1_indi)
 summary(princi_comp1)
@@ -328,9 +347,9 @@ princ1_ploty
 
 princi_comp2 <- prcomp(comp2_indi)
 summary(princi_comp2)
-fviz_eig(princi_comp2, main = 'variance explained: components of comp_2')
+#fviz_eig(princi_comp2, main = 'variance explained: components of comp_2')
 
-xtable(princi_comp2)
+princi_comp2
 
 princ2_ploty <- ggplotly(fviz_eig(princi_comp2, main = 'variance explained: components of comp_2'))
 
@@ -338,7 +357,7 @@ princ2_ploty
 
 princi_comp2.2 <- prcomp(comp2.2_indi)
 summary(princi_comp2.2)
-fviz_eig(princi_comp2.2, main = 'variance explained: components of comp_2.2')
+#fviz_eig(princi_comp2.2, main = 'variance explained: components of comp_2.2')
 
 #xtable
 
@@ -348,7 +367,7 @@ princ2.2_ploty
 
 princi_comp3 <- prcomp(comp3_indi)
 summary(princi_comp3)
-fviz_eig(princi_comp3, main = "variance explained: components of comp_3")
+#fviz_eig(princi_comp3, main = "variance explained: components of comp_3")
 
 #xtable
 
@@ -358,7 +377,7 @@ princ3_ploty
 
 princi_comp3.2 <- prcomp(comp3.2_indi)
 summary(princi_comp3.2)
-fviz_eig(princi_comp3.2, main = 'variance explained: components of comp_3.2')
+#fviz_eig(princi_comp3.2, main = 'variance explained: components of comp_3.2')
 
 #xtable
 
@@ -368,7 +387,7 @@ princ3.2_ploty
 
 princi_comp4 <- prcomp(comp4_indi)
 summary(princi_comp4)
-fviz_eig(princi_comp4, main = "variance explained: components of comp_4")
+#fviz_eig(princi_comp4, main = "variance explained: components of comp_4")
 
 #xtable
 
@@ -379,6 +398,7 @@ princ4_ploty
 
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#need to add visualizations here
 selected_behaviors_latemods <- selected_norms_ffostare_v1 %>%
   select(- comp_1, - comp_2, - comp_3, - comp_4, -comp_2.2, -comp_3.2)
 
@@ -387,20 +407,68 @@ SEM_comp1 <- 'latemod_comp1 =~ Zstationary_middle_percent_butters + Zlocomotion_
 SEM_comp1_fit <- cfa(model = SEM_comp1, estimator = "MLR", data = selected_behaviors_latemods)
 summary(SEM_comp1_fit, standardize = TRUE, fit.measures = TRUE)  
 
+SEM_comp1_fit
+
+semPaths(SEM_comp1_fit,
+         layout = "tree",
+         color = "gray",
+         whatLabels = "std",
+         edge.color = "black",
+         what = "std", 
+         rotation = 2,
+         edge.label.cex = 1.25, 
+         nCharNodes = 8, 
+         sizeLat = 10, 
+         sizeMan = 10, 
+         title = TRUE)
+
 
 SEM_comp2 <- 'latemod_comp2 =~ ZStationary_back_butters + Zstereotypy_butters + Zvigilant_percent_butters + Zstation_back_ffostare + Zself_gro_ffosta + Zthreat_stranger_ffosta + Zfreeze_back_ffosta'
 
 SEM_comp2_fit <- cfa(model = SEM_comp2, estimator = "MLR", data = selected_behaviors_latemods)
 summary(SEM_comp2_fit, standardize = TRUE, fit.measures = TRUE)
+SEM_comp2_table <- parTable(SEM_comp2_fit)
 
-xtable(SEM_comp2_fit)
+SEM_comp2_fit
+
+semPaths(SEM_comp2_fit,
+         layout = "tree",
+         color = "gray",
+         whatLabels = "std",
+         edge.color = "black",
+         what = "std", 
+         rotation = 2,
+         edge.label.cex = 1.25, 
+         nCharNodes = 8, 
+         sizeLat = 10, 
+         sizeMan = 10, 
+         title = TRUE)
+
+#as.datatable(formattable(SEM_comp2_fit,
+                         #align = c("l", "l", "l", "l", "l", "l", "l", "l", "l", "l", "l", "l", "l", "l", "l")
+                         #))
 
 SEM_comp2.2 <- 'latemod_comp2 =~ Zstereotypy_butters + Zstation_back_ffostare + Zself_gro_ffosta + Zthreat_stranger_ffosta + Zfreeze_back_ffosta'
 
 SEM_comp2.2_fit <- cfa(model = SEM_comp2.2, estimator = "MLR", data = selected_behaviors_latemods)
 summary(SEM_comp2_fit, standardize = TRUE, fit.measures = TRUE)
+SEM_comp2.2_table <- parTable(SEM_comp2.2_fit)
 
-xtable(SEM_comp2.2)
+SEM_comp2.2_fit
+#note that we get rid of the negative loadings with this model
+
+semPaths(SEM_comp2.2_fit,
+         layout = "tree",
+         color = "gray",
+         whatLabels = "std",
+         edge.color = "black",
+         what = "std", 
+         rotation = 2,
+         edge.label.cex = 1.25, 
+         nCharNodes = 8, 
+         sizeLat = 10, 
+         sizeMan = 10, 
+         title = TRUE)
   
 SEM_comp3 <- 'latemod_comp3 =~ Zstationary_front_percent_butters + Zmovement_percent_butters + Ztouch_butters_percent + Zcrouching_butters + Znonvigilant_percent_butters + Zcrouching_ffosta + Zvigi_ffosta + Zno_response_ffosta'
 
