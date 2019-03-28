@@ -2,7 +2,11 @@
 title: "methods_document"
 author: "aj_mitchell"
 date: "March 25, 2019"
-output: html_document
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    theme: yeti
 ---
 
 ```{r setup, include=FALSE, message=FALSE, warning=FALSE}
@@ -39,7 +43,9 @@ library(xtable)
 
 The purpose of this document is to outline of the methods used to contruct composite variables from the raw behaviors collected form the Human Intruder Task. The data include the **Stare, Familiar Food Offer, and Novel Object** epochs and a total of 37 behaviors were included in the analysis. 
 
-Below is a the first few rows of the normalized, raw data. Notice that the descriptive variables such as animal ID, interval time, etc have been removed in order to calculate correlations.
+Briefly, raw behaviors were normalized and subjected to a correlational analysis. The output of this analysis is visualized below and the values are outlined in the table. If you want to view specific relationships about certain behaviors, type the behavior (starting with 'Z' - so ' Zstationary..'). You can also filter by value by typing in the starting range of the desired correlational values. All correlations with a value of 1 were removed from the table.   
+
+##Correlations: Values and Visuals##
 
 ```{r loading the data, echo=FALSE, warning=FALSE, message=FALSE}
 znormed_ffostare_v1 <- read_excel("znormed_ffostare_v1.xlsx")
@@ -80,11 +86,21 @@ as.datatable(formattable(melted_corrnorm_selected_ffostare_v1_reduced,
                          align = c("l", "l")))
 ```
 
-From correlational values above were used to investigate the relationships amongst the behaviors. Specifically, how behaviors cluster together. To do this, an empirical approach was chosen that used community detection algorithm to determin which behaviors were clustering together. 
 
-The output of the community detection is outline below. 4 communities were detected by this empirical process. These communities will now be considered **composite behaviors** (thus 4 composite behaviors emerged from this analysis) which we will investigate diet differences on. 
+The correlational values above were used to investigate the relationships amongst the behaviors. Specifically, how behaviors cluster together. To do this, an empirical approach was chosen that used community detection algorithm to determin which behaviors were clustering together. 
+
+
+![The outputs from the various parameter changes I ran. The final groups were based on a consensus approach, which means I kept the groupings that appeared the most. One note, is that the smallest community was kept because the behaviors make sense as a group. Behaviors that share the same color are within the same group.](comm_detec_groups.PNG)
+
+##Inidividual Composite Scores##
+
+The output of the community detection is outline below. 4 communities were detected by this empirical process. These communities will now be referred to as **composite behaviors** (thus 4 composite behaviors emerged from this analysis) which I will investigate diet and sex differences. 
 
 One thing I want to do is reduce the size of **Composite 1**, as it contains too many variables to accurately define a latent behavioral trait. PCA and SEM modeling was used to investigated the strength of these composite groupings; those figures are at the end of this document.   
+
+
+
+
 
 ```{r creating the composite scores, echo=FALSE}
 selected_norms_ffostare_v1$comp_1 <- selected_norms_ffostare_v1$Zstationary_middle_percent_butters + selected_norms_ffostare_v1$Zlocomotion_percent_butters + selected_norms_ffostare_v1$Zhanging_behaviors_butters + selected_norms_ffostare_v1$Ztactile_exploration_butters + selected_norms_ffostare_v1$Zmo_manip_apple_butters + selected_norms_ffostare_v1$Zstation_fr_ffostare + selected_norms_ffostare_v1$Zstation_mid_ffosta + selected_norms_ffostare_v1$Zlocomote_ffosta + selected_norms_ffostare_v1$Zmovement_ffosta + selected_norms_ffostare_v1$Ztac_expl_ffosta + selected_norms_ffostare_v1$Zstereo_ffosta + selected_norms_ffostare_v1$Zteethgrind_ffosta + selected_norms_ffostare_v1$Zlipsmack_ffosta + selected_norms_ffostare_v1$Ztouch_app_ffosta + selected_norms_ffostare_v1$Zmouth_app_ffosta + selected_norms_ffostare_v1$Zmanip_app_ffosta + selected_norms_ffostare_v1$Zeat_app_ffosta + selected_norms_ffostare_v1$Znonvigi_ffosta + selected_norms_ffostare_v1$Zdir_eye_contact_ffosta
@@ -108,11 +124,13 @@ selected_norms_ffostare_v1$comp_3.2 <- selected_norms_ffostare_v1$Zstationary_fr
 
 #write.csv(selected_norms_ffostare_v1, "selected_norms_composites_demgraf_v2.csv")
 ```
+
 The output below represents the composite scores for the individual animals. 
 
 Composite scores were created by taking the value of each individual behavior from the output of community detection. Below represent the individual scores for each animal and their respective categorical groupings.
 
-Need to have a 'what you are looking at here explanation'
+You will notice a **2.2 and 3.2 group**. In short, I will likely want to move forward with that composite group given the effect it had. The group came about after a meeting with Elinor where she suggested I reincorporate the 'no_response' behavior. Simply, creating a new composite group to represent this was easier than redoing and renaming all the previous files I made. I'm confident I can explain this in person. 
+
 
 ```{r inserting demographic infomation, echo=FALSE}
 selected_norms_composites_demgraf_v1.2 <- read.csv("selected_norms_composites_demgraf_v2.csv")
@@ -124,6 +142,11 @@ composite_scores_withgroups <- selected_norms_composites_demgraf_v1.2[order(sele
 composite_scores_withgroups$initial_diet <- as.factor(composite_scores_withgroups$initial_diet)
 composite_scores_withgroups$new_diet <- as.factor(composite_scores_withgroups$new_diet)
 composite_scores_withgroups$sex <- as.factor(composite_scores_withgroups$sex)
+
+#str(composite_scores_withgroups)
+as.datatable(formattable(composite_scores_withgroups,
+                         align = c("l", "l", "l", "l", "l","l", "l", "l", "l", "l" )
+                         ))
 
 #glimpse(composite_scores_withgroups)
 
@@ -150,7 +173,7 @@ matdiet_filtered_v2 <- composite_scores_withgroups %>%
 
 ##Wilcoxon Tests on effects of Maternal Diet, Sex, and Postnatal Diet##
 
-Below are the Pvalues for each of the composite groups. These values were calculated using the Wilcoxon rank sum test after failing the normality test. Only Composite Variable 1 and Composite Variable 2 displayed a significant effect of diet group.
+Below are the p-values for each of the composite groups. These values were calculated using the Wilcoxon rank sum test after failing the normality test. Only Composite Variable 1, Composite Variable 2 and Composite Variable 2.2 displayed a significant effect of diet group. Significant p-values are in **bold**. 
 
 These data are void of subjects with a postnatal HFD diet in order to only look at the effects of maternal diet on temperament. 
 
@@ -201,6 +224,8 @@ as.datatable(formattable(matdiet_composite_difference,
 
 Below are scatterplots and bar plots of individual scores relating to the significant composite behaviors. Bar plots can provide insight into specific cohort differences whereas the scatterplots let you see the visualize the overall difference in performance. Only the results of the maternal diet were visualized. 
 
+These graphs are interactive, and hovering over your interest point may tell you what you need to know. 
+
 ```{r visulizations of significant composites for maternal diet, echo=FALSE, warning = FALSE}
 ggcomp1 <- ggplot(matdiet_filtered, aes(x=Observations, y=comp_1, color=initial_diet, fill=initial_diet)) +
   geom_bar(stat = "identity", width = 20, position = position_dodge())
@@ -245,7 +270,7 @@ ggdotcomp1_ly <- ggplotly(dotplotly_comp1)
 ggdotcomp1_ly
 ```
 
-The table below describes differences observed based on sex. 
+The table below describes differences observed based on sex. Apologies on not changing the variable names.. it was a time consuming process.  
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 matdiet_sex_wiltest_comp1 <- wilcox.test(matdiet_filtered$comp_1~matdiet_filtered$sex)
@@ -255,7 +280,7 @@ matdiet_sex_wiltest_comp4 <- wilcox.test(matdiet_filtered$comp_4~matdiet_filtere
 matdiet_sex_wiltest_comp3.2 <- wilcox.test(matdiet_filtered_v2$comp_3.2~matdiet_filtered$sex)
 matdiet_sex_wiltest_comp2.2 <- wilcox.test(matdiet_filtered_v2$comp_2.2~matdiet_filtered$sex)
 
-matdiet_sex_wiltest_comp3.2$p.value
+#matdiet_sex_wiltest_comp3.2$p.value
 
 matdiet_sex_pvals <- c(matdiet_sex_wiltest_comp1$p.value, matdiet_sex_wiltest_comp2$p.value, matdiet_sex_wiltest_comp2.2$p.value, matdiet_sex_wiltest_comp3$p.value, matdiet_sex_wiltest_comp3.2$p.value, matdiet_sex_wiltest_comp4$p.value)
 composite_sexframe_matdietpval <- c("Composite 1 P-value ",
@@ -291,7 +316,7 @@ newdiet_differences_wiltest_comp3 <- wilcox.test(newdiet_filtered$comp_3~newdiet
 newdiet_differences_wiltest_comp3.2 <- wilcox.test(newdiet_filtered$comp_3.2~newdiet_filtered$new_diet)
 newdiet_differences_wiltest_comp4 <- wilcox.test(newdiet_filtered$comp_4~newdiet_filtered$new_diet)
 
-newdiet_differences_wiltest_comp4$p.value
+#newdiet_differences_wiltest_comp4$p.value
 
 newdiet_pvals <- c(newdiet_differences_wiltest_comp1$p.value, newdiet_differences_wiltest_comp2$p.value, newdiet_differences_wiltest_comp2.2$p.value, newdiet_differences_wiltest_comp3$p.value, newdiet_differences_wiltest_comp3.2$p.value, newdiet_differences_wiltest_comp4$p.value)
 newdiet_titles <- c("Composite 1 P-value ",
@@ -309,8 +334,7 @@ as.datatable(formattable(newdiet_pvals_df,
 
 ##PCAs and Structural Models##
 
-Below is the pca from the composite behavior groups. Additionally, structural equation modeling has been used to look at the strength of the groupings. 
-
+Below are the results from the PC Analysis looking at the composite behavior groups. Additionally, structural equation modeling has been used to look at the strength of the groupings. Only models representing composites that showed significant effects of diet on behavior were visualized. Unfortunately, there was not a more aesthetic way to present this data. 
 
 ```{r creating individual composites for pca and sem, echo=FALSE, warning=FALSE, message=TRUE}
 comp1_indi <- selected_norms_ffostare_v1 %>%
@@ -333,7 +357,7 @@ comp4_indi <- selected_norms_ffostare_v1 %>%
 
 ```
 
-**The text box will describe the scree plot output below.**
+**The text box will describe the scree plot visualization below. The scree plot represents how much each component is contributing to the variance about composite behavior group.**
 
 ```{r, echo=FALSE, warning = FALSE, message = FALSE}
 princi_comp1 <- prcomp(comp1_indi)
@@ -349,7 +373,7 @@ princi_comp2 <- prcomp(comp2_indi)
 summary(princi_comp2)
 #fviz_eig(princi_comp2, main = 'variance explained: components of comp_2')
 
-princi_comp2
+#princi_comp2
 
 princ2_ploty <- ggplotly(fviz_eig(princi_comp2, main = 'variance explained: components of comp_2'))
 
@@ -395,6 +419,10 @@ princ4_ploty <- ggplotly(fviz_eig(princi_comp4, main = 'variance explained: comp
 
 princ4_ploty
 ```
+
+**Structural Models** Again, the text box above will describe the visualization below. I am interested in the RMSEA, CFI, and TLI values. It is a bit hard to find but the output is very similar to Mplus. These models used the **MLR** estimator to mimic the model used in Mplus. 
+
+Additionally, one reason why I want to keep the 2.2 grouping is because it removes the negative loading variables in the model; making it stronger. 
 
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
@@ -448,16 +476,16 @@ semPaths(SEM_comp2_fit,
                          #align = c("l", "l", "l", "l", "l", "l", "l", "l", "l", "l", "l", "l", "l", "l", "l")
                          #))
 
-SEM_comp2.2 <- 'latemod_comp2 =~ Zstereotypy_butters + Zstation_back_ffostare + Zself_gro_ffosta + Zthreat_stranger_ffosta + Zfreeze_back_ffosta'
+SEM_comp2.2.1 <- 'latemod_comp2.2 =~ Zstereotypy_butters + Zstation_back_ffostare + Zself_gro_ffosta + Zthreat_stranger_ffosta + Zfreeze_back_ffosta'
 
-SEM_comp2.2_fit <- cfa(model = SEM_comp2.2, estimator = "MLR", data = selected_behaviors_latemods)
-summary(SEM_comp2_fit, standardize = TRUE, fit.measures = TRUE)
-SEM_comp2.2_table <- parTable(SEM_comp2.2_fit)
+SEM_comp2.2.1_fit <- cfa(model = SEM_comp2.2.1, estimator = "MLR", data = selected_behaviors_latemods)
+summary(SEM_comp2.2.1_fit, standardize = TRUE, fit.measures = TRUE)
+SEM_comp2.2_table <- parTable(SEM_comp2.2.1_fit)
 
-SEM_comp2.2_fit
+SEM_comp2.2.1_fit
 #note that we get rid of the negative loadings with this model
 
-semPaths(SEM_comp2.2_fit,
+semPaths(SEM_comp2.2.1_fit,
          layout = "tree",
          color = "gray",
          whatLabels = "std",
@@ -484,6 +512,17 @@ SEM_comp4 <- 'latemod_comp4 =~ Zself_groom_percent_butters + Zmouth_butters_perc
 
 SEM_comp4_fit <- cfa(model = SEM_comp4, estimator = "MLR", data = selected_behaviors_latemods)
 summary(SEM_comp4_fit, standardize = TRUE, fit.measures = TRUE)
-
-
 ```
+
+##Conclusion##
+
+I would like to use this as a template for the methods sections. I would like to build off some of the figures created, improve them, and use them for publishing paper, abstract, etc. 
+
+Although the Random Forest output was not included, I still feel this document can provide a solid foundation for out meetings over the next few weeks. I also think i need to conceptualize the RF process and output more before i begin talking about it. 
+
+Some things that still need to be discussed are:
+ - how to reduce the size of Composite 1
+ - is there anything I can do to 'stregthen' the other composite behaviors via empirical approaches
+ - what is the direction for moving forward if this looks good.
+ 
+
