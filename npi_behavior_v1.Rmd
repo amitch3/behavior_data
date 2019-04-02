@@ -1,0 +1,140 @@
+---
+title: "NPI_behavior_v1"
+author: "aj_mitchell"
+date: "February 25, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyselect)
+library(ggplot2)
+library(broom)
+library(dplyr)
+library(corrplot)
+library(kableExtra)
+library(knitr)
+library(Hmisc)
+library(infer)
+library(plotly) 
+library(skimr)
+library(stringr)
+library(reshape2)
+library(som)
+library(readxl)
+library(manipulate)
+library(lavaan)
+library(semPlot)
+#library(FactoMineR)
+#library(factoextra)
+```
+
+```{r}
+#loading the normalized data
+#this data has combined count and percentage data
+#subj 35455 has been averaged bc he participated in two behavioral trials
+#one behavioral trail appears to have 2 controls - if this is wrong the stats for Kroenke are wrong too
+
+NPI_znorm_v1 <- read_excel("norm_correct_avgdsubj_NPI_v1.xlsx")
+View(NPI_znorm_v1)
+
+selected_NPI_znorm_v1 <- NPI_znorm_v1 %>%
+  select(- Result_Containers, - Statistics, - Observations, - Intervals, - Subjects, - Animal_lD, - Hanging_Toy_at_perch_N0Y1, - Perch_at_dividerN0Y1, - Duration, - Introduction, - diet_group)
+
+selected_NPIgroup_znorm_v1 <- NPI_znorm_v1 %>%
+  select(- Result_Containers, - Statistics, - Observations, - Intervals, - Subjects, - Hanging_Toy_at_perch_N0Y1, - Perch_at_dividerN0Y1, - Duration, - Introduction)
+
+NPI_znorm_v1$diet_group <- as.factor(NPI_znorm_v1$diet_group)
+```
+
+
+```{r}
+cor_selected_NPI <- cor(selected_NPI_znorm_v1)
+melted_cor_selected_NPI <- melt(cor_selected_NPI) %>%
+  filter(value <= .99,
+         value >= .3)
+
+kable(melted_cor_selected_NPI) %>%
+  kable_styling(bootstrap_options = c("hover", "condensed")) %>% 
+  scroll_box(width = "1000px", height = "400px")
+```
+
+```{r}
+ggplot(melted_cor_selected_NPI, aes(x=Var2, y=Var1, fill=value)) +
+  geom_tile() +
+  scale_fill_gradient(low = "dark blue", high = "orange") + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90,
+                                   vjust = 1,
+                                   size = 9,
+                                   hjust = 1)
+  )
+```
+
+
+```{r}
+selected_NPIgroup_znorm_v1$social_affiliative <- selected_NPIgroup_znorm_v1$ZContact_peer + selected_NPIgroup_znorm_v1$ZPlay + selected_NPIgroup_znorm_v1$ZPlay_Face + selected_NPIgroup_znorm_v1$ZGroom + selected_NPIgroup_znorm_v1$ZMouth_peer + selected_NPIgroup_znorm_v1$ZLipsmack + selected_NPIgroup_znorm_v1$ZApproach_peer 
+
+selected_NPIgroup_znorm_v1$object_oriented <- selected_NPIgroup_znorm_v1$ZInspect_Object + selected_NPIgroup_znorm_v1$ZMouth_Object + selected_NPIgroup_znorm_v1$ZManipulate_Object + selected_NPIgroup_znorm_v1$ZTouch_Object + selected_NPIgroup_znorm_v1$ZSteal_Resource_Attempt 
+
+selected_NPIgroup_znorm_v1$social_nonaffiliative <- selected_NPIgroup_znorm_v1$ZCrook_Tail + selected_NPIgroup_znorm_v1$ZOpen_Mouth_Threat + selected_NPIgroup_znorm_v1$ZAggress + selected_NPIgroup_znorm_v1$ZBite + selected_NPIgroup_znorm_v1$ZDisplace + selected_NPIgroup_znorm_v1$ZLeave_peer + selected_NPIgroup_znorm_v1$ZAvoid
+
+selected_NPIgroup_znorm_v1$anxious <- selected_NPIgroup_znorm_v1$ZStereotypy + selected_NPIgroup_znorm_v1$ZScratch + selected_NPIgroup_znorm_v1$ZYawn + selected_NPIgroup_znorm_v1$ZAvoid + selected_NPIgroup_znorm_v1$ZFear_Grimace
+
+skim(selected_NPIgroup_znorm_v1)
+```
+
+```{r}
+
+#youre gonna have to change the name of your variable - diet group
+object_oriented_v <- selected_NPIgroup_znorm_v1 %>%
+  select(Animal_lD, object_oriented, diet_group) 
+
+social_affiliative_v <- selected_NPIgroup_znorm_v1 %>%
+  select(Animal_lD, social_affiliative, diet_group)
+View(social_affiliative)
+
+social_nonaffiliative_v <- selected_NPIgroup_znorm_v1 %>%
+  select(Animal_lD, social_nonaffiliative, diet_group)
+
+anxious_v <- selected_NPIgroup_znorm_v1 %>%
+  select(Animal_lD, anxious, diet_group)
+
+str(anxious_v)
+
+```
+
+
+```{r}
+anxious_v %>%
+  ggplot(., aes(x=Animal_lD, y=anxious,  fill=diet_group)) +
+  geom_histogram(stat = "identity", width = 30)
+
+anxious_v %>%
+  ggplot(., aes(x=diet_group, y=anxious, color=diet_group)) +
+  geom_boxplot()
+
+social_nonaffiliative_v %>%
+  ggplot(., aes(x=Animal_lD, y=social_nonaffiliative,  fill=diet_group)) +
+  geom_histogram(stat = "identity", width = 30)
+
+social_affiliative_v %>%
+  ggplot(., aes(x=Animal_lD, y=social_affiliative,  fill=diet_group)) +
+  geom_histogram(stat = "identity", width = 30)
+
+object_oriented_v %>%
+  ggplot(., aes(x=Animal_lD, y=object_oriented,  fill=diet_group)) +
+  geom_histogram(stat = "identity", width = 30)
+
+#i think these results, in conjunction with the structural findings, provide evidence that FA values related to WM tracts correlate strongly with behavioral findings. It is clear that further and more direct investigation is needed but this study provides [the first] evidence of WM tracts development and behavioral correllations. 
+```
+
+```{r}
+#normality tests
+shapiro.test(object_oriented_v$object_oriented)
+#none have normal distrubutoons except object orientation 
+
+```
