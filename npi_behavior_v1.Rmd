@@ -281,7 +281,8 @@ datatable(formattable(PR_group_differences))
 #prosocial behaviors are significant
 
 ggplot(social_affiliative_vR_50, aes(x=diet_group, y=social_affiliative, color=diet_group)) +
-  geom_boxplot() 
+  geom_boxplot() +
+  theme_grey()
   #geom_smooth(method = "lm", se =FALSE)
 
 ```
