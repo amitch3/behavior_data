@@ -274,7 +274,7 @@ pvals_PRgroups_titles <- c("Anxious_33per_PR",
                            "Non-Affiliative_50per_PR",
                            "Object_Oriented_33per_PR",
                            "Object_Oriented_50per_PR")
-#this table defines differences based on 50 percent and 30 percent PR
+#this table defines differences based on 50 percent and 30 percent PR..
 PR_group_differences <- data.frame(pvals_PRgroups_titles, pvals_PRgroups_on_behaviors)
 
 datatable(formattable(PR_group_differences))
