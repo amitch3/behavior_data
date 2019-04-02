@@ -39,13 +39,17 @@ library(semPlot)
 #one behavioral trail appears to have 2 controls - if this is wrong the stats for Kroenke are wrong too
 
 NPI_znorm_v1 <- read_excel("norm_correct_avgdsubj_NPI_v1.xlsx")
-View(NPI_znorm_v1)
+
 
 selected_NPI_znorm_v1 <- NPI_znorm_v1 %>%
   select(- Result_Containers, - Statistics, - Observations, - Intervals, - Subjects, - Animal_lD, - Hanging_Toy_at_perch_N0Y1, - Perch_at_dividerN0Y1, - Duration, - Introduction, - diet_group)
 
+skim(selected_NPI_znorm_v1)
+
 selected_NPIgroup_znorm_v1 <- NPI_znorm_v1 %>%
   select(- Result_Containers, - Statistics, - Observations, - Intervals, - Subjects, - Hanging_Toy_at_perch_N0Y1, - Perch_at_dividerN0Y1, - Duration, - Introduction)
+
+skim(selected_NPIgroup_znorm_v1)
 
 NPI_znorm_v1$diet_group <- as.factor(NPI_znorm_v1$diet_group)
 ```
@@ -92,16 +96,33 @@ skim(selected_NPIgroup_znorm_v1)
 #youre gonna have to change the name of your variable - diet group
 object_oriented_v <- selected_NPIgroup_znorm_v1 %>%
   select(Animal_lD, object_oriented, diet_group) 
+#..vR == the undefined diet group subjects (0, n=2) removed 
+object_oriented_vR <- selected_NPIgroup_znorm_v1 %>%
+  select(Animal_lD, object_oriented, diet_group) %>%
+  filter(!diet_group == 0)
 
 social_affiliative_v <- selected_NPIgroup_znorm_v1 %>%
   select(Animal_lD, social_affiliative, diet_group)
 View(social_affiliative)
 
+social_affiliative_vR <- selected_NPIgroup_znorm_v1 %>%
+  select(Animal_lD, social_affiliative, diet_group) %>%
+  filter(!diet_group == 0)
+
+
 social_nonaffiliative_v <- selected_NPIgroup_znorm_v1 %>%
   select(Animal_lD, social_nonaffiliative, diet_group)
 
+social_nonaffiliative_vR <- selected_NPIgroup_znorm_v1 %>%
+  select(Animal_lD, social_nonaffiliative, diet_group) %>%
+  filter(!diet_group == 0)
+
 anxious_v <- selected_NPIgroup_znorm_v1 %>%
   select(Animal_lD, anxious, diet_group)
+
+anxious_vR <- selected_NPIgroup_znorm_v1 %>%
+  select(Animal_lD, anxious, diet_group) %>%
+  filter(!diet_group == 0)
 
 str(anxious_v)
 
@@ -136,5 +157,31 @@ object_oriented_v %>%
 #normality tests
 shapiro.test(object_oriented_v$object_oriented)
 #none have normal distrubutoons except object orientation 
+
+
+#these are totals diet group differences; no splitting between 50 and 33% PR)
+ttest_anxious_vR <- wilcox.test(anxious_vR$anxious~anxious_vR$diet_group)
+ttest_social_nonaffiliative_vR <- wilcox.test(social_nonaffiliative_vR$social_nonaffiliative~social_nonaffiliative_vR$diet_group)
+ttest_social_affiliative_vR <- wilcox.test(social_affiliative_vR$social_affiliative~social_affiliative_vR$diet_group)
+ttest_object_oriented_vR <- t.test(object_oriented_vR$object_oriented~object_oriented_vR$diet_group)
+#no significant effects of subjective groupings
+ttest_social_nonaffiliative_vR$p.value
+
+pvals_NPI_subjectivegroups <- c(ttest_anxious_vR$p.value, ttest_social_affiliative_vR$p.value, ttest_social_nonaffiliative_vR$p.value, ttest_object_oriented_vR$p.value)
+pvals_NPI_titles <- c("Anxious Behavior",
+                      "Pro-Social Behavior",
+                      "Non-Social Behavior",
+                      "Object Oriented Behavior")
+table_NPI_subjectivegroups <- data.frame(pvals_NPI_titles, pvals_NPI_subjectivegroups)
+
+datatable(formattable(table_NPI_subjectivegroups))
+```
+
+```{r}
+selected_4_fulldata_pca <- selected_NPI_znorm_v1 
+
+selected_4_fulldata_pca <- prcomp(selected_4_fulldata_pca)
+
+summary(selected_4_fulldata_pca)
 
 ```
