@@ -339,7 +339,7 @@ social_aff_color_test+labs(title="Social Affiliative Behaviors", x="Diet",y="Aff
 
 #scale_color_manual(values = c("dark blue", "dark green"))
 
-glimpse(iri
+#glimpse(iri
 
 #mtcars <- as.factor(mtcars$cyl) 
 
