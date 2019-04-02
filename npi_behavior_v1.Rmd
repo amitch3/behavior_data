@@ -167,9 +167,14 @@ str(anxious_v)
 
 
 ```{r}
-anxious_v %>%
+anx_bp_test <- anxious_v %>%
   ggplot(., aes(x=Animal_lD, y=anxious,  fill=diet_group)) +
-  geom_histogram(stat = "identity", width = 30)
+  geom_histogram(stat = "identity", width = 30) +
+  scale_fill_manual(values = wes_palette(n=3, "Darjeeling1")) +
+  theme(plot.background = element_rect(fill = "light gray"),
+        panel.background = element_rect(fill = "dark gray"))
+  
+anx_bp_test + theme(legend.title = element_text(colour = "blue"))
 
 anxious_v %>%
   ggplot(., aes(x=diet_group, y=anxious, color=diet_group)) +
@@ -280,9 +285,72 @@ PR_group_differences <- data.frame(pvals_PRgroups_titles, pvals_PRgroups_on_beha
 datatable(formattable(PR_group_differences))
 #prosocial behaviors are significant
 
-ggplot(social_affiliative_vR_50, aes(x=diet_group, y=social_affiliative, color=diet_group)) +
+customviz_affil_vR50 <- ggplot(social_affiliative_vR_50, aes(x=diet_group, y=social_affiliative, color=diet_group)) +
   geom_boxplot() +
+  geom_jitter() +
   theme_grey()
   #geom_smooth(method = "lm", se =FALSE)
+
+
+```
+
+```{r}
+wes_palettes <- list(
+  BottleRocket1 = c("#A42820", "#5F5647", "#9B110E", "#3F5151", "#4E2A1E", "#550307", "#0C1707"),
+  BottleRocket2 = c("#FAD510", "#CB2314", "#273046", "#354823", "#1E1E1E"),
+  Rushmore1 = c("#E1BD6D", "#EABE94", "#0B775E", "#35274A" ,"#F2300F"),
+  Rushmore = c("#E1BD6D", "#EABE94", "#0B775E", "#35274A" ,"#F2300F"),
+  Royal1 = c("#899DA4", "#C93312", "#FAEFD1", "#DC863B"),
+  Royal2 = c("#9A8822", "#F5CDB4", "#F8AFA8", "#FDDDA0", "#74A089"),
+  Zissou1 = c("#3B9AB2", "#78B7C5", "#EBCC2A", "#E1AF00", "#F21A00"),
+  Darjeeling1 = c("#FF0000", "#00A08A", "#F2AD00", "#F98400", "#5BBCD6"),
+  Darjeeling2 = c("#ECCBAE", "#046C9A", "#D69C4E", "#ABDDDE", "#000000"),
+  Chevalier1 = c("#446455", "#FDD262", "#D3DDDC", "#C7B19C"),
+  FantasticFox1 = c("#DD8D29", "#E2D200", "#46ACC8", "#E58601", "#B40F20"),
+  Moonrise1 = c("#F3DF6C", "#CEAB07", "#D5D5D3", "#24281A"),
+  Moonrise2 = c("#798E87", "#C27D38", "#CCC591", "#29211F"),
+  Moonrise3 = c("#85D4E3", "#F4B5BD", "#9C964A", "#CDC08C", "#FAD77B"),
+  Cavalcanti1 = c("#D8B70A", "#02401B", "#A2A475", "#81A88D", "#972D15"),
+  GrandBudapest1 = c("#F1BB7B", "#FD6467", "#5B1A18", "#D67236"),
+  GrandBudapest2 = c("#E6A0C4", "#C6CDF7", "#D8A499", "#7294D4"),
+  IsleofDogs1 = c("#9986A5", "#79402E", "#CCBA72", "#0F0D0E", "#D9D0D3", "#8D8680"),
+  IsleofDogs2 = c("#EAD3BF", "#AA9486", "#B6854D", "#39312F", "#1C1718")
+```
+    
+```{r}
+
+
+library(wesanderson)
+library(ggthemes)
+wes_palette("FantasticFox1")
+
+customviz_affil_vR50+labs(title="Social Affiliative Behaviors", x="Diet",y="Affiliative Behavior")  +
+  scale_fill_manual(values = wes_palette(n=2, "FantasticFox1")) +
+  theme_grey()
+
+social_aff_color_test <- ggplot(social_affiliative_vR_50, aes(x=diet_group, y=social_affiliative, color=diet_group)) +
+  geom_boxplot(size=1) +
+  scale_color_manual(values = wes_palette(n=2, "GrandBudapest1")) +
+  theme_minimal()
+  
+social_aff_color_test+labs(title="Social Affiliative Behaviors", x="Diet",y="Affiliative Behavior Score") +
+  theme_economist()
+  
+
+#scale_color_manual(values = c("dark blue", "dark green"))
+
+glimpse(iri
+
+#mtcars <- as.factor(mtcars$cyl) 
+
+ggplot(mtcars, aes(x = cyl, y=hp)) +
+  geom_point() +
+  scale_color_manual(values = wes_palette(n=3, "FantasticFox1"))
+
+ggplot(iris, aes(Sepal.Length, Sepal.Width, color = Species)) + 
+geom_point(size = 3) + 
+scale_color_manual(values = wes_palette(n=3, "FantasticFox1")) + 
+theme_gray() +
+  geom_smooth(method = "lm", se=F)
 
 ```
