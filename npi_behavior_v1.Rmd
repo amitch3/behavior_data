@@ -28,6 +28,9 @@ library(readxl)
 library(manipulate)
 library(lavaan)
 library(semPlot)
+library(readxl)
+library(formattable)
+library(DT)
 #library(FactoMineR)
 #library(factoextra)
 ```
@@ -39,7 +42,7 @@ library(semPlot)
 #one behavioral trail appears to have 2 controls - if this is wrong the stats for Kroenke are wrong too
 
 NPI_znorm_v1 <- read_excel("norm_correct_avgdsubj_NPI_v1.xlsx")
-
+NPI_znorm_v1$diet_group <- as.factor(NPI_znorm_v1$diet_group)
 
 selected_NPI_znorm_v1 <- NPI_znorm_v1 %>%
   select(- Result_Containers, - Statistics, - Observations, - Intervals, - Subjects, - Animal_lD, - Hanging_Toy_at_perch_N0Y1, - Perch_at_dividerN0Y1, - Duration, - Introduction, - diet_group)
@@ -49,9 +52,9 @@ skim(selected_NPI_znorm_v1)
 selected_NPIgroup_znorm_v1 <- NPI_znorm_v1 %>%
   select(- Result_Containers, - Statistics, - Observations, - Intervals, - Subjects, - Hanging_Toy_at_perch_N0Y1, - Perch_at_dividerN0Y1, - Duration, - Introduction)
 
-skim(selected_NPIgroup_znorm_v1)
+View(selected_NPIgroup_znorm_v1)
 
-NPI_znorm_v1$diet_group <- as.factor(NPI_znorm_v1$diet_group)
+
 ```
 
 
@@ -93,22 +96,42 @@ skim(selected_NPIgroup_znorm_v1)
 
 ```{r}
 
-#youre gonna have to change the name of your variable - diet group
+######## object oriented
+
 object_oriented_v <- selected_NPIgroup_znorm_v1 %>%
   select(Animal_lD, object_oriented, diet_group) 
+
 #..vR == the undefined diet group subjects (0, n=2) removed 
 object_oriented_vR <- selected_NPIgroup_znorm_v1 %>%
   select(Animal_lD, object_oriented, diet_group) %>%
   filter(!diet_group == 0)
 
+#for the year1 vs year2 groups: removed 35764 and 35740 bc they are not included in MRI analysis. additionally, not on behavior sheet from domacc 
+
+object_oriented_vR_50 <- object_oriented_vR %>%
+  filter(Animal_lD <= 35000)
+
+object_oriented_vR_33 <- object_oriented_vR %>%
+  filter(Animal_lD >= 35000)
+
+#glimpse(object_oriented_vR_33)
+####### social affiliative
+
 social_affiliative_v <- selected_NPIgroup_znorm_v1 %>%
   select(Animal_lD, social_affiliative, diet_group)
-View(social_affiliative)
+
 
 social_affiliative_vR <- selected_NPIgroup_znorm_v1 %>%
   select(Animal_lD, social_affiliative, diet_group) %>%
   filter(!diet_group == 0)
 
+social_affiliative_vR_50 <- social_affiliative_vR %>%
+  filter(Animal_lD <= 35000)
+
+social_affiliative_vR_33 <- social_affiliative_vR %>%
+  filter(Animal_lD >= 35000)
+
+######## social_nonaffiliative 
 
 social_nonaffiliative_v <- selected_NPIgroup_znorm_v1 %>%
   select(Animal_lD, social_nonaffiliative, diet_group)
@@ -117,12 +140,26 @@ social_nonaffiliative_vR <- selected_NPIgroup_znorm_v1 %>%
   select(Animal_lD, social_nonaffiliative, diet_group) %>%
   filter(!diet_group == 0)
 
+social_nonaffiliative_vR_50 <- social_nonaffiliative_vR %>%
+  filter(Animal_lD <= 35000)
+
+social_nonaffiliative_vR_33 <- social_nonaffiliative_vR %>%
+  filter(Animal_lD >= 35000)
+
+######## anxious 
+
 anxious_v <- selected_NPIgroup_znorm_v1 %>%
   select(Animal_lD, anxious, diet_group)
 
 anxious_vR <- selected_NPIgroup_znorm_v1 %>%
   select(Animal_lD, anxious, diet_group) %>%
   filter(!diet_group == 0)
+
+anxious_vR_50 <- anxious_vR %>%
+  filter(Animal_lD <= 35000)
+
+anxious_vR_33 <- anxious_vR %>%
+  filter(Animal_lD >= 35000)
 
 str(anxious_v)
 
@@ -182,6 +219,69 @@ selected_4_fulldata_pca <- selected_NPI_znorm_v1
 
 selected_4_fulldata_pca <- prcomp(selected_4_fulldata_pca)
 
-summary(selected_4_fulldata_pca)
+```
+
+```{r}
+#lets look at the impact of specific PR restriction
+#start by splitting the groups between 50% PR and 33%; since behavior was only collected from the 33% group then we 
+
+fiftyper_PR_behavior <- fiftyper_PR_behavior %>% filter(fiftyper_PR_behavior$Animal_lD <= 35000)
+
+skim(fiftyper_PR_behavior)
+
+thirtythreeper_PR_behavior <- thirtythreeper_PR_behavior %>% filter(thirtythreeper_PR_behavior$Animal_lD >= 35000)
+  
+View(thirtythreeper_PR_behavior)
+
+```
+
+```{r}
+#differences dependent on PR levels 
+
+#shapiro.test(object_oriented_vR_50$object_oriented)
+
+#anxious..50_ttest has normal distribution 
+anxious_vR_33_ttest <- wilcox.test(anxious_vR_33$anxious~anxious_vR_33$diet_group)
+anxious_vR_50_ttest <- t.test(anxious_vR_50$anxious~anxious_vR_50$diet_group)
+
+#social_affiliative...50 has normal distribution  
+social_affiliative_vR_33_ttest <- wilcox.test(social_affiliative_vR_33$social_affiliative~social_affiliative_vR_33$diet_group)
+social_affiliative_vR_50_ttest <- t.test(social_affiliative_vR_50$social_affiliative~social_affiliative_vR_50$diet_group)
+
+#both social_non...33 and social_non..50 have normal distributions
+social_nonaffiliative_vR_33_ttest <- t.test(social_nonaffiliative_vR_33$social_nonaffiliative~social_affiliative_vR_33$diet_group)
+social_nonaffiliative_vR_50_ttest <- t.test(social_nonaffiliative_vR_50$social_nonaffiliative~social_nonaffiliative_vR_50$diet_group)
+
+#both object_ori..33 and object_ori..50 have normal distributions
+object_oriented_vR_33_ttest <- t.test(object_oriented_vR_33$object_oriented~object_oriented_vR_33$diet_group)
+object_oriented_vR_50_ttest <- t.test(object_oriented_vR_50$object_oriented~object_oriented_vR_50$diet_group)
+
+
+
+pvals_PRgroups_on_behaviors <- c(anxious_vR_33_ttest$p.value,
+                                 anxious_vR_50_ttest$p.value,
+                                 social_affiliative_vR_33_ttest$p.value,
+                                 social_affiliative_vR_50_ttest$p.value,
+                                 social_nonaffiliative_vR_33_ttest$p.value,
+                                 social_nonaffiliative_vR_50_ttest$p.value,
+                                 object_oriented_vR_33_ttest$p.value,
+                                 object_oriented_vR_50_ttest$p.value)
+pvals_PRgroups_titles <- c("Anxious_33per_PR",
+                           "Anxious_50per_PR",
+                           "Pro-Social_33per_PR",
+                           "Pro-Social_50per_PR",
+                           "Non-Affiliative_33per_PR",
+                           "Non-Affiliative_50per_PR",
+                           "Object_Oriented_33per_PR",
+                           "Object_Oriented_50per_PR")
+#this table defines differences based on 50 percent and 30 percent PR
+PR_group_differences <- data.frame(pvals_PRgroups_titles, pvals_PRgroups_on_behaviors)
+
+datatable(formattable(PR_group_differences))
+#prosocial behaviors are significant
+
+ggplot(social_affiliative_vR_50, aes(x=diet_group, y=social_affiliative, color=diet_group)) +
+  geom_boxplot() 
+  #geom_smooth(method = "lm", se =FALSE)
 
 ```
