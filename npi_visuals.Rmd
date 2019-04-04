@@ -64,7 +64,11 @@ selected_NPI_znorm_v1 <- NPI_znorm_v1 %>%
 
 selected_NPIgroup_znorm_v1 <- NPI_znorm_v1 %>%
   select(- Result_Containers, - Statistics, - Observations, - Intervals, - Subjects, - Hanging_Toy_at_perch_N0Y1, - Perch_at_dividerN0Y1, - Duration, - Introduction)
+```
 
+```{r}
+#####gets rid of outlier subject
+#controling for housing <- select out 35375, 35455, 35476, 35712
 
 ```
 
@@ -279,6 +283,7 @@ social_affiliative_vR_50_v2 <- social_affiliative_vR_v2 %>%
 
 social_affiliative_vR_33_v2 <- social_affiliative_vR_v2 %>%
   filter(Animal_lD >= 35000)
+
 
 #View(social_affiliative_vR_33)
 
