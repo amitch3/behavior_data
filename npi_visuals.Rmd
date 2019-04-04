@@ -2,7 +2,11 @@
 title: "npi_firstpass"
 author: "aj_mitchell"
 date: "April 3, 2019"
-output: html_document
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    theme: yeti
 ---
 
 ```{r setup, include=FALSE}
@@ -38,11 +42,11 @@ library(DT)
 
 **This document is for explaining the pilot NPI behavior analysis.**
 
-###Intro###
+##Description##
 
-A total of 21 subjects were included in the analysis. 2 of these subjects are yet to be identified protein restricted (PR) or CNT. This is partially because they are on neither list which defining year 1 vs year 2 animals (although it is clear by the animals id that these are year 2 subjects). This information will be easy to incorporate and update. 
+A total of 21 subjects were included in the analysis. 
 
-29 individual behaviors were included in the analysis and subsequently divided up into 4 composite groups to investigate the effects of PR. These composite groups were made based on aggregates of *anxious behaviors*, *pro-social behavior (social affiliation)*, *non-affiliative social behaviors*, and *object oriented behaviors*.  These scores are outlined in later tables below.  
+30 individual behaviors were included in the analysis and subsequently divided up into 4 composite groups to investigate the effects of PR. These composite groups were made based on aggregates of **anxious behaviors**, **pro-social behavior (social affiliation)**, **non-affiliative social behaviors**, and **object oriented behaviors**.  These scores are outlined in later tables below.  
 
 The table below provides correlational values about the individual behaviors.
 
@@ -56,7 +60,7 @@ NPI_znorm_v1$diet_group <- as.factor(NPI_znorm_v1$diet_group)
 selected_NPI_znorm_v1 <- NPI_znorm_v1 %>%
   select(- Result_Containers, - Statistics, - Observations, - Intervals, - Subjects, - Animal_lD, - Hanging_Toy_at_perch_N0Y1, - Perch_at_dividerN0Y1, - Duration, - Introduction, - diet_group)
 
-skim(selected_NPI_znorm_v1)
+#skim(selected_NPI_znorm_v1)
 
 selected_NPIgroup_znorm_v1 <- NPI_znorm_v1 %>%
   select(- Result_Containers, - Statistics, - Observations, - Intervals, - Subjects, - Hanging_Toy_at_perch_N0Y1, - Perch_at_dividerN0Y1, - Duration, - Introduction)
@@ -66,6 +70,7 @@ selected_NPIgroup_znorm_v1 <- NPI_znorm_v1 %>%
 
 The first table outlines the overall effects of protein restriction whereas the latter graphs detail specific differences of either 33% or 50% PR. I did not look at individual behavioral differences (comparing individual behaviors across diet groups). **Only pro-social behavior surrounding the 50 PR showed significant differences based on diet group.** This is visualized later in the document. 
 
+The 'v2' just capture the little changes that I thought improved the groups. 
 
 
 
@@ -115,17 +120,33 @@ The first table outlines the overall effects of protein restriction whereas the 
                "Follow",
                "Groom",
                "Approach peer",
+               "Lipsmack"
+               
+**Prosocial_v2** = "Play",
+               "Play Face",
+               "Contact peer",
+               "Follow",
+               "Groom",
+               "Approach peer",
                "Lipsmack",
                "Inspect",
-               "Mouth peer")
+               "Mouth peer"
 
-**Nonsocial** =    "Open Mouth Threat",
+**Nonsocial** = "Open Mouth Threat",
+               "Aggress",
+               "Bite",
+               "Displace",
+               "Avoid",
+               "Crooked Tail",
+               
+**Nonsocial_v2** = "Open Mouth Threat",
                "Aggress",
                "Bite",
                "Resource Takeover",
                "Displace",
                "Avoid",
-               "Crooked Tail"
+               "Crooked Tail",
+               "Steal Resource Attempt Count"
 
 **Object_Oriented** = "Mouth Object",
                "Touch Object",
@@ -139,12 +160,10 @@ The first table outlines the overall effects of protein restriction whereas the 
                "Avoid",
                "Fear Grimmace"
                
-**Omitted or used *twice** = "No Response to Object",
+**Omitted** = "No Response to Object",
               "Contact Peer Count",
-              "No Response",
-              *"Steal Resource Attempt count"
+              "No Response"
 
-Some of the more ambigious groupings like resource takeover or steal resource attempt were used in both object oriented and non-social behavior
                
 ```{r, echo=F, warning=F, message=F}
 #Behavior_table <- rbind(Anxious, Prosocial, Nonsocial, Object_Oriented)
@@ -158,15 +177,15 @@ melted_cor_selected_NPI <- melt(cor_selected_NPI) %>%
   filter(value <= .99)
 ```
 
+##Correllation Values and Matrix##
 
 ```{r, echo=F, message=F, warning=F}
 datatable(formattable(melted_cor_selected_NPI))
 ```
 
-Correllation Matrix Visualization 
 
 ```{r, echo=F, message=F, warning=F}
-
+library(wesanderson)
 corrmat_NPI <- ggplot(melted_cor_selected_NPI, aes(x=Var2, y=Var1, fill=value)) +
   geom_tile() +
   scale_fill_gradient(low = "dark blue", high = "orange") + 
@@ -211,7 +230,7 @@ selected_NPIgroup_znorm_v1$social_nonaffiliative_v2 <- selected_NPIgroup_znorm_v
 
 selected_NPIgroup_znorm_v1$anxious <- selected_NPIgroup_znorm_v1$ZStereotypy + selected_NPIgroup_znorm_v1$ZScratch + selected_NPIgroup_znorm_v1$ZYawn + selected_NPIgroup_znorm_v1$ZAvoid + selected_NPIgroup_znorm_v1$ZFear_Grimace
 
-View(selected_NPIgroup_znorm_v1)
+#View(selected_NPIgroup_znorm_v1)
 ```
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
@@ -234,7 +253,7 @@ object_oriented_vR_50 <- object_oriented_vR %>%
 object_oriented_vR_33 <- object_oriented_vR %>%
   filter(Animal_lD >= 35000)
 
-glimpse(object_oriented_vR_50)
+#glimpse(object_oriented_vR_50)
 
 ####### social affiliative
 
@@ -261,12 +280,15 @@ social_affiliative_vR_50_v2 <- social_affiliative_vR_v2 %>%
 social_affiliative_vR_33_v2 <- social_affiliative_vR_v2 %>%
   filter(Animal_lD >= 35000)
 
-View(social_affiliative_vR_33)
+#View(social_affiliative_vR_33)
 
 ######## social_nonaffiliative 
 
 social_nonaffiliative_v <- selected_NPIgroup_znorm_v1 %>%
   select(Animal_lD, social_nonaffiliative, diet_group)
+
+social_nonaffiliative_vR <- selected_NPIgroup_znorm_v1 %>%
+  select(Animal_lD, social_nonaffiliative, diet_group) 
 
 social_nonaffiliative_vR_v2 <- selected_NPIgroup_znorm_v1 %>%
   select(Animal_lD, social_nonaffiliative_v2, diet_group) 
@@ -301,13 +323,38 @@ anxious_vR_50 <- anxious_vR %>%
 anxious_vR_33 <- anxious_vR %>%
   filter(Animal_lD >= 35000)
 
-skim(anxious_vR_33)
+#skim(anxious_vR_33)
 
 ```
 
+##Overall Behavioral Differences##
+
+This table details the different effects of diet based on aggregating year1 and year2.
+
+```{r, echo=F, message=F, warning=F}
+#these are totals diet group differences; no splitting between 50 and 33% PR)
+ttest_anxious_vR <- wilcox.test(anxious_vR$anxious~anxious_vR$diet_group)
+ttest_social_nonaffiliative_vR <- wilcox.test(social_nonaffiliative_vR$social_nonaffiliative~social_nonaffiliative_vR$diet_group)
+ttest_social_affiliative_vR <- wilcox.test(social_affiliative_vR$social_affiliative~social_affiliative_vR$diet_group)
+ttest_object_oriented_vR <- t.test(object_oriented_vR$object_oriented~object_oriented_vR$diet_group)
+#no significant effects of subjective groupings
+#ttest_social_nonaffiliative_vR$p.value
+
+pvals_NPI_subjectivegroups <- c(ttest_anxious_vR$p.value, ttest_social_affiliative_vR$p.value, ttest_social_nonaffiliative_vR$p.value, ttest_object_oriented_vR$p.value)
+pvals_NPI_titles <- c("Anxious Behavior",
+                      "Pro-Social Behavior",
+                      "Non-Social Behavior",
+                      "Object Oriented Behavior")
+table_NPI_subjectivegroups <- data.frame(pvals_NPI_titles, pvals_NPI_subjectivegroups)
+
+datatable(formattable(table_NPI_subjectivegroups))
+```
+
+
+
 ##Year 1 vs Year 2 differences##
 
-The table below describes differences based on year one and year two. In summary, only year 1 displayed behavioral differences. Year 1 subjected to a PR diet were less likely to engage in prosocial behavior. 
+The table below describes differences based on year one and year two. In summary, only year 1 displayed behavioral differences. Year 1 subjected to a PR diet were less likely to engage in prosocial behavior. Overall diet differences were not seen, also since the diet was changed between year 1 and year 2, I felt separating the years was more informative. Especially given the results. 
 
 Year 1 Information:
   - n = 8
@@ -318,12 +365,17 @@ Year 2 Information:
   - 7 CTR(1) / 6 PR(2)
   
   
-Each group was subject to a Shapiro Wilks test for normality, and the respective t-test was done to calculate the p-value. For groupings whose distribution strongly deviated from the norm, a Wilcoxon/Mann-Whitney test was used. The command is interchangable in R and both pair and unpair commands were tested to ensure values are accurate.
+Each group was subject to a Shapiro Wilks test for normality, and the respective t-test was done to calculate the p-value. For groupings whose distribution significantly deviated from the norm, a Wilcoxon/Mann-Whitney test was used.
+
+**50per = year 1 @ 50% PR**
+
+
+**33per = year 2 @ 33% PR**
 
 ```{r, echo=FALSE, warning=FALSE, message=FALSE}
 #differences dependent on PR levels 
 
-#shapiro.test(social_nonaffiliative_vR_33_v2$social_nonaffiliative_v2)
+#shapiro.test(social_affiliative_vR_33_v2$social_affiliative_v2)
 
 
 ##############
@@ -351,7 +403,7 @@ social_affiliative_vR_50_v2_ttest <- t.test(social_affiliative_vR_50_v2$social_a
 #both social_non...33 and social_non..50 have normal distributions
 social_nonaffiliative_vR_33_ttest <- t.test(social_nonaffiliative_vR_33$social_nonaffiliative~social_nonaffiliative_vR_33$diet_group, paired=F)
 
-social_nonaffiliative_vR_33_v2_ttest <- t.test(social_nonaffiliative_vR_33_v2$social_nonaffiliative_v2~social_nonaffiliative_vR_33_v2$diet_group, paired=F)
+social_nonaffiliative_vR_33_v2_ttest <- wilcox.test(social_nonaffiliative_vR_33_v2$social_nonaffiliative_v2~social_nonaffiliative_vR_33_v2$diet_group, paired=F)
 
 social_nonaffiliative_vR_50_ttest <- t.test(social_nonaffiliative_vR_50$social_nonaffiliative~social_nonaffiliative_vR_50$diet_group, paired=F)
 
@@ -402,10 +454,10 @@ datatable(formattable(PR_group_differences))
 #prosocial behaviors are significan
 ```
 
-Below is the boxplot overlayed with scatter plot showing both the avg difference between groups and where each individual falls per group. 
+Below is the boxplot overlayed with scatter plot showing both the avg difference between groups and where each individual falls per group. **This was the only behavior category that showed significant differences based on diet.**
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-library(wesanderson)
+#library(wesanderson)
 library(ggthemes)
 
 customviz_affil_vR50 <- ggplot(social_affiliative_vR_50, aes(x=diet_group, y=social_affiliative, color=diet_group)) +
@@ -414,7 +466,7 @@ customviz_affil_vR50 <- ggplot(social_affiliative_vR_50, aes(x=diet_group, y=soc
   theme_grey()
   #geom_smooth(method = "lm", se =FALSE)
 
-customviz_affil_vR50+labs(title="Social Affiliative Behaviors (CTR=1, PR=2)", x="Diet",y="Affiliative Behavior")  +
+customviz_affil_vR50+labs(title="Year 1: Prosocial Behaviors** (CTR=1, PR=2)", x="Diet",y="Affiliative Behavior Score")  +
   scale_color_manual(values = wes_palette(n=2, "GrandBudapest1")) +
   theme(plot.background = element_rect(fill = "light gray"),
         panel.background = element_rect(fill = "dark gray"),
@@ -426,10 +478,15 @@ customviz_affil_vR50+labs(title="Social Affiliative Behaviors (CTR=1, PR=2)", x=
 
 ##Extra Visualizations##
 
-Here, only the non_affiliative group is visualized because it is the closest to significant P-value. 
+Here, only groups i thought were interesting are visualized; just for simplicity. We can add as many as desired. 
+
+**Non-affiliative behaviors during year 1 (50% PR) were strongly trending but not significant.**
+
+Refer to the list in the **Description Section** for individual behaviors that make up this group. 
 
 ```{r, echo=F, warning=F, message=F}
 ####nonaffiliative
+#v2 includes resource takeover attempts 
 
 customviz_nonaffil_vR50 <- ggplot(social_nonaffiliative_vR_50, aes(x=diet_group, y=social_nonaffiliative, color=diet_group)) +
   geom_boxplot() +
@@ -437,8 +494,8 @@ customviz_nonaffil_vR50 <- ggplot(social_nonaffiliative_vR_50, aes(x=diet_group,
   theme_grey()
   #geom_smooth(method = "lm", se =FALSE)
 
-customviz_nonaffil_vR50+labs(title="Year 1: Social Non-Affiliative Behaviors (CTR=1, PR=2)", x="Diet",y="Non-Affiliative Behavior")  +
-  scale_color_manual(values = wes_palette(n=2, "GrandBudapest1")) +
+customviz_nonaffil_vR50+labs(title="Year 1: Social Non-Affiliative Behaviors (CTR=1, PR=2)", x="Diet",y="Non-Affiliative Behavior Score")  +
+  scale_color_manual(values = wes_palette(n=2, "Royal1")) +
   theme(plot.background = element_rect(fill = "light gray"),
         panel.background = element_rect(fill = "dark gray"),
         legend.background = element_rect(fill = "dark gray"))
@@ -449,24 +506,38 @@ customviz_nonaffil_vR50_v2 <- ggplot(social_nonaffiliative_vR_50_v2, aes(x=diet_
   theme_grey()
   #geom_smooth(method = "lm", se =FALSE)
 
-customviz_nonaffil_vR50_v2+labs(title="Year 1: Social Non-Affiliative (v2) Behaviors (CTR=1, PR=2)", x="Diet",y="Non-Affiliative Behavior (v2)")  +
-  scale_color_manual(values = wes_palette(n=2, "GrandBudapest1")) +
+customviz_nonaffil_vR50_v2+labs(title="Year 1: Social Non-Affiliative (v2) Behaviors (CTR=1, PR=2)", x="Diet",y="Non-Affiliative Behavior (v2) Score")  +
+  scale_color_manual(values = wes_palette(n=2, "Royal1")) +
   theme(plot.background = element_rect(fill = "light gray"),
         panel.background = element_rect(fill = "dark gray"),
         legend.background = element_rect(fill = "dark gray"))
 
 
-#######prosocial
+#######prosocial: year 1
+#v2 includes follow and 
 
 
-customviz_nonaffil_vR50 <- ggplot(social_nonaffiliative_vR_50, aes(x=diet_group, y=social_nonaffiliative, color=diet_group)) +
+customviz_affil_vR50 <- ggplot(social_affiliative_vR_50, aes(x=diet_group, y=social_affiliative, color=diet_group)) +
   geom_boxplot() +
   geom_jitter() +
   theme_grey()
   #geom_smooth(method = "lm", se =FALSE)
 
-customviz_affil_vR50+labs(title="Year 1: Social Non-Affiliative Behaviors (CTR=1, PR=2)", x="Diet",y="Non-Affiliative Behavior")  +
-  scale_color_manual(values = wes_palette(n=2, "GrandBudapest1")) +
+customviz_affil_vR50+labs(title="Year 1: Prosocial Behaviors (CTR=1, PR=2)", x="Diet",y="Prosocial Behavior Score")  +
+  scale_color_manual(values = wes_palette(n=2, "Cavalcanti1")) +
+  theme(plot.background = element_rect(fill = "light gray"),
+        panel.background = element_rect(fill = "dark gray"),
+        legend.background = element_rect(fill = "dark gray"))
+
+
+customviz_affil_vR50_v2 <- ggplot(social_affiliative_vR_50_v2, aes(x=diet_group, y=social_affiliative_v2, color=diet_group)) +
+  geom_boxplot() +
+  geom_jitter() +
+  theme_grey()
+  #geom_smooth(method = "lm", se =FALSE)
+
+customviz_affil_vR50+labs(title="Year 1: Prosocial (v2) Behaviors (CTR=1, PR=2)", x="Diet",y="Prosocial (v2) Behavior Score")  +
+  scale_color_manual(values = wes_palette(n=2, "Cavalcanti1")) +
   theme(plot.background = element_rect(fill = "light gray"),
         panel.background = element_rect(fill = "dark gray"),
         legend.background = element_rect(fill = "dark gray"))
@@ -477,6 +548,8 @@ customviz_affil_vR50+labs(title="Year 1: Social Non-Affiliative Behaviors (CTR=1
 
 
 **Closing**
+
+I'd like to talk about adjusting the groupings and how we could expand on that end. Or would these be the groups we move forward with? I thought they were useful because the interpretation of them is more simple than the community detection approach.
 
 
 There are many things I need to improve on here but mainly:
