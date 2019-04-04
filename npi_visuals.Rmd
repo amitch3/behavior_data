@@ -329,7 +329,7 @@ anxious_vR_33 <- anxious_vR %>%
 
 ##Overall Behavioral Differences##
 
-This table details the different effects of diet based on aggregating year1 and year2.
+This table details the different effects of diet based on overall year1 and year2 PR vs Control performance.
 
 ```{r, echo=F, message=F, warning=F}
 #these are totals diet group differences; no splitting between 50 and 33% PR)
