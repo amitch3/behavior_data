@@ -138,7 +138,7 @@ You will notice a **2.2 and 3.2 group**. In short, I will likely want to move fo
 
 
 ```{r inserting demographic infomation, echo=FALSE}
-selected_norms_composites_demgraf_v1.2 <- read.csv("selected_norms_composites_demgraf_v2.csv")
+selected_norms_composites_demgraf_v1.2 <- read.csv("selected_norms_composites_demgraf_v2_use.csv")
 #View(selected_norms_composites_demgraf_v1.2)
 
 composite_scores_withgroups <- selected_norms_composites_demgraf_v1.2[order(selected_norms_composites_demgraf_v1.2$initial_diet),]  %>%
@@ -432,7 +432,7 @@ Additionally, one reason why I want to keep the 2.2 grouping is because it remov
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 #need to add visualizations here
-selected_behaviors_latemods <- selected_norms_ffostare_v1 %>%
+selected_behaviors_latemods <- selected_norms_composites_demgraf_v1.2 %>%
   select(- comp_1, - comp_2, - comp_3, - comp_4, -comp_2.2, -comp_3.2)
 
 SEM_comp1 <- 'latemod_comp1 =~ Zstationary_middle_percent_butters + Zlocomotion_percent_butters + Zhanging_behaviors_butters + Ztactile_exploration_butters + Zmo_manip_apple_butters + Zstation_fr_ffostare + Zstation_mid_ffosta + Zlocomote_ffosta + Zmovement_ffosta + Ztac_expl_ffosta + Zstereo_ffosta + Zteethgrind_ffosta + Zlipsmack_ffosta + Ztouch_app_ffosta + Zmouth_app_ffosta + Zmanip_app_ffosta + Zeat_app_ffosta + Znonvigi_ffosta + Zdir_eye_contact_ffosta'
