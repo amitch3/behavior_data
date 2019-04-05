@@ -66,13 +66,8 @@ selected_NPIgroup_znorm_v1 <- NPI_znorm_v1 %>%
   select(- Result_Containers, - Statistics, - Observations, - Intervals, - Subjects, - Hanging_Toy_at_perch_N0Y1, - Perch_at_dividerN0Y1, - Duration, - Introduction)
 ```
 
-```{r}
-#####gets rid of outlier subject
-#controling for housing <- select out 35375, 35455, 35476, 35712
 
-```
-
-The first table outlines the overall effects of protein restriction whereas the latter graphs detail specific differences of either 33% or 50% PR. I did not look at individual behavioral differences (comparing individual behaviors across diet groups). **Only pro-social behavior surrounding the 50 PR showed significant differences based on diet group.** This is visualized later in the document. 
+The subsequent table outlines the overall effects of protein restriction whereas the latter graphs detail specific differences of either 33% or 50% PR. I did not look at individual behavioral differences (comparing individual behaviors across diet groups). **Only pro-social behavior surrounding the 50 PR showed significant differences based on diet group.** This is visualized later in the document. 
 
 The 'v2' just capture the little changes that I thought improved the groups. 
 
@@ -331,6 +326,77 @@ anxious_vR_33 <- anxious_vR %>%
 #skim(anxious_vR_33)
 
 ```
+
+the table below is the output when you control for housing. After speaking with Jacqui, she said that several animals in year 2 were housed differently than the others. Thus, i removed these animals to look at the **effect housing has on the beahvioral outcome**.
+
+Take this data with a grain of salt though.. at this point, a lot of manipulation have been made and i will likely need to reevaluate this part of the analysis. Additionally, it has not been looked at as thoroughly as other measurements. 
+
+The boxplot below is for fact checking the distribution
+
+```{r, echo=F, warning=F, message=F}
+
+########
+#cutting out the outlier; only applies to year 2
+########
+#controling for housing <- select out 35375, 35455, 35476, 35712
+
+matched_housing_object_ori <- object_oriented_vR %>%
+  filter(!Animal_lD %in% 35375, 35455, 35476, 35712)
+
+#View(matched_housing_object_ori)
+
+matched_housing_prosocial_v1 <- social_affiliative_vR %>%
+  filter(!Animal_lD %in% 35375, 35455, 35476, 35712)
+
+matched_housing_prosocial_v2 <- social_affiliative_vR_33 %>%
+  filter(!Animal_lD %in% 35375, 35455, 35476, 35712)
+
+matched_housing_prosocial_v2_ttesst <- wilcox.test(matched_housing_prosocial_v2$social_affiliative~matched_housing_prosocial_v2$diet_group)
+#matched_housing_prosocial_v2_ttesst$p.value
+
+matched_housing_nonsocial_v1 <- social_nonaffiliative_vR %>%
+  filter(!Animal_lD %in% 35375, 35455, 35476, 35712)
+
+#matched_housing_nonsocial_v2 <- social_nonaffiliative_vR %>%
+  #filter(!Animal_lD %in% 35375, 35455, 35476, 35712)
+
+matched_housing_anxious <- anxious_vR %>%
+  filter(!Animal_lD %in% 35375, 35455, 35476, 35712)
+
+#only object has normal distrib
+#shapiro.test(matched_housing_prosocial_v2$social_affiliative)
+
+matched_housing_prosocial_v1_ttest <- wilcox.test(matched_housing_prosocial_v1$social_affiliative~matched_housing_prosocial_v1$diet_group, paired=F)
+matched_housing_nonsocial_v1_ttest <- wilcox.test(matched_housing_nonsocial_v1$social_nonaffiliative~matched_housing_nonsocial_v1$diet_group, paired=F)
+matched_housing_object_ori_ttest <- t.test(matched_housing_object_ori$object_oriented~matched_housing_object_ori$diet_group, paired=F)
+matched_housing_anxious_ttest <- wilcox.test(matched_housing_anxious$anxious~matched_housing_anxious$diet_group, paired=F)
+
+
+matched_housing_pvals <- c(matched_housing_prosocial_v1_ttest$p.value, matched_housing_nonsocial_v1_ttest$p.value, matched_housing_object_ori_ttest$p.value, matched_housing_anxious_ttest$p.value)
+matched_housing_titles <- c("Prosocial Controlled Housing",
+                            "Nonsocial Controlled Housing",
+                            "Object Oriented Controlled Housing",
+                            "Anxious Controlled Housing")
+
+table_matched_housing <- data.frame(matched_housing_titles, matched_housing_pvals)
+
+datatable(formattable(table_matched_housing))
+
+
+customviz_matched <- ggplot(matched_housing_nonsocial_v1, aes(x=diet_group, y=social_nonaffiliative, color=diet_group)) +
+  geom_boxplot() +
+  geom_jitter() +
+  theme_grey()
+  #geom_smooth(method = "lm", se =FALSE)
+
+customviz_matched+labs(title="Non-Social Behavior_HousMath (CTR=1, PR=2)", x="Diet",y="Non-Affiliative Behavior Score")  +
+  scale_color_manual(values = wes_palette(n=2, "FantasticFox1")) +
+  theme(plot.background = element_rect(fill = "light gray"),
+        panel.background = element_rect(fill = "dark gray"),
+        legend.background = element_rect(fill = "dark gray"))
+```
+
+
 
 ##Overall Behavioral Differences##
 
