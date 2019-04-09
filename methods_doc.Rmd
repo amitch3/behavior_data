@@ -225,14 +225,16 @@ as.datatable(formattable(matdiet_composite_difference,
 #View(xtab1)
 
 #make a data table here!
+```
 
-melted_scores <- melt(matdiet_filtered_v2, id.vars = "initial_diet") %>%
-  filter(!variable %in% "Observations", "sex", "new_diet") 
+```{r}
+#melted_scores <- melt(matdiet_filtered_v2, id.vars = "initial_diet") %>%
+  #filter(!variable %in% "Observations", "sex", "new_diet") 
 
-str(matdiet_filtered_v2)
+#str(matdiet_filtered_v2)
 
-melted_scores_avg <- group_by(melted_scores, initial_diet) %>%
-  summarise(mean(variable$comp_1, variable$comp_2.2, variable$comp_3.2, variable$comp_4))
+#melted_scores_avg <- group_by(melted_scores, initial_diet) %>%
+  #summarise(mean(variable$comp_1, variable$comp_2.2, variable$comp_3.2, variable$comp_4))
 
 matdiet_filtered_v2_avgcomp1_d1 <- matdiet_filtered_v2 %>%
   filter(initial_diet == 1) %>%
@@ -277,7 +279,7 @@ value_matdiet_filtered_v2_avgcomp1_d2 <- mean(matdiet_filtered_v2_avgcomp1_d2$co
 value_matdiet_filtered_v2_avgcomp2.2_d2 <- mean(matdiet_filtered_v2_avgcomp2.2_d2$comp_2.2)
 value_matdiet_filtered_v2_avgcomp3.2_d2 <- mean(matdiet_filtered_v2_avgcomp3.2_d2$comp_3.2)
 value_matdiet_filtered_v2_avgcomp4_d2 <- mean(matdiet_filtered_v2_avgcomp4_d2$comp_4)
-d1_avg_matdiet_values <- c(value_matdiet_filtered_v2_avgcomp1_d2, value_matdiet_filtered_v2_avgcomp2.2_d2, value_matdiet_filtered_v2_avgcomp3.2_d2, value_matdiet_filtered_v2_avgcomp4_d2)
+#d1_avg_matdiet_values <- c(value_matdiet_filtered_v2_avgcomp1_d2, value_matdiet_filtered_v2_avgcomp2.2_d2, value_matdiet_filtered_v2_avgcomp3.2_d2, value_matdiet_filtered_v2_avgcomp4_d2)
 d2_avg_matdiet_values <- c(value_matdiet_filtered_v2_avgcomp1_d2, value_matdiet_filtered_v2_avgcomp2.2_d2, value_matdiet_filtered_v2_avgcomp3.2_d2, value_matdiet_filtered_v2_avgcomp4_d2)
 
 title_avg_matdiet_values <- c("Composite 1", 
@@ -292,27 +294,52 @@ table_avg_matdiet_values <- data.frame(title_avg_matdiet_values, d1_avg_matdiet_
 View(table_avg_matdiet_values)
 #needed to further clarify these differences and we see that not only is composite group 2.2 the group showing diet differences, but animals exposed to the HFD score highest on this composite variable than the others. 
 #i did this because i was concerned that people would say this is not a representation of temperament.
-ggplot(table_avg_matdiet_values, aes(x=title_avg_matdiet_values, y=d1_avg_matdiet_values)) +
+<- ggplot(table_avg_matdiet_values, aes(x=title_avg_matdiet_values, y=d1_avg_matdiet_values)) +
   geom_bar(stat="identity")
-ggplot(table_avg_matdiet_values, aes(x=title_avg_matdiet_values, y=d2_avg_matdiet_values)) +
+<- ggplot(table_avg_matdiet_values, aes(x=title_avg_matdiet_values, y=d2_avg_matdiet_values)) +
   geom_bar(stat="identity")
 
-matdiet_filtered_v2_avgcomp2.2 <- mean(matdiet_filtered_v2$comp_2.2)
-matdiet_filtered_v2_avgcomp3.2 <- mean(matdiet_filtered_v2$comp_3.2)
-matdiet_filtered_v2_avgcomp4 <- mean(matdiet_filtered_v2$comp_4)
+diet_avg <- c(value_matdiet_filtered_v2_avgcomp1_d1, value_matdiet_filtered_v2_avgcomp2.2_d1, value_matdiet_filtered_v2_avgcomp3.2_d1, value_matdiet_filtered_v2_avgcomp4_d1, value_matdiet_filtered_v2_avgcomp1_d2, value_matdiet_filtered_v2_avgcomp2.2_d2, value_matdiet_filtered_v2_avgcomp3.2_d2, value_matdiet_filtered_v2_avgcomp4_d2)
+diet_vec <- c(1,1,1,1,2,2,2,2)
+diet_vec_title <- c("Composite 1", 
+                    "Composite 2.2", 
+                    "Composite 3.2",
+                    "Composite 4",
+                    "Composite 1", 
+                    "Composite 2.2", 
+                    "Composite 3.2",
+                    "Composite 4")
+all_diet_table <- data.frame(diet_vec_title, diet_vec, diet_avg)
 
-filterd_avgs <- c(matdiet_filtered_v2_avgcomp1, matdiet_filtered_v2_avgcomp2.2, matdiet_filtered_v2_avgcomp3.2, matdiet_filtered_v2_avgcomp4)
+all_diet_table$diet_vec <- as.factor(all_diet_table$diet_vec)
+
+View(all_diet_table)
+
+gplot_diet_avgs <- ggplot(all_diet_table, aes(x=diet_vec_title, y=diet_avg, fill=diet_vec)) +
+  geom_bar(stat="identity", position = "dodge")
+
+gplot_diet_avgs +labs(title = "Diet Group Averages", x="Composite Groups", y="Composite Scores") +
+  theme_minimal() +
+  #scale_fill_brewer(palette = "Accent")
+  scale_fill_manual(values = wes_palette(n=4, "Cavalcanti1"))
+
+###can delete most of this below
+#matdiet_filtered_v2_avgcomp2.2 <- mean(matdiet_filtered_v2$comp_2.2)
+#matdiet_filtered_v2_avgcomp3.2 <- mean(matdiet_filtered_v2$comp_3.2)
+#matdiet_filtered_v2_avgcomp4 <- mean(matdiet_filtered_v2$comp_4)
+
+#filterd_avgs <- c(matdiet_filtered_v2_avgcomp1, matdiet_filtered_v2_avgcomp2.2, matdiet_filtered_v2_avgcomp3.2, matdiet_filtered_v2_avgcomp4)
 
 
-str(melted_scores)
+#str(melted_scores)
 
-View(matdiet_filtered_v2_avgcomp1)
+#View(matdiet_filtered_v2_avgcomp1)
 
-ggplot(melted_scores, aes(x=initial_diet, y=value, color = initial_diet)) +
-  geom_jitter()
+#ggplot(melted_scores, aes(x=initial_diet, y=value, color = initial_diet)) +
+  #geom_jitter()
 
-ggplot(matdiet_filtered_v2, aes(x=initial_diet, y= comp_2.2)) %>%
-  boxplot()
+#ggplot(matdiet_filtered_v2, aes(x=initial_diet, y= comp_2.2)) %>%
+  #boxplot()
 
 ```
 
