@@ -49,7 +49,7 @@ Briefly, raw behaviors were normalized and subjected to a correlational analysis
 
 ```{r loading the data, echo=FALSE, warning=FALSE, message=FALSE}
 znormed_ffostare_v1 <- read_excel("znormed_ffostare_v1.xlsx")
-#skim(znormed_ffostare_v1)
+skim(znormed_ffostare_v1)
 
 selected_norms_ffostare_v1 <- znormed_ffostare_v1 %>%
   select(-Observations, - ResultContainers, - Intervals, - Zno_sec_behav_ffosta)
@@ -138,8 +138,8 @@ You will notice a **2.2 and 3.2 group**. In short, I will likely want to move fo
 
 
 ```{r inserting demographic infomation, echo=FALSE}
-selected_norms_composites_demgraf_v1.2 <- read.csv("selected_norms_composites_demgraf_v2_use.csv")
-#View(selected_norms_composites_demgraf_v1.2)
+selected_norms_composites_demgraf_v1.2 <- read.csv("selected_norms_composites_demgraf_v2.csv")
+#skim(selected_norms_composites_demgraf_v1.2)
 
 composite_scores_withgroups <- selected_norms_composites_demgraf_v1.2[order(selected_norms_composites_demgraf_v1.2$initial_diet),]  %>%
   select(Observations, sex, initial_diet, new_diet, comp_1, comp_2, comp_3, comp_4, comp_3.2, comp_2.2) 
@@ -225,6 +225,95 @@ as.datatable(formattable(matdiet_composite_difference,
 #View(xtab1)
 
 #make a data table here!
+
+melted_scores <- melt(matdiet_filtered_v2, id.vars = "initial_diet") %>%
+  filter(!variable %in% "Observations", "sex", "new_diet") 
+
+str(matdiet_filtered_v2)
+
+melted_scores_avg <- group_by(melted_scores, initial_diet) %>%
+  summarise(mean(variable$comp_1, variable$comp_2.2, variable$comp_3.2, variable$comp_4))
+
+matdiet_filtered_v2_avgcomp1_d1 <- matdiet_filtered_v2 %>%
+  filter(initial_diet == 1) %>%
+  select(comp_1)
+matdiet_filtered_v2_avgcomp2.2_d1 <- matdiet_filtered_v2 %>%
+  filter(initial_diet == 1) %>%
+  select(comp_2.2)
+matdiet_filtered_v2_avgcomp3.2_d1 <- matdiet_filtered_v2 %>%
+  filter(initial_diet == 1) %>%
+  select(comp_3.2)
+matdiet_filtered_v2_avgcomp4_d1 <- matdiet_filtered_v2 %>%
+  filter(initial_diet == 1) %>%
+  select(comp_4)
+
+
+
+View(matdiet_filtered_v2_avgcomp1_d1)
+
+value_matdiet_filtered_v2_avgcomp1_d1 <- mean(matdiet_filtered_v2_avgcomp1_d1$comp_1)
+value_matdiet_filtered_v2_avgcomp2.2_d1 <- mean(matdiet_filtered_v2_avgcomp2.2_d1$comp_2.2)
+value_matdiet_filtered_v2_avgcomp3.2_d1 <- mean(matdiet_filtered_v2_avgcomp3.2_d1$comp_3.2)
+value_matdiet_filtered_v2_avgcomp4_d1 <- mean(matdiet_filtered_v2_avgcomp4_d1$comp_4)
+d1_avg_matdiet_values <- c(value_matdiet_filtered_v2_avgcomp1_d1, value_matdiet_filtered_v2_avgcomp2.2_d1, value_matdiet_filtered_v2_avgcomp3.2_d1, value_matdiet_filtered_v2_avgcomp4_d1)
+
+View(d1_avg_matdiet_values)
+
+
+matdiet_filtered_v2_avgcomp1_d2 <- matdiet_filtered_v2 %>%
+  filter(initial_diet == 2) %>%
+  select(comp_1)
+matdiet_filtered_v2_avgcomp2.2_d2 <- matdiet_filtered_v2 %>%
+  filter(initial_diet == 2) %>%
+  select(comp_2.2)
+matdiet_filtered_v2_avgcomp3.2_d2 <- matdiet_filtered_v2 %>%
+  filter(initial_diet == 2) %>%
+  select(comp_3.2)
+matdiet_filtered_v2_avgcomp4_d2 <- matdiet_filtered_v2 %>%
+  filter(initial_diet == 2) %>%
+  select(comp_4)
+
+value_matdiet_filtered_v2_avgcomp1_d2 <- mean(matdiet_filtered_v2_avgcomp1_d2$comp_1)
+value_matdiet_filtered_v2_avgcomp2.2_d2 <- mean(matdiet_filtered_v2_avgcomp2.2_d2$comp_2.2)
+value_matdiet_filtered_v2_avgcomp3.2_d2 <- mean(matdiet_filtered_v2_avgcomp3.2_d2$comp_3.2)
+value_matdiet_filtered_v2_avgcomp4_d2 <- mean(matdiet_filtered_v2_avgcomp4_d2$comp_4)
+d1_avg_matdiet_values <- c(value_matdiet_filtered_v2_avgcomp1_d2, value_matdiet_filtered_v2_avgcomp2.2_d2, value_matdiet_filtered_v2_avgcomp3.2_d2, value_matdiet_filtered_v2_avgcomp4_d2)
+d2_avg_matdiet_values <- c(value_matdiet_filtered_v2_avgcomp1_d2, value_matdiet_filtered_v2_avgcomp2.2_d2, value_matdiet_filtered_v2_avgcomp3.2_d2, value_matdiet_filtered_v2_avgcomp4_d2)
+
+title_avg_matdiet_values <- c("Composite 1", 
+                              "Composite 2.2", 
+                              "Composite 3.2",
+                              "Composite 4")
+
+View(d2_avg_matdiet_values)
+
+table_avg_matdiet_values <- data.frame(title_avg_matdiet_values, d1_avg_matdiet_values, d2_avg_matdiet_values)
+
+View(table_avg_matdiet_values)
+#needed to further clarify these differences and we see that not only is composite group 2.2 the group showing diet differences, but animals exposed to the HFD score highest on this composite variable than the others. 
+#i did this because i was concerned that people would say this is not a representation of temperament.
+ggplot(table_avg_matdiet_values, aes(x=title_avg_matdiet_values, y=d1_avg_matdiet_values)) +
+  geom_bar(stat="identity")
+ggplot(table_avg_matdiet_values, aes(x=title_avg_matdiet_values, y=d2_avg_matdiet_values)) +
+  geom_bar(stat="identity")
+
+matdiet_filtered_v2_avgcomp2.2 <- mean(matdiet_filtered_v2$comp_2.2)
+matdiet_filtered_v2_avgcomp3.2 <- mean(matdiet_filtered_v2$comp_3.2)
+matdiet_filtered_v2_avgcomp4 <- mean(matdiet_filtered_v2$comp_4)
+
+filterd_avgs <- c(matdiet_filtered_v2_avgcomp1, matdiet_filtered_v2_avgcomp2.2, matdiet_filtered_v2_avgcomp3.2, matdiet_filtered_v2_avgcomp4)
+
+
+str(melted_scores)
+
+View(matdiet_filtered_v2_avgcomp1)
+
+ggplot(melted_scores, aes(x=initial_diet, y=value, color = initial_diet)) +
+  geom_jitter()
+
+ggplot(matdiet_filtered_v2, aes(x=initial_diet, y= comp_2.2)) %>%
+  boxplot()
+
 ```
 
 Below are scatterplots and bar plots of individual scores relating to the significant composite behaviors. Bar plots can provide insight into specific cohort differences whereas the scatterplots let you see the visualize the overall difference in performance. Only the results of the maternal diet were visualized. 
