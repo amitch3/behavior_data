@@ -39,6 +39,7 @@ library(readxl)
 library(formattable)
 library(DT)
 library(xtable)
+library(wesanderson)
 ```
 
 The purpose of this document is to outline of the methods used to contruct composite variables from the raw behaviors collected form the Human Intruder Task. The data include the **Stare, Familiar Food Offer, and Novel Object** epochs and a total of 37 behaviors were included in the analysis. 
@@ -279,6 +280,22 @@ value_matdiet_filtered_v2_avgcomp1_d2 <- mean(matdiet_filtered_v2_avgcomp1_d2$co
 value_matdiet_filtered_v2_avgcomp2.2_d2 <- mean(matdiet_filtered_v2_avgcomp2.2_d2$comp_2.2)
 value_matdiet_filtered_v2_avgcomp3.2_d2 <- mean(matdiet_filtered_v2_avgcomp3.2_d2$comp_3.2)
 value_matdiet_filtered_v2_avgcomp4_d2 <- mean(matdiet_filtered_v2_avgcomp4_d2$comp_4)
+
+value_matdiet_filtered_v2_avgcomp1_d2_err <- std.error(matdiet_filtered_v2_avgcomp1_d2$comp_1)
+value_matdiet_filtered_v2_avgcomp2.2_d2_err <- stderr(matdiet_filtered_v2_avgcomp2.2_d2$comp_2.2)
+value_matdiet_filtered_v2_avgcomp3.2_d2_err <- stderr(matdiet_filtered_v2_avgcomp3.2_d2$comp_3.2)
+value_matdiet_filtered_v2_avgcomp4_d2_err <- stderr(matdiet_filtered_v2_avgcomp4_d2$comp_4)
+
+
+####calculate standard error for other metrics###
+###get elinor the data
+library(Hmisc)
+library(psych)
+
+des_comp_1 <- describe(matdiet_filtered_v2_avgcomp1_d2$comp_1)
+
+se_des_comp1   <- des_comp_1$se
+
 #d1_avg_matdiet_values <- c(value_matdiet_filtered_v2_avgcomp1_d2, value_matdiet_filtered_v2_avgcomp2.2_d2, value_matdiet_filtered_v2_avgcomp3.2_d2, value_matdiet_filtered_v2_avgcomp4_d2)
 d2_avg_matdiet_values <- c(value_matdiet_filtered_v2_avgcomp1_d2, value_matdiet_filtered_v2_avgcomp2.2_d2, value_matdiet_filtered_v2_avgcomp3.2_d2, value_matdiet_filtered_v2_avgcomp4_d2)
 
@@ -294,9 +311,9 @@ table_avg_matdiet_values <- data.frame(title_avg_matdiet_values, d1_avg_matdiet_
 View(table_avg_matdiet_values)
 #needed to further clarify these differences and we see that not only is composite group 2.2 the group showing diet differences, but animals exposed to the HFD score highest on this composite variable than the others. 
 #i did this because i was concerned that people would say this is not a representation of temperament.
-<- ggplot(table_avg_matdiet_values, aes(x=title_avg_matdiet_values, y=d1_avg_matdiet_values)) +
+ ggplot(table_avg_matdiet_values, aes(x=title_avg_matdiet_values, y=d1_avg_matdiet_values)) +
   geom_bar(stat="identity")
-<- ggplot(table_avg_matdiet_values, aes(x=title_avg_matdiet_values, y=d2_avg_matdiet_values)) +
+ ggplot(table_avg_matdiet_values, aes(x=title_avg_matdiet_values, y=d2_avg_matdiet_values)) +
   geom_bar(stat="identity")
 
 diet_avg <- c(value_matdiet_filtered_v2_avgcomp1_d1, value_matdiet_filtered_v2_avgcomp2.2_d1, value_matdiet_filtered_v2_avgcomp3.2_d1, value_matdiet_filtered_v2_avgcomp4_d1, value_matdiet_filtered_v2_avgcomp1_d2, value_matdiet_filtered_v2_avgcomp2.2_d2, value_matdiet_filtered_v2_avgcomp3.2_d2, value_matdiet_filtered_v2_avgcomp4_d2)
@@ -354,8 +371,11 @@ ggcomp1 <- ggplot(matdiet_filtered, aes(x=Observations, y=comp_1, color=initial_
 ggcomp2 <- ggplot(matdiet_filtered, aes(x=Observations, y=comp_2, color=initial_diet, fill=initial_diet)) +
   geom_bar(stat = "identity", width = 20, position = position_dodge())
 
-ggcomp2.2 <- ggplot(matdiet_filtered_v2, aes(x=Observations, y=comp_2.2, color=initial_diet, fill=initial_diet)) +
+ggcomp2.2 <- ggplot(matdiet_filtered_v2, aes(x=Observations, y=comp_2.2, fill=initial_diet)) +
   geom_bar(stat = "identity", width = 20, position = position_dodge())
+
+ggcomp2.2 +labs(title = "Composite 2.2 Score", x="Animal ID", y="Composite Score") +
+  scale_color_manual(values = wes_palette(n=4, "FantasticFox1"))
 
 dotplotly_comp2 <- ggplot(matdiet_filtered, aes(x=Observations, y=comp_2, color=initial_diet, fill=initial_diet)) +
   geom_point(stat = "identity") + 
@@ -647,3 +667,27 @@ Some things that still need to be discussed are:
  - what is the direction for moving forward if this looks good.
  
 
+```{r}
+#understanding iGraph with correlation data
+
+library(igraph)
+
+corrdataplay1 <- corrnorm_selected_ffostare_v1
+
+corrdataplay1[corrdataplay1>.01 & corrdataplay1<.1]=0
+
+corr_network= graph_from_adjacency_matrix(corrdataplay1, mode = "undirected", weighted = TRUE)
+
+plot(corr_network)
+
+order_corr <- layout_with_fr(corrdataplay1)
+
+plot(order_corr)
+
+
+cor2graph_v2 <- corrnorm_selected_ffostare_v1 %>%
+  filter(abs(r) < .99,
+         abs(r) > .3) %>%
+  graph_from_data_frame(directed = F)
+
+```
