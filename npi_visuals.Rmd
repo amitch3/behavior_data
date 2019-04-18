@@ -648,19 +648,19 @@ And i am unsure of which would be the better approach for quantifying such behav
 ##importing data
 
 year1_4mo_NPI_combined <- read_excel("4mo_year1_NPI_combined.xlsx")
-str(year1_4mo_NPI_combined)
+#str(year1_4mo_NPI_combined)
 
 year2_4mo_NPI_combined <- read_excel("4mo_year2_NPI_combined.xlsx")
-View(year2_4mo_NPI_combined)
+#View(year2_4mo_NPI_combined)
 
 year2_11mo_NPI_combined <- read_excel("11mo_year2_NPI_combined.xlsx")
-str(year2_11mo_NPI_combined)
+#str(year2_11mo_NPI_combined)
 
 year2_4mo_11mo_NPI_combined <- read_excel("year2_4mo_11mo_combined.xlsx")
-View(year2_4mo_11mo_NPI_combined)
+#View(year2_4mo_11mo_NPI_combined)
 
 yr1_yr2_4mo_NPI_combined <- read_excel("yr1_yr2_4mo_combined.xlsx")
-View(yr1_yr2_4mo_NPI_combined)
+#View(yr1_yr2_4mo_NPI_combined)
 ```
 
 
@@ -749,7 +749,7 @@ metled_cor_selected_yr1_yr2_4mo_NPI_combined_4cor <- melt(cor_selected_yr1_yr2_4
 
 ```
 
-**The tables below, type in your measurement of interest (e.g. "FA" or "brain_volume") to see how it correlates with other behaviors. You can also type in values (e.g. ".8" to isolate variables with strong correlations**
+**For the tables below, type in your measurement of interest (e.g. "FA" or "brain_volume") to see how it correlates with other behaviors. You can also type in values (e.g. ".8") to isolate variables with strong correlations. Additionally, you can extend this to ".8 FA to isolate further.** 
 
 ```{r, echo=F, warning=F, message=F}
 datatable(formattable(melted_cor_yr1_4moNPI_v1))
@@ -820,8 +820,12 @@ gplot_yr2_4mo_11mo_NPI <- ggplot(metled_cor_yr2_4mo_11mo_NPI_4cor, aes(x=Var2, y
   theme(axis.text.x = element_text(angle = 90,
                                    vjust = 1,
                                    size = 9,
-                                   hjust = 1))
+                                   hjust = 1,
+                                    ))
 
-gplot_yr2_4mo_11mo_NPI + labs(title="Year 2: 4mo plus 11mo Correlations ", x="Correlation Value", y="Correlation Value")
+gplot_yr2_4mo_11mo_NPI + labs(title="Year 2: 4mo plus 11mo Correlations ", x="Correlation Value", y="Correlation Value") 
 
 ```
+
+
+![I could not figure out how to get the proportions right in the output of the figure so i took an extended screenshot to represent the last figure; detailing the year2 4 and 11 mo comparison with behavior.](spread_last_fig.PNG)
