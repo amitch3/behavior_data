@@ -640,5 +640,188 @@ And i am unsure of which would be the better approach for quantifying such behav
       
 -  **I am open to any changes. I am unsure if the makeup of the data allows us to use Community Detection, and I also thought grouping terms into pro-social/non-social/anxious provides a better output.** 
       - But again, we can adjust where needed.. this adjustment/documentation process has become increasingly faster for me. 
-      
-      
+    
+
+##new graphs and tables for NPI meeting##
+
+```{r, echo=FALSE, warning=F, message=F}
+##importing data
+
+year1_4mo_NPI_combined <- read_excel("4mo_year1_NPI_combined.xlsx")
+str(year1_4mo_NPI_combined)
+
+year2_4mo_NPI_combined <- read_excel("4mo_year2_NPI_combined.xlsx")
+View(year2_4mo_NPI_combined)
+
+year2_11mo_NPI_combined <- read_excel("11mo_year2_NPI_combined.xlsx")
+str(year2_11mo_NPI_combined)
+
+year2_4mo_11mo_NPI_combined <- read_excel("year2_4mo_11mo_combined.xlsx")
+View(year2_4mo_11mo_NPI_combined)
+
+yr1_yr2_4mo_NPI_combined <- read_excel("yr1_yr2_4mo_combined.xlsx")
+View(yr1_yr2_4mo_NPI_combined)
+```
+
+
+
+
+```{r, echo=FALSE, warning=F, message=F}
+##removing subjects with missing data
+
+selected_yr1_4moNPI_v1 <- year1_4mo_NPI_combined %>%
+  filter(!subj_id == 34404,
+         !subj_id == 34412)
+
+selected_yr2_4moNPI_v1 <- year2_4mo_NPI_combined %>%
+  filter(!subj_id == 35408)
+
+selected_yr2_11moNPI_v1 <- year2_11mo_NPI_combined %>%
+  filter(!subj_ID == 35505,
+         !subj_ID == 35408)
+
+selected_year2_4mo_11mo_NPI_combined <- year2_4mo_11mo_NPI_combined %>%
+  filter(!subj_id == 35505,
+         !subj_id == 35408)
+
+selected_yr1_yr2_4mo_NPI_combined <- yr1_yr2_4mo_NPI_combined %>%
+  filter(!subj_id == 35505,
+         !subj_id == 35408)
+
+####selecting out subj_id and group
+
+selected_yr1_4moNPI_v1_4cor <- year1_4mo_NPI_combined %>%
+  filter(!subj_id == 34404,
+         !subj_id == 34412) %>%
+  select(- subj_id, -group)
+
+selected_yr2_4moNPI_v14cor <- year2_4mo_NPI_combined %>%
+  filter(!subj_id == 35408) %>%
+  select(- subj_id, -group)
+
+selected_yr2_11moNPI_v1_4cor <- year2_11mo_NPI_combined %>%
+  filter(!subj_ID == 35505,
+         !subj_ID == 35408) %>%
+  select(-subj_ID, -group)
+
+selected_year2_4mo_11mo_NPI_combined_4cor <- year2_4mo_11mo_NPI_combined %>%
+  filter(!subj_id == 35505,
+         !subj_id == 35408) %>%
+  select(- subj_id, -group)
+
+selected_yr1_yr2_4mo_NPI_combined_4cor <- selected_yr1_yr2_4mo_NPI_combined %>%
+  filter(!subj_id == 35505,
+         !subj_id == 35408, 
+         !subj_id == 34412) %>%
+  select(- subj_id, -group)
+
+
+#View(selected_yr2_11moNPI_v1_4cor)
+```
+
+
+
+```{r, echo=FALSE, warning=F, message=F}
+##calculating correlations
+cor_yr1_4moNPI_v1 <- cor(selected_yr1_4moNPI_v1_4cor)
+melted_cor_yr1_4moNPI_v1 <- melt(cor_yr1_4moNPI_v1)
+
+thresh_melt_cor_yr1 <- melted_cor_yr1_4moNPI_v1 %>%
+  filter(!is.na(value),
+         value <= .99)
+
+#View(thresh_melt_cor_yr1)
+
+
+cor_yr2_4moNPI_v1 <- cor(selected_yr2_4moNPI_v14cor)
+melted_cor_yr2_4moNPI_v1 <- melt(cor_yr2_4moNPI_v1)
+
+cor_yr2_11moNPI_v1 <- cor(selected_yr2_11moNPI_v1_4cor)
+melted_cor_yr2_11moNPI_v1 <- melt(cor_yr2_11moNPI_v1)
+
+cor_yr2_4mo_11mo_NPI_4cor <- cor(selected_year2_4mo_11mo_NPI_combined_4cor)
+metled_cor_yr2_4mo_11mo_NPI_4cor <- melt(cor_yr2_4mo_11mo_NPI_4cor)
+
+cor_selected_yr1_yr2_4mo_NPI_combined_4cor <- cor(selected_yr1_yr2_4mo_NPI_combined_4cor)
+metled_cor_selected_yr1_yr2_4mo_NPI_combined_4cor <- melt(cor_selected_yr1_yr2_4mo_NPI_combined_4cor)
+
+#View(metled_cor_selected_yr1_yr2_4mo_NPI_combined_4cor)
+
+```
+
+**The tables below, type in your measurement of interest (e.g. "FA" or "brain_volume") to see how it correlates with other behaviors. You can also type in values (e.g. ".8" to isolate variables with strong correlations**
+
+```{r, echo=F, warning=F, message=F}
+datatable(formattable(melted_cor_yr1_4moNPI_v1))
+
+datatable(formattable(melted_cor_yr2_4moNPI_v1))
+
+datatable(formattable(melted_cor_yr2_11moNPI_v1))
+
+datatable(formattable(metled_cor_yr2_4mo_11mo_NPI_4cor))
+
+```
+
+
+##new graphs for NPI meeting##
+
+**The graphs below are visualizations for how behaviors and structural measurements relate to each other. The title describe the input data. I was unable to generate a matrix showing how the 4mo_yr1 and 4mo_yr2 data relate to behavior as well as each other, but I should be able to figure this out after the weekend.**
+
+
+**Additionally, I want to investigate the percent change between yr2_4mo and yr2_11mo subjects related to structural, volume, and diffusion (MRI metrics) and relate these to expressions in behavior. The driving hypothesis being that animals subjected to a protein restricted diet will have less change (flatter slope) between these time points than subjects given a normal diet. I expect PR animals to have decreased changes relating to normal developmental trajectories and relate these differences to differences in behavior between the two diet groups.**
+
+```{r, echo=F, warning=F, message=F}
+##yr1_4mo
+
+gplot_yr1_4mo_NPI <- ggplot(melted_cor_yr1_4moNPI_v1, aes(x=Var2, y=Var1, fill=value)) +
+  geom_tile() +
+  scale_fill_gradientn(colours = topo.colors(10)) + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90,
+                                   vjust = 1,
+                                   size = 9,
+                                   hjust = 1))
+
+gplot_yr1_4mo_NPI+labs(title="No Threshold 4mo Year 1 Behavior plus Structure Correlation Matrix", x="Correlation Value", y="Correlation Value")
+
+###yr2_4mo
+
+gplot_yr2_4mo_NPI <- ggplot(melted_cor_yr2_4moNPI_v1, aes(x=Var2, y=Var1, fill=value)) +
+  geom_tile() +
+  scale_fill_gradientn(colours = topo.colors(10)) + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90,
+                                   vjust = 1,
+                                   size = 9,
+                                   hjust = 1))
+
+gplot_yr2_4mo_NPI + labs(title= "Year2_4mo_NPI", x="Correlation Value", y="Correlation Value")
+
+###yr2_11mo
+
+gplot_yr2_11mo_NPI <- ggplot(melted_cor_yr2_11moNPI_v1, aes(x=Var2, y=Var1, fill=value)) +
+  geom_tile() +
+  scale_fill_gradientn(colours = topo.colors(10)) + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90,
+                                   vjust = 1,
+                                   size = 9,
+                                   hjust = 1))
+
+gplot_yr2_11mo_NPI + labs(title="year2_11mo_NPI", x="Correlation Value", y="Correlation Value")
+
+###yr_2_4mo_11mo
+
+
+gplot_yr2_4mo_11mo_NPI <- ggplot(metled_cor_yr2_4mo_11mo_NPI_4cor, aes(x=Var2, y=Var1, fill=value)) +
+  geom_tile() +
+  scale_fill_gradientn(colours = topo.colors(10)) + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90,
+                                   vjust = 1,
+                                   size = 9,
+                                   hjust = 1))
+
+gplot_yr2_4mo_11mo_NPI + labs(title="Year 2: 4mo plus 11mo Correlations ", x="Correlation Value", y="Correlation Value")
+
+```
