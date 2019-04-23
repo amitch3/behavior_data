@@ -36,7 +36,10 @@ library(semPlot)
 library(readxl)
 library(formattable)
 library(DT)
-#library(wesanderson)
+library(ggthemes)
+library(ggcorrplot)
+library(wesanderson)
+library(RColorBrewer)
 #library(ggthemes)
 ```
 
@@ -824,8 +827,234 @@ gplot_yr2_4mo_11mo_NPI <- ggplot(metled_cor_yr2_4mo_11mo_NPI_4cor, aes(x=Var2, y
                                     ))
 
 gplot_yr2_4mo_11mo_NPI + labs(title="Year 2: 4mo plus 11mo Correlations ", x="Correlation Value", y="Correlation Value") 
+```
+
+
+```{r}
+##loading the new data
+
+#structural only @ 4mo between yr1 and yr2
+##did this to maximize data set - must remove significantly more animals from data when incorporating behavior
+structural_yr1_yr2 <- read_excel("structural_yr1_yr2.xlsx")
+str(structural_yr1_yr2)
+
+#behavior plus structural @ 4mo between yr1 and yr2
+perc_diffs_4mo_yr2_11mo_yr2 <- read_excel("perc_diffs_4mo_yr2_11mo_yr2.xlsx")
+View(perc_diffs_4mo_yr2_11mo_yr2)
+
+selected_perc_diffs_4mo_yr2_11mo_yr2 <- perc_diffs_4mo_yr2_11mo_yr2 %>%
+  select(- subj_id, - group)
+
+#differences in 4mo_yr1 and 11mo_yr2
+##here i'm trying to look at the percent change between the 7 months and see if animals given a normal diet showed greater changes in areas associated with behaviors (i.e are there differences in percent change in areas related to the behavioral deficiets we see - is there a flatter slope in the PFC between diet groups and does their behavior reflect this?)
+behav_plus_struc_4moyr1_4moyr2 <- read_excel("behav_plus_struc_4moyr1_4moyr2.xlsx")
+View(behav_plus_struc_4moyr1_4moyr2)
+```
+
+```{r}
+
+##testing
+##select out variables (only in perc_diffs) and calculate correlations as well as pvalues and melt data
+##here we are also going to start incorporating the cor.test funciton to get pvalues for Elinor
+    #compare matrices to make sure they look the same - problem is i need to make my data in a different format for pvalues 
+
+cor_structural_yr1_yr2 <- cor(structural_yr1_yr2)
+
+cor_pval_structural_yr1_yr2 <- rcorr(as.matrix(structural_yr1_yr2))
+
+cor_structural_yr1_yr2
+
+cor_pval_structural_yr1_yr2$P
+
+melted_cor_structural_yr1_yr2_cor <- melt(cor_structural_yr1_yr2)
+melted_cor_structural_yr1_yr2_rcorr <- melt(cor_pval_structural_yr1_yr2$r)
+
+thresh_melted_cor_pval_structural_yr1_yr2 <- melt(cor_pval_structural_yr1_yr2$P) %>%
+  filter(value <= .05)
+
+#gplot_thresh_melted_cor_pval_structural_yr1_yr2 <- 
+  
+  ggplot(melted_cor_structural_yr1_yr2_cor, aes(x=Var2, y=Var1, fill=value)) +
+  geom_tile() +
+  scale_fill_gradientn(colours = topo.colors(10)) + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90,
+                                   vjust = 1,
+                                   size = 9,
+                                   hjust = 1,
+                                    ))
+
+gplot_thresh_melted_cor_pval_structural_yr1_yr2 + labs(title="Structural Relationships between Yr1 and Yr1: Correlations", x="P Value", y="P Value") 
 
 ```
+
+
+```{r}
+#starting real analysis
+cor_structural_yr1_yr2 <- rcorr(as.matrix(structural_yr1_yr2))
+melted_cor_structural_yr1_yr2_rcorr <- melt(cor_pval_structural_yr1_yr2$r)
+thresh_melted_cor_pval_structural_yr1_yr2 <- melt(cor_pval_structural_yr1_yr2$P) %>%
+  filter(value <= .05)
+
+cor_perc_diffs_4mo_yr2_11mo_yr2 <- rcorr(as.matrix(selected_perc_diffs_4mo_yr2_11mo_yr2))
+melted_cor_perc_diffs_4mo_yr2_11mo_yr2 <- melt(cor_perc_diffs_4mo_yr2_11mo_yr2$r)
+thresh_melted_pvals_melted_cor_perc_diffs_4mo_yr2_11mo_yr2 <- melt(cor_perc_diffs_4mo_yr2_11mo_yr2$P) %>%
+  filter(value <= .05)
+  
+cor_behav_plus_struc_4moyr1_4moyr2 <- rcorr(as.matrix(behav_plus_struc_4moyr1_4moyr2))
+melted_cor_behav_plus_struc_4moyr1_4moyr2 <- melt(cor_behav_plus_struc_4moyr1_4moyr2$r)
+thresh_melted_pvals_cor_behav_plus_struc_4moyr1_4moyr2 <- melt(cor_behav_plus_struc_4moyr1_4moyr2$P) %>%
+  filter(value <= .05)
+```
+
+```{r}
+
+##Structure Only
+
+#plot of correlation values of structure only
+gplot_corplot_structure_corval <- ggcorrplot(cor_structural_yr1_yr2$r, hc.order = TRUE, type = "lower", colors = topo.colors(3)) +  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90,
+                                   vjust = 1,
+                                   size = 9,
+                                   hjust = 1
+                                    ))
+
+gplot_corplot_structure_corval + labs(title="Structural Relationships between Yr1 and Yr2: Correlations", x="Correlation Stregnth", y="Correlation Stregnth")
+
+#plot of pvalues for structure only
+gplot_corplot_structure_pval <- ggplot(thresh_melted_cor_pval_structural_yr1_yr2, aes(x=Var2, y=Var1, fill=value)) +
+  geom_tile() +
+  scale_fill_gradientn(colours = topo.colors(5)) + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90,
+                                   vjust = 1,
+                                   size = 9,
+                                   hjust = 1
+                                    ))
+
+gplot_corplot_structure_pval + labs(title="Structural Relationships between Yr1 and Yr2: Pvalue", x="Significance Stregnth", y="Significance Stregnth")
+```
+
+```{r}
+
+##Structure plus behavior
+
+#plot of correlation values of structure plus behavior
+##does not work bc of NaNs
+gplot_corplot_behave_struct_corval <- ggcorrplot(cor_behav_plus_struc_4moyr1_4moyr2$r, hc.order = TRUE, type = "lower", colors = topo.colors(3)) +  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90,
+                                   vjust = 1,
+                                   size = 9,
+                                   hjust = 1
+                                    ))
+
+gplot_corplot_behav_struct_corval + labs(title="Behavior and Structure Relationships between Yr1 and Yr2: Correlations", x="Correlation Stregnth", y="Correlation Stregnth")
+
+##above does not work bc of NaNs
+gplot_behav_plus_struc_4moyr1_4moyr2_v2 <- ggplot(melted_cor_behav_plus_struc_4moyr1_4moyr2, aes(x=Var2, y=Var1, fill=value)) +
+  geom_tile() +
+  scale_fill_gradientn(colours = topo.colors(9)) + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90,
+                                   vjust = 1,
+                                   size = 9,
+                                   hjust = 1
+                                    )) +
+     theme(axis.text.y = element_text(margin = margin(b = .5, t=.5),
+                                   vjust = 1,
+                                   size = 9,
+                                   hjust = 1
+                                    ))
+
+gplot_behav_plus_struc_4moyr1_4moyr2_v2 + labs(title="Year1 and Year2: Structure related to Behavior: Correlation Values", x="Correlation Stregnth", y="Correlation Stregnth")
+
+
+
+
+#plot of pvalues for structure plus behavior
+gplot_corplot_behave_structure_pval <- ggplot(thresh_melted_pvals_cor_behav_plus_struc_4moyr1_4moyr2, aes(x=Var2, y=Var1, fill=value)) +
+  geom_tile() +
+  scale_fill_gradientn(colours = topo.colors(5)) + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90,
+                                   vjust = 1,
+                                   size = 9,
+                                   hjust = 1
+                                    ))
+
+gplot_corplot_behave_structure_pval + labs(title="Year1 and Year2: Structure related to Behavior: Pvalue", x="Significance Stregnth", y="Significance Stregnth")
+```
+
+```{r}
+##percent differences between year 2, 4mo and 11mo 
+
+#plot of correlation values of percent differences between year 2, 4mo and 11mo
+##DOESNT WORK DUE TO NaNs
+gplot_corplot_percdiff_corval <- ggcorrplot(cor_perc_diffs_4mo_yr2_11mo_yr2$r, hc.order = TRUE, type = "lower", colors = topo.colors(3)) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90,
+                                   vjust = 1,
+                                   size = 9,
+                                   hjust = 1
+                                    ))
+
+gplot_corplot_structure_corval + labs(title="Year2: Percent Differences 4mo/11mo in Structure related to Behavior: Correlations", x="Correlation Stregnth", y="Correlation Stregnth")
+
+#######above doesnt work bc of NaNs...
+
+gplot_corplot_percdiff_corval_v2 <- ggplot(melted_cor_perc_diffs_4mo_yr2_11mo_yr2, aes(x=Var2, y=Var1, fill=value)) +
+  geom_tile() +
+  scale_fill_gradientn(colours = topo.colors(10)) + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90,
+                                   vjust = 1,
+                                   size = 9,
+                                   hjust = 1
+                                    )) +
+     theme(axis.text.y = element_text(margin = margin(b = .5, t=.5),
+                                   vjust = 1,
+                                   size = 9,
+                                   hjust = 1
+                                    ))
+
+gplot_corplot_percdiff_corval_v2 + labs(title="Year2: Percent Differences in 4mo/11mo Structure related to Behavior: Correlation Values", x="Correlation Stregnth", y="Correlation Stregnth")
+
+#plot of correlation values of percent differences between year 2, 4mo and 11mo
+gplot_corplot_cor_percdiff_pval <- ggplot(thresh_melted_pvals_melted_cor_perc_diffs_4mo_yr2_11mo_yr2, aes(x=Var2, y=Var1, fill=value)) +
+  geom_tile() +
+  scale_fill_gradientn(colours = topo.colors(5)) + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90,
+                                   vjust = 1,
+                                   size = 9,
+                                   hjust = 1
+                                    )) +
+   theme(axis.text.y = element_text(
+                                   vjust = 1,
+                                   size = 9,
+                                   hjust = 1
+                                    ))
+
+gplot_corplot_cor_percdiff_pval + labs(title="Year2: Percent Differences in 4mo/11mo Structure related to Behavior: Pvalue", x="Significance Stregnth", y="Significance Stregnth")
+
+
+
+```
+
+
+
+
+```{r}
+##need to go back and look at this with the composite variable included
+#additionally need to make tables.. 
+
+
+```
+
+
+
+
+
 
 
 ![I could not figure out how to get the proportions right in the output of the figure so i took an extended screenshot to represent the last figure; detailing the year2 4 and 11 mo comparison with behavior.](spread_last_fig.PNG)
