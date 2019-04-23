@@ -782,7 +782,7 @@ gplot_yr1_4mo_NPI <- ggplot(melted_cor_yr1_4moNPI_v1, aes(x=Var2, y=Var1, fill=v
                                    size = 9,
                                    hjust = 1))
 
-gplot_yr1_4mo_NPI+labs(title="No Threshold 4mo Year 1 Behavior plus Structure Correlation Matrix", x="Correlation Value", y="Correlation Value")
+gplot_yr1_4mo_NPI+labs(title="Year 1 Behavior plus Structure Correlation Matrix", x="Correlation Value", y="Correlation Value")
 
 ###yr2_4mo
 
