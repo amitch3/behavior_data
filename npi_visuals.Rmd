@@ -848,7 +848,7 @@ selected_perc_diffs_4mo_yr2_11mo_yr2 <- perc_diffs_4mo_yr2_11mo_yr2 %>%
 #differences in 4mo_yr1 and 11mo_yr2
 ##here i'm trying to look at the percent change between the 7 months and see if animals given a normal diet showed greater changes in areas associated with behaviors (i.e are there differences in percent change in areas related to the behavioral deficiets we see - is there a flatter slope in the PFC between diet groups and does their behavior reflect this?)
 behav_plus_struc_4moyr1_4moyr2 <- read_excel("behav_plus_struc_4moyr1_4moyr2.xlsx")
-View(behav_plus_struc_4moyr1_4moyr2)
+str(behav_plus_struc_4moyr1_4moyr2)
 ```
 
 ```{r}
@@ -891,20 +891,39 @@ gplot_thresh_melted_cor_pval_structural_yr1_yr2 + labs(title="Structural Relatio
 
 ```{r}
 #starting real analysis
-cor_structural_yr1_yr2 <- rcorr(as.matrix(structural_yr1_yr2))
+cor_pval_structural_yr1_yr2 <- rcorr(as.matrix(structural_yr1_yr2))
 melted_cor_structural_yr1_yr2_rcorr <- melt(cor_pval_structural_yr1_yr2$r)
+
+str(melted_cor_structural_yr1_yr2_rcorr)
+
 thresh_melted_cor_pval_structural_yr1_yr2 <- melt(cor_pval_structural_yr1_yr2$P) %>%
   filter(value <= .05)
 
+####
+
 cor_perc_diffs_4mo_yr2_11mo_yr2 <- rcorr(as.matrix(selected_perc_diffs_4mo_yr2_11mo_yr2))
 melted_cor_perc_diffs_4mo_yr2_11mo_yr2 <- melt(cor_perc_diffs_4mo_yr2_11mo_yr2$r)
+removed_dups_perc_diffs <- melt(cor_perc_diffs_4mo_yr2_11mo_yr2$r) %>%
+  filter(value <= 1,
+         value >=.25)
 thresh_melted_pvals_melted_cor_perc_diffs_4mo_yr2_11mo_yr2 <- melt(cor_perc_diffs_4mo_yr2_11mo_yr2$P) %>%
   filter(value <= .05)
+
+#####
+
+removed_dups_behave_plus_struc <- thresh_melted_pvals_cor_behav_plus_struc_4moyr1_4moyr2[!duplicated(thresh_melted_pvals_cor_behav_plus_struc_4moyr1_4moyr2$value), ]
   
 cor_behav_plus_struc_4moyr1_4moyr2 <- rcorr(as.matrix(behav_plus_struc_4moyr1_4moyr2))
 melted_cor_behav_plus_struc_4moyr1_4moyr2 <- melt(cor_behav_plus_struc_4moyr1_4moyr2$r)
+thresh_melt_behav_struc_test4pval <- melt(cor_behav_plus_struc_4moyr1_4moyr2$r) %>%
+  filter(value <= 1,
+         value >= .25)
 thresh_melted_pvals_cor_behav_plus_struc_4moyr1_4moyr2 <- melt(cor_behav_plus_struc_4moyr1_4moyr2$P) %>%
   filter(value <= .05)
+
+removed_dups_behave_plus_struc <- thresh_melted_pvals_cor_behav_plus_struc_4moyr1_4moyr2[!duplicated(thresh_melted_pvals_cor_behav_plus_struc_4moyr1_4moyr2$value), ]
+
+duplicated(thresh_melted_pvals_cor_behav_plus_struc_4moyr1_4moyr2$value) 
 ```
 
 ```{r}
@@ -933,6 +952,10 @@ gplot_corplot_structure_pval <- ggplot(thresh_melted_cor_pval_structural_yr1_yr2
                                     ))
 
 gplot_corplot_structure_pval + labs(title="Structural Relationships between Yr1 and Yr2: Pvalue", x="Significance Stregnth", y="Significance Stregnth")
+
+
+##this is all structure
+datatable(formattable(thresh_melted_cor_pval_structural_yr1_yr2))
 ```
 
 ```{r}
@@ -983,6 +1006,8 @@ gplot_corplot_behave_structure_pval <- ggplot(thresh_melted_pvals_cor_behav_plus
                                     ))
 
 gplot_corplot_behave_structure_pval + labs(title="Year1 and Year2: Structure related to Behavior: Pvalue", x="Significance Stregnth", y="Significance Stregnth")
+
+datatable(formattable(removed_dups_behave_plus_struc))
 ```
 
 ```{r}
@@ -1038,7 +1063,7 @@ gplot_corplot_cor_percdiff_pval <- ggplot(thresh_melted_pvals_melted_cor_perc_di
 gplot_corplot_cor_percdiff_pval + labs(title="Year2: Percent Differences in 4mo/11mo Structure related to Behavior: Pvalue", x="Significance Stregnth", y="Significance Stregnth")
 
 
-
+datatable(formattable(melted_cor_perc_diffs_4mo_yr2_11mo_yr2))
 ```
 
 
@@ -1047,6 +1072,9 @@ gplot_corplot_cor_percdiff_pval + labs(title="Year2: Percent Differences in 4mo/
 ```{r}
 ##need to go back and look at this with the composite variable included
 #additionally need to make tables.. 
+
+
+##adding the composite
 
 
 ```
