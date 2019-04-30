@@ -43,13 +43,303 @@ library(RColorBrewer)
 #library(ggthemes)
 ```
 
+#New Data#
+
+This data set is made as requested: it contains a single vector for all 4month data. 
+
+##Structure and Composite Behaviors Only##
+
+The visualizations below contain only **structural and composite** data. I included all composite scores as to get an idea of the complete picture being painted with behavior and structural data. I limited these visuals because the **relationships were relatively consistent regardless of the amount of data** that was input. Thus, the subsequent visualizations below this section will expand to include Structure, Individual Behaviors, and Composites; and then to Structure and Individual Behaviors Only.
+
+
+Points of interest regarding composite behaviors and structure are: 
+
+- 'Social Affiliation' shows **no** relationship with any structural development ROIs
+
+- 'Social Non-affiliation' shows a interesting, positive relatioship with FA @ 4months in the **Allocortex (p =.019)** and **Parietal (p =.047)** regions
+
+- 'Object Oriented' shows **no** relationship with any structural development ROIs
+
+- 'Anxious behavior group' showed the **most robust relationships with structure.** Most of these relationships involved the contrast enhanced images **(t1w/t2w)** but i'm not sure what these measures represent (volume, cortical thickness, etc). 
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+##breaking down further to only look at composites
+##these commands are exploring the structural and composite data only
+
+NPI_structure_wcomposites_v1 <- read_excel("NPI_structure_wcomposites_v1.xlsx")
+View(NPI_structure_wcomposites_v1)
+
+selected_NPI_structure_wcomposites_v1 <- NPI_structure_wcomposites_v1 %>%
+  select(- subj_id, - group, - year)
+
+##correlations##
+
+cor_selected_NPI_structure_wcomposites_v1 <- rcorr(as.matrix(selected_NPI_structure_wcomposites_v1))
+
+##melting##
+
+corvalmat_selected_NPI_structure_wcomposites_v1 <- cor_selected_NPI_structure_wcomposites_v1$r
+
+corvalmat_selected_NPI_structure_wcomposites_v1_melted <- melt(corvalmat_selected_NPI_structure_wcomposites_v1)
+
+pvalmat_selected_NPI_structure_wcomposites_v1 <- cor_selected_NPI_structure_wcomposites_v1$P
+
+pvalmat_selected_NPI_structure_wcomposites_v1_melted <- melt(pvalmat_selected_NPI_structure_wcomposites_v1) %>%
+  filter(value <= .05)
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height = 15, fig.width = 18}
+gplot_corvalmat_selected_NPI_structure_wcomposites_v1_melted <- ggplot(corvalmat_selected_NPI_structure_wcomposites_v1_melted, aes(x=Var2, y=Var1, fill=value)) +
+  geom_tile() +
+  scale_fill_gradientn(colours = topo.colors(10)) + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(margin = margin(b = .5, t=.5),
+                                   angle = 90,
+                                   vjust = 1,
+                                   size = 15,
+                                   hjust = 1
+                                    )) +
+     theme(axis.text.y = element_text(margin = margin(b = .5, t=.5),
+                                   vjust = 1,
+                                   size = 15,
+                                   hjust = 1
+                                    ))
+
+gplot_corvalmat_selected_NPI_structure_wcomposites_v1_melted + labs(title="4mo Structure and Composites: Correlations", x="Correlation Stregnth", y="Correlation Stregnth", size=60)
+
+#plot of pvals values of percent differences between year 2, 4mo and 11mo
+gplot_pvalmat_selected_NPI_structure_wcomposites_v1_melted <- ggplot(pvalmat_selected_NPI_structure_wcomposites_v1_melted, aes(x=Var2, y=Var1, fill=value)) +
+  geom_tile() +
+  scale_fill_gradientn(colours = topo.colors(5)) + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(margin = margin(b = .5, t=.5),
+                                   angle = 90,
+                                   vjust = 1,
+                                   size = 20,
+                                   hjust = 1
+                                    )) +
+   theme(axis.text.y = element_text(margin = margin(b = .5, t=.5),
+                                   vjust = 1,
+                                   size = 20,
+                                   hjust = 1
+                                    ))
+
+gplot_pvalmat_selected_NPI_structure_wcomposites_v1_melted + labs(title="4mo Structure and Composites: Pvalues", x="Significance Stregnth", y="Significance Stregnth")
+
+datatable(formattable(pvalmat_selected_NPI_structure_wcomposites_v1_melted))
+
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#gplotly_structure_composite_test <- ggplotly(gplot_pvalmat_selected_NPI_structure_wcomposites_v1_melted)
+
+#gplotly_structure_composite_test
+
+
+#datatable(formattable(corvalmat_selected_NPI_structure_wcomposites_v1_melted))
+
+```
+
+
+##Structure plus Individual Behavior plus Composite Behaviors##
+
+The visuals below are just expanded from the one above to include the individual behaviors. There is some slight variation in the values since there are more variables included, but overall the significant results remained the same.
+
+
+Based on the information in the table:
+
+  - social_nonaffiliative behavior has (again) a signficant positive relationship with the development of the **parietal_FA** and **allocortex_FA**
+  
+  - anxious behaviors show the most robust relationship with brain metrics; it showed the most amount relationships with the structural regions. Particuluarly, t1w/t2w measures. 
+  
+  - **object oriented** and **social affiliation** shows no relationship with structural measures.
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height = 15, fig.width = 18}
+
+##introducing the 4mo_yr1yr2 composite plus structure data
+#file=NPI_indibehav_wcomposites_v1.csv <- includes all composites and all behaviors with structure; file is checked.
+##these visuals represent data with structure, individual behavior, and composite data
+
+NPI_indibehav_wcomposites_v1 <- read_excel("NPI_indibehav_wcomposites_v1.xlsx")
+View(NPI_indibehav_wcomposites_v1)
+
+selected_NPI_indibehav_wcomposites_v1 <- NPI_indibehav_wcomposites_v1 %>%
+  select(- subj_id, - group, - year)
+```
 
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
-##loading the new data
+##these visuals represent data with structure, individual behavior, and composite data
+cor_selected_NPI_indibehav_wcomposites_v1 <- rcorr(as.matrix(selected_NPI_indibehav_wcomposites_v1))
+corvalmat_selected_NPI_indibehav_wcomposites_v1 <- cor_selected_NPI_indibehav_wcomposites_v1$r
+pvalmat_selected_NPI_indibehav_wcomposites_v1 <- cor_selected_NPI_indibehav_wcomposites_v1$P
+
+corvalmat_selected_NPI_indibehav_wcomposites_v1_melted <- melt(corvalmat_selected_NPI_indibehav_wcomposites_v1)
+pvalmat_selected_NPI_indibehav_wcomposites_v1_melted <- melt(pvalmat_selected_NPI_indibehav_wcomposites_v1) %>%
+  filter(value <= .05)
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height = 15, fig.width = 18}
+
+##these visuals represent data with structure, individual behavior, and composite data
+gplot_corvalmat_selected_NPI_indibehav_wcomposites_v1_melted <- ggplot(corvalmat_selected_NPI_indibehav_wcomposites_v1_melted, aes(x=Var2, y=Var1, fill=value)) +
+  geom_tile() +
+  scale_fill_gradientn(colours = topo.colors(10)) + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(margin = margin(b = .5, t=.5),
+                                   angle = 90,
+                                   vjust = 1,
+                                   size = 20,
+                                   hjust = 1
+                                    )) +
+     theme(axis.text.y = element_text(margin = margin(b = .5, t=.5),
+                                   vjust = 1,
+                                   size = 20,
+                                   hjust = 1
+                                    ))
+
+gplot_corvalmat_selected_NPI_indibehav_wcomposites_v1_melted + labs(title="4mo Structure, Individual Behavior, and Composites: Correlations", x="Correlation Stregnth", y="Correlation Stregnth")
+
+#plot of pvals values of percent differences between year 2, 4mo and 11mo
+gplot_pvalmat_selected_NPI_indibehav_wcomposites_v1_melted <- ggplot(pvalmat_selected_NPI_indibehav_wcomposites_v1_melted, aes(x=Var2, y=Var1, fill=value)) +
+  geom_tile() +
+  scale_fill_gradientn(colours = topo.colors(5)) + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(margin = margin(b = .5, t=.5),
+                                   angle = 90,
+                                   vjust = 1,
+                                   size = 20,
+                                   hjust = 1
+                                    )) +
+   theme(axis.text.y = element_text(margin = margin(b = .5, t=.5),
+                                   vjust = 1,
+                                   size = 20,
+                                   hjust = 1
+                                    ))
+
+gplot_pvalmat_selected_NPI_indibehav_wcomposites_v1_melted + labs(title="4mo Structure, Individual Behavior, and Composites: Pvalues", x="Significance Stregnth", y="Significance Stregnth")
+
+datatable(formattable(pvalmat_selected_NPI_indibehav_wcomposites_v1_melted))
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#gplotly_structure_indibehavs_composites <- ggplotly(gplot_pvalmat_selected_NPI_indibehav_wcomposites_v1_melted)
+
+#gplotly_structure_indibehavs_composites
+
+
+
+#datatable(formattable(corvalmat_selected_NPI_indibehav_wcomposites_v1_melted))
+
+##based on the information in the table, 
+  # social_nonaffiliative behaviors have a signficant positive relationship with the development of the parietal_FA and allocortex_FA 
+  # anxious behaviors show the most robust relationship with brain metrics
+  # object oriented and social affiliation shows no relationship with structural measures. 
+
+```
+
+##Structure plus Individual Behaviors only##
+
+This is the final visualzation of the new data. This dataset is void of composite variables. 
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height = 15, fig.width = 18}
+allcombine_4mo_v1 <- read_excel("4mo_allcombine_v1.xlsx")
+#View(allcombine_4mo_v1)
+
+selected_4mo_allcombine_v1 <- allcombine_4mo_v1 %>%
+  select(- subj_id, - group, - year)
+
+
+corr_selected_4mo_allcombine_v1 <- rcorr(as.matrix(selected_4mo_allcombine_v1))
+melted_corvals_corr_selected_4mo_allcombine_v1 <- melt(corr_selected_4mo_allcombine_v1$r)
+melted_pvals_corr_selected_4mo_allcombine_v1 <- melt(corr_selected_4mo_allcombine_v1$P) %>% 
+  filter(value <= .05)
+
+```
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height = 15, fig.width = 18}
+gplot_melted_corvals_corr_selected_4mo_allcombine_v1 <- ggplot(melted_corvals_corr_selected_4mo_allcombine_v1, aes(x=Var2, y=Var1, fill=value)) +
+  geom_tile() +
+  scale_fill_gradientn(colours = topo.colors(10)) + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(margin = margin(b = .5, t=.5),
+                                   angle = 90,
+                                   vjust = 1,
+                                   size = 20,
+                                   hjust = 1
+                                    )) +
+     theme(axis.text.y = element_text(margin = margin(b = .5, t=.5),
+                                   vjust = 1,
+                                   size = 20,
+                                   hjust = 1
+                                    ))
+
+gplot_melted_corvals_corr_selected_4mo_allcombine_v1 + labs(title="Year1 and Year 2 4mo Structure plus Behavior: Correlation Vals", x="Correlation Stregnth", y="Correlation Stregnth")
+
+
+gplot_melted_pvals_corr_selected_4mo_allcombine_v1 <- ggplot(melted_pvals_corr_selected_4mo_allcombine_v1, aes(x=Var2, y=Var1, fill=value)) +
+  geom_tile() +
+  scale_fill_gradientn(colours = topo.colors(10)) + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(margin = margin(b = .5, t=.5),
+                                   angle = 90,
+                                   vjust = 1,
+                                   size = 20,
+                                   hjust = 1
+                                    )) +
+     theme(axis.text.y = element_text(margin = margin(b = .5, t=.5),
+                                   vjust = 1,
+                                   size = 20,
+                                   hjust = 1
+                                    ))
+
+gplot_melted_pvals_corr_selected_4mo_allcombine_v1 + labs(title="Year1 and Year 2 4mo Structure plus Behavior: P-Vals", x="Pvalue", y="Pvalue")
+
+datatable(formattable(melted_pvals_corr_selected_4mo_allcombine_v1))
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+
+#gplotly_structure_indi_composite_test <- ggplotly(gplot_melted_pvals_corr_selected_4mo_allcombine_v1)
+
+#gplotly_structure_indi_composite_test)
+```
+
+##Side-by-side or Correlation Martices##
+
+Summary visualization via side by side comparisons 
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.height = 15, fig.width = 18}
+gplot_corvalmat_selected_NPI_structure_wcomposites_v1_melted + labs(title="4mo Structure and Composites: Correlations", x="Correlation Stregnth", y="Correlation Stregnth", size=60)
+
+gplot_corvalmat_selected_NPI_indibehav_wcomposites_v1_melted + labs(title="4mo Structure, Individual Behavior, and Composites: Correlations", x="Correlation Stregnth", y="Correlation Stregnth")
+
+gplot_melted_corvals_corr_selected_4mo_allcombine_v1 + labs(title="Year1 and Year 2 4mo Structure plus Behavior: Correlation Vals", x="Correlation Stregnth", y="Correlation Stregnth")
+
+###pvals below###
+
+gplot_pvalmat_selected_NPI_structure_wcomposites_v1_melted + labs(title="4mo Structure and Composites: Pvalues", x="Significance Stregnth", y="Significance Stregnth")
+
+#gplotly_structure_composite_test <- ggplotly(gplot_pvalmat_selected_NPI_structure_wcomposites_v1_melted)
+
+#gplotly_structure_composite_test
+
+gplot_pvalmat_selected_NPI_indibehav_wcomposites_v1_melted + labs(title="4mo Structure, Individual Behavior, and Composites: Pvalues", x="Significance Stregnth", y="Significance Stregnth")
+
+gplot_melted_pvals_corr_selected_4mo_allcombine_v1 + labs(title="Year1 and Year 2 4mo Structure plus Behavior: P-Vals", x="Pvalue", y="Pvalue")
+```
+
+
+#Previously Discussed Data#
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
 #structural only @ 4mo between yr1 and yr2
 ##did this to maximize data set - must remove significantly more animals from data when incorporating behavior
+
 
 structural_yr1_yr2 <- read_excel("structural_yr1_yr2.xlsx")
 #str(structural_yr1_yr2)
@@ -67,6 +357,7 @@ selected_perc_diffs_4mo_yr2_11mo_yr2 <- perc_diffs_4mo_yr2_11mo_yr2 %>%
 
 behav_plus_struc_4moyr1_4moyr2 <- read_excel("behav_plus_struc_4moyr1_4moyr2.xlsx")
 #str(behav_plus_struc_4moyr1_4moyr2)
+
 ```
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
@@ -132,7 +423,6 @@ thresh_melted_pvals_melted_cor_perc_diffs_4mo_yr2_11mo_yr2 <- melt(cor_perc_diff
 
 #####behavior plus structure
 
-
   
 cor_behav_plus_struc_4moyr1_4moyr2 <- rcorr(as.matrix(behav_plus_struc_4moyr1_4moyr2))
 melted_cor_behav_plus_struc_4moyr1_4moyr2 <- melt(cor_behav_plus_struc_4moyr1_4moyr2$r)
@@ -174,9 +464,15 @@ gplot_corplot_structure_pval <- ggplot(thresh_melted_cor_pval_structural_yr1_yr2
   geom_tile() +
   scale_fill_gradientn(colours = topo.colors(5)) + 
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 90,
+  theme(axis.text.x = element_text(margin = margin(b = .5, t=.5),
+                                   angle = 90,
                                    vjust = 1,
-                                   size = 9,
+                                   size = 20,
+                                   hjust = 1
+                                    )) +
+  theme(axis.text.y = element_text(margin = margin(b = .5, t=.5),
+                                   vjust = 1,
+                                   size = 20,
                                    hjust = 1
                                     ))
 
@@ -214,14 +510,15 @@ gplot_behav_plus_struc_4moyr1_4moyr2_v2 <- ggplot(melted_cor_behav_plus_struc_4m
   geom_tile() +
   scale_fill_gradientn(colours = topo.colors(9)) + 
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 90,
+  theme(axis.text.x = element_text(margin = margin(b = .5, t=.5),
+                                   angle = 90,
                                    vjust = 1,
-                                   size = 9,
+                                   size = 20,
                                    hjust = 1
                                     )) +
      theme(axis.text.y = element_text(margin = margin(b = .5, t=.5),
                                    vjust = 1,
-                                   size = 9,
+                                   size = 20,
                                    hjust = 1
                                     ))
 
@@ -235,9 +532,10 @@ gplot_corplot_behave_structure_pval <- ggplot(thresh_melted_pvals_cor_behav_plus
   geom_tile() +
   scale_fill_gradientn(colours = topo.colors(5)) + 
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 90,
+  theme(axis.text.x = element_text(margin = margin(b = .5, t=.5),
+                                   angle = 90,
                                    vjust = 1,
-                                   size = 9,
+                                   size = 20,
                                    hjust = 1
                                     ))
 
@@ -276,14 +574,15 @@ gplot_corplot_percdiff_corval_v2 <- ggplot(melted_cor_perc_diffs_4mo_yr2_11mo_yr
   geom_tile() +
   scale_fill_gradientn(colours = topo.colors(10)) + 
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 90,
+  theme(axis.text.x = element_text(margin = margin(b = .5, t=.5),
+                                   angle = 90,
                                    vjust = 1,
-                                   size = 9,
+                                   size = 20,
                                    hjust = 1
                                     )) +
      theme(axis.text.y = element_text(margin = margin(b = .5, t=.5),
                                    vjust = 1,
-                                   size = 9,
+                                   size = 20,
                                    hjust = 1
                                     ))
 
@@ -294,14 +593,15 @@ gplot_corplot_cor_percdiff_pval <- ggplot(thresh_melted_pvals_melted_cor_perc_di
   geom_tile() +
   scale_fill_gradientn(colours = topo.colors(5)) + 
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 90,
+  theme(axis.text.x = element_text(margin = margin(b = .5, t=.5),
+                                   angle = 90,
                                    vjust = 1,
-                                   size = 9,
+                                   size = 20,
                                    hjust = 1
                                     )) +
    theme(axis.text.y = element_text(
                                    vjust = 1,
-                                   size = 9,
+                                   size = 20,
                                    hjust = 1
                                     ))
 
@@ -311,63 +611,48 @@ gplot_corplot_cor_percdiff_pval + labs(title="Year2: Percent Differences in 4mo/
 datatable(formattable(thresh_melted_pvals_melted_cor_perc_diffs_4mo_yr2_11mo_yr2))
 ```
 
-again, i know the composite behavior isn't included in these and i will get that together soon. Its a bit laborious beacuse a new data set has to be created to investigate each relationship. What makes it difficult is combining the two data sets in a way that preserved the data and also allows to create these visuals. I think in order to look at the relationship between 4mo_yr1_structure, 4mo_yr2_structure, and the prosocial behvaioral composite will take a different method. I'm currently trying to think about the best way to do this.  
+**END**
 
-##combining 4mo year1 and year2 (properly)##
 
 ```{r}
-allcombine_4mo_v1 <- read_excel("4mo_allcombine_v1.xlsx")
-View(allcombine_4mo_v1)
+#NPI_indibehavior_plus_composites <- selected_NPIgroup_znorm_v1 
 
-selected_4mo_allcombine_v1 <- allcombine_4mo_v1 %>%
-  select(- subj_id, - group, - year)
+#skim(NPI_indibehavior_plus_composites)
 
-
-corr_selected_4mo_allcombine_v1 <- rcorr(as.matrix(selected_4mo_allcombine_v1))
-melted_corvals_corr_selected_4mo_allcombine_v1 <- melt(corr_selected_4mo_allcombine_v1$r)
-melted_pvals_corr_selected_4mo_allcombine_v1 <- melt(corr_selected_4mo_allcombine_v1$P) %>% 
-  filter(value <= .05)
-
+#write.csv(NPI_indibehavior_plus_composites, "NPI_indibehav_pluscomposite_v1.csv")
 ```
 
 
+
+
+
 ```{r}
-gplot_melted_corvals_corr_selected_4mo_allcombine_v1 <- ggplot(melted_corvals_corr_selected_4mo_allcombine_v1, aes(x=Var2, y=Var1, fill=value)) +
-  geom_tile() +
-  scale_fill_gradientn(colours = topo.colors(10)) + 
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 90,
-                                   vjust = 1,
-                                   size = 9,
-                                   hjust = 1
-                                    )) +
-     theme(axis.text.y = element_text(margin = margin(b = .5, t=.5),
-                                   vjust = 1,
-                                   size = 9,
-                                   hjust = 1
-                                    ))
 
-gplot_melted_corvals_corr_selected_4mo_allcombine_v1 + labs(title="Year1 and Year 2 4mo Structure plus Behavior: Correlation Vals", x="Correlation Stregnth", y="Correlation Stregnth")
+##visualizing the relationships between structure and composites only 
 
 
-gplot_melted_pvals_corr_selected_4mo_allcombine_v1 <- ggplot(melted_pvals_corr_selected_4mo_allcombine_v1, aes(x=Var2, y=Var1, fill=value)) +
-  geom_tile() +
-  scale_fill_gradientn(colours = topo.colors(10)) + 
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 90,
-                                   vjust = 1,
-                                   size = 9,
-                                   hjust = 1
-                                    )) +
-     theme(axis.text.y = element_text(margin = margin(b = .5, t=.5),
-                                   vjust = 1,
-                                   size = 9,
-                                   hjust = 1
-                                    ))
+##this looks better but need to do the same kind of graphs as above for consistency
+#gplot_corvalmat_selected_NPI_structure_wcomposites_v1 <- ggcorrplot(corvalmat_selected_NPI_structure_wcomposites_v1, #hc.order = TRUE, type = "lower", colors = topo.colors(3)) +  theme_minimal() +
+  #theme(axis.text.x = element_text(angle = 90,
+                                   #vjust = 1,
+                                   #size = 9,
+                                   #hjust = 1
+                                  #  ))
 
-gplot_melted_pvals_corr_selected_4mo_allcombine_v1 + labs(title="Year1 and Year 2 4mo Structure plus Behavior: P-Vals", x="Pvalue", y="Pvalue")
+#gplot_corvalmat_selected_NPI_structure_wcomposites_v1 + labs(title="All 4mo Structure with Composites only", y="Correlation Stregnth")
 
 
-datatable(formattable(melted_pvals_corr_selected_4mo_allcombine_v1))
+#
+##
+####
+###### for visual consistency below ######
+####
+##
+#
+
+
+
+#results are similar 
+
 ```
 
