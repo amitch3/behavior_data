@@ -1,0 +1,178 @@
+---
+title: "lavaan_practice_v1"
+author: "aj_mitchell"
+date: "December 7, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyselect)
+library(ggplot2)
+library(broom)
+library(dplyr)
+library(corrplot)
+library(kableExtra)
+library(knitr)
+library(Hmisc)
+library(infer)
+library(plotly) 
+library(skimr)
+library(stringr)
+library(reshape2)
+library(som)
+library(lavaan)
+library(semPlot)
+library(stargazer)
+```
+
+
+```{r}
+library(readxl)
+allepochs_lavprac_v1 <- read_excel("Stats Class/all_behaviors_ffostarebutts_v1_znorm.xlsx")
+glimpse(allepochs_lavprac_v1)
+```
+
+
+##one factor model##
+```{r}
+latent_model_1 <- "investigative =~  Zbutters_behavior + a*Zself_groom_percent_butters + a*Zmouth_butters_percent"
+
+latent_model_1_fit <- cfa(model = latent_model_1, data = allepochs_lavprac_v1)
+
+summary(latent_model_1_fit, standardize = TRUE, fit.measures = TRUE)
+
+modificationindices(latent_model_1_fit, sort = TRUE)
+```
+
+##two factor model## 
+```{r}
+latent_model_3 <- "anxious_engagement =~ Zteeth_grind_percent_ffostare + Zmovement_percent_ffostare + Zdirect_eye_contact_percent_ffostare + Zlipsmack_stranger_percent_ffostare"
+
+latent_model_3_fit <- cfa(model = latent_model_3, data = allepochs_lavprac_v1)
+
+summary(latent_model_3_fit, standardize = TRUE, fit.measures = TRUE)
+
+#modificationindices(latent_model_3_fit, sort = TRUE)
+```
+
+```{r}
+
+latent_model_3.2.1 <- "anxious_engagement =~ Zteeth_grind_percent_ffostare + Zmovement_percent_ffostare + Zdirect_eye_contact_percent_ffostare + Zlipsmack_stranger_percent_ffostare
+investigative =~ Zbutters_behavior + Zself_groom_percent_butters + Zmouth_butters_percent
+"
+
+latent_model_3.2.1_fit <- cfa(model = latent_model_3.2.1, data = allepochs_lavprac_v1)
+
+summary(latent_model_3.2.1_fit, standardize = TRUE, fit.measures = TRUE)
+
+#var(allepochs_lavprac_v1$Zmouth_butters_percent)
+
+#modificationindices(latent_model_3.2.1_fit, sort = TRUE)
+```
+
+
+
+```{r}
+#this model is the best single fitting model
+glimpse(allepochs_lavprac_v1)
+latent_model_2 <- "Lat_2 =~ NA*Zcrouch_percent_ffostare + Zvigilant_percent_ffostare + Zstationary_middle_percent_butters + Ztactile_exploration_butters + Zhanging_behaviors"
+
+latent_model_2_fit <- cfa(model = latent_model_2, data = allepochs_lavprac_v1) 
+
+summary(latent_model_2_fit, standardize = TRUE, fit.measures = TRUE)
+
+modfit <- modindices(latent_model_2_fit)
+
+semPaths(latent_model_2_fit,
+         layout = "tree",
+         color = "gray",
+         whatLabels = "std",
+         edge.color = "black",
+         what = "std", 
+         rotation = 1,
+         edge.label.cex = 1.25 
+)
+```
+
+**this is real data from community detection**
+
+```{r}
+glimpse(all_epoc)
+#se the loading variables to its raw
+community1 <- "lat_comm_1 =~ NA*Zself_groom_percent_butters + Zmouth_butters_percent + Ztouch_butters_percent + Zhanging_behaviors + Zcrouching_butters + Zoral_exploration_butters + Ztactile_exploration_butters + Zstereotypy_butters + Zbutters_behavior"
+
+comm_1_fit <- cfa(model = community1, data = allepochs_lavprac_v1)
+modificationindices(comm_1_fit, standardized = TRUE)
+summary(comm_1_fit, standardize = TRUE, fit.measures = TRUE)
+
+community1.2 <- "lat_comm_1.2 =~ Zself_groom_percent_butters + Zmouth_butters_percent + Ztouch_butters_percent + Zhanging_behaviors + Zcrouching_butters + Zoral_exploration_butters + Ztactile_exploration_butters + Zstereotypy_butters"
+
+comm_1.2_fit <- cfa(model = community1.2, data = allepochs_lavprac_v1)
+summary(comm_1.2_fit, standardize = TRUE, fit.measures = TRUE)
+
+
+#model does not run without 'butters behaviors' but butters behaviors carries a negative variance/estimate?
+```
+
+
+```{r}
+community2 <- "lat_comm_2 =~ Zthreat_stranger_percent_ffostare + ZStationary_back_butters + Zvigilan_percent_butters + Zstationary_back_percent_ffostare + Zfreeze_2_back_percent_ffostar" 
+
+comm_2_fit <- cfa(model = community2, data = allepochs_lavprac_v1)
+summary(comm_2_fit, standardize = TRUE, fit.measures = TRUE)
+
+#RMSEA - 0.0/CFI = 1.0 : output = weird
+```
+
+```{r}
+community3 <- "lat_comm_3 =~  Zapple_behavior_butters + Zlocomotion_percent_butters + Zlocomotion_percent_ffostare  + Zmovement_percent_ffostare + Zlipsmack_stranger_percent_ffostare + Zteeth_grind_percent_ffostare + Zdirect_eye_contact_percent_ffostare"
+
+comm_3_fit <- cfa(model = community3, data = allepochs_lavprac_v1)
+summary(comm_3_fit, standardize = TRUE, fit.measures = TRUE)
+
+modfit_comm3 <- modindices(comm_3_fit, sort. = TRUE)
+View(modfit_comm3)
+
+semPaths(comm_3_fit,
+         layout = "tree",
+         color = "gray",
+         whatLabels = "std",
+         edge.color = "black",
+         what = "std", 
+         rotation = 2,
+         edge.label.cex = 1.25, 
+         nCharNodes = 8, 
+         sizeLat = 10, 
+         sizeMan = 10, 
+         title = TRUE
+)
+
+#extract parameter vals
+
+comm_fit <- sem(community3, std.lv=TRUE)
+View(comm_fit)
+comm_3_vales <- standardizedSolution(comm_fit)[standardizedSolution(comm_fit)[,'Options']=='=~', c(1:5)]
+
+startab <- stargazer(comm_3_vales, summary = FALSE, type = "html", title = "Factor Loadings", digits = 3, rownames = FALSE)
+
+View(startab)
+
+#not a bad fit, RMSEA = .134: but not a good fit, CFI = .701
+```
+
+```{r}
+community4 <- "lat_comm_4 =~ Zthreat_stranger_percent_ffostare + Zstationary_front_percent_butters + Znonvigilant_percent_butters + Zstationary_middle_percent_ffostare"
+
+comm_4_fit <- cfa(model = community4, data = allepochs_lavprac_v1)
+summary(comm_4_fit, standardize = TRUE, fit.measures = TRUE)
+
+
+community4.2 <- "lat_comm_4 =~ Zthreat_stranger_percent_ffostare + Znonvigilant_percent_butters + Zstationary_middle_percent_ffostare"
+
+comm_4.2_fit <- cfa(model = community4.2, data = allepochs_lavprac_v1)
+summary(comm_4.2_fit, standardize = TRUE, fit.measures = TRUE)
+```
