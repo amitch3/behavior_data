@@ -1,0 +1,78 @@
+---
+title: "themes_and_useful_chunks"
+author: "aj_mitchell"
+date: "May 4, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyselect)
+library(ggplot2)
+library(broom)
+library(dplyr)
+library(corrplot)
+library(kableExtra)
+library(knitr)
+library(Hmisc)
+library(infer)
+library(plotly) 
+library(skimr)
+library(stringr)
+library(reshape2)
+library(som)
+library(readxl)
+library(manipulate)
+library(lavaan)
+library(semPlot)
+library(readxl)
+library(formattable)
+library(DT)
+library(ggthemes)
+library(ggcorrplot)
+library(wesanderson)
+library(RColorBrewer)
+library(ggthemes)
+```
+
+```{r}
+numbers = c(3, 10, 20, 32, 69, 88, 420)
+meanings = c("fave", "ten", "twenty", "hs_fave", "haha", "best", "mmhmm")
+
+playdata1 <- data.frame(meanings, numbers)
+
+View(playdata1)
+
+
+ggplot(playdata1, aes(x=meanings, y=numbers)) +
+  geom_point(stat = 'identity') +
+  theme_foundation() +
+  theme(plot.title = element_text(face = "bold",
+                                         size = rel(1.2), hjust = 0.5),
+               text = element_text(),
+               panel.background = element_rect(colour = NA), #dunno
+               plot.background = element_rect(colour = NA), #colors for overall border of graph
+               panel.border = element_rect(colour = "black"), #colors upper corner of graph
+               axis.title = element_text(face = "bold",size = rel(1)), #controls the size of the x and y axis text
+               axis.title.y = element_text(angle=90,vjust =2), #vjust tells you how far the axis title will stick out from the y axis
+               axis.title.x = element_text(vjust = -0.3), #vjust tells you how far the axis title will stick out from the x axis
+               axis.text = element_text(), 
+               axis.line = element_line(colour=NA), #y and x axis colors
+               axis.ticks = element_line(), 
+               panel.grid.major = element_line(colour="#f0f0f0"),
+               panel.grid.minor = element_blank(), #horizontal line descriptor 
+               legend.key = element_rect(colour = NA), #legend box color
+               legend.position = "bottom", #placement of the legend
+               legend.direction = "horizontal", #need to figure out
+               legend.key.size= unit(0.2, "cm"), #need to figure out
+               legend.margin = unit(0, "cm"), #need to figure out
+               legend.title = element_text(face="italic"), #need to figure out
+               plot.margin=unit(c(10,5,5,5),"mm"), #need to figure out
+               strip.background=element_rect(colour="#f0f0f0",fill="#f0f0f0"), #need to figure out
+               strip.text = element_text(face="bold") #need to figure out
+          )
+
+```
