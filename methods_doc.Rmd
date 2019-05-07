@@ -12,7 +12,7 @@ output:
 ```{r setup, include=FALSE, message=FALSE, warning=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-
+#this is the document for making SEM models - AM_5/6
 
 ```{r, warning=FALSE, message=FALSE, echo=FALSE}
 library(tidyselect)
@@ -29,7 +29,6 @@ library(skimr)
 library(stringr)
 library(reshape2)
 library(som)
-library(readxl)
 library(manipulate)
 library(lavaan)
 library(semPlot)
@@ -50,8 +49,9 @@ Briefly, raw behaviors were normalized and subjected to a correlational analysis
 
 ```{r loading the data, echo=FALSE, warning=FALSE, message=FALSE}
 znormed_ffostare_v1 <- read_excel("znormed_ffostare_v1.xlsx")
-skim(znormed_ffostare_v1)
+#skim(znormed_ffostare_v1)
 
+#the znormed_ffostare_v1 is corrected output of ffo_corrected_spssout_full. then, for demographic information use selected_norms_composites_demgrafs_v1_use
 selected_norms_ffostare_v1 <- znormed_ffostare_v1 %>%
   select(-Observations, - ResultContainers, - Intervals, - Zno_sec_behav_ffosta)
          
@@ -85,6 +85,37 @@ melted_corrnorm_selected_ffostare_v1_reduced <- melted_corrnorm_selected_ffostar
 
 as.datatable(formattable(melted_corrnorm_selected_ffostare_v1_reduced,
                          align = c("l", "l")))
+
+
+
+#####new 5/6/19####
+#######introducing the pca to see how many factors to expect#########
+#####new 5/6/19####
+
+total_PCA_v1_5_6 <- prcomp(selected_norms_ffostare_v1)
+
+fviz_screeplot(total_PCA_v1_5_6, addlabels = TRUE)
+
+summary(total_PCA_v1_5_6)
+
+fviz_pca_ind(total_PCA_v1_5_6,
+            col.ind = "cos2",
+            repel = TRUE)
+
+fviz_pca_ind(total_PCA_v1_5_6,
+         geom.ind = "point",
+         col.ind = as.factor("cos2"), 
+         gradient = "Dark2",
+         repel = F,
+         addEllipses = TRUE
+         )
+
+total_PCA_var <- get_pca_var(total_PCA_v1_5_6)
+
+
+##the information below will tell you which variables contribute the most to each component
+barplot(total_PCA_var$contrib [,1])
+
 ```
 
 
@@ -140,7 +171,7 @@ You will notice a **2.2 and 3.2 group**. In short, I will likely want to move fo
 
 ```{r inserting demographic infomation, echo=FALSE}
 selected_norms_composites_demgraf_v1.2 <- read.csv("selected_norms_composites_demgraf_v2.csv")
-#skim(selected_norms_composites_demgraf_v1.2)
+#View(selected_norms_composites_demgraf_v1.2)
 
 composite_scores_withgroups <- selected_norms_composites_demgraf_v1.2[order(selected_norms_composites_demgraf_v1.2$initial_diet),]  %>%
   select(Observations, sex, initial_diet, new_diet, comp_1, comp_2, comp_3, comp_4, comp_3.2, comp_2.2) 
@@ -154,7 +185,7 @@ as.datatable(formattable(composite_scores_withgroups,
                          align = c("l", "l", "l", "l", "l","l", "l", "l", "l", "l" )
                          ))
 
-#glimpse(composite_scores_withgroups)
+#View(composite_scores_withgroups)
 
 #(composite_scores_withgroups)
 
@@ -174,6 +205,8 @@ matdiet_filtered_v2 <- composite_scores_withgroups %>%
   filter(!new_diet == 2)
 
 #View(matdiet_filtered_v2)
+
+#write.csv(matdiet_filtered_v2, "filtered4matdiet_compositesonly.csv")
 ```
 
 
