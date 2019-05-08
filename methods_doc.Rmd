@@ -54,6 +54,8 @@ znormed_ffostare_v1 <- read_excel("znormed_ffostare_v1.xlsx")
 #the znormed_ffostare_v1 is corrected output of ffo_corrected_spssout_full. then, for demographic information use selected_norms_composites_demgrafs_v1_use
 selected_norms_ffostare_v1 <- znormed_ffostare_v1 %>%
   select(-Observations, - ResultContainers, - Intervals, - Zno_sec_behav_ffosta)
+
+View(selected_norms_ffostare_v1)
          
 #glimpse(selected_norms_ffostare_v1)         
 ```
@@ -96,7 +98,13 @@ total_PCA_v1_5_6 <- prcomp(selected_norms_ffostare_v1)
 
 fviz_screeplot(total_PCA_v1_5_6, addlabels = TRUE)
 
-summary(total_PCA_v1_5_6)
+
+View(eig_vals)
+
+
+fviz_eig(total_PCA_v1_5_6)
+
+datatable(formattable(as.data.frame(eig_vals)))
 
 fviz_pca_ind(total_PCA_v1_5_6,
             col.ind = "cos2",
@@ -112,9 +120,28 @@ fviz_pca_ind(total_PCA_v1_5_6,
 
 total_PCA_var <- get_pca_var(total_PCA_v1_5_6)
 
+total_PCA_var$cor
 
 ##the information below will tell you which variables contribute the most to each component
 barplot(total_PCA_var$contrib [,1])
+
+###also need to be careful because later in this code chunk you add the composites to this file 
+
+####an important questions regarding compostie PCAs: what is it telling me that i have one variable explaining the majority of the variance about my composite? shouldn't i be more concerned with how much that composite variable explains the variability within the whole data; thus, getting at the question of how the structured model (latent variable trait) will represent the behavior of an individual based of the data collected. can this model explain the variance in behavior?
+
+####this plot is most accurate for the powerpoint
+##based on this output, there are around 13 variables that highly influence the variation observed within the data.  given that the slope contains elbows at 3 places, we can speculate that there are somewhere around 3 latent factors within our data.
+
+#thus, i think we can explain the variation about the behavioral performance of these HFD and Control animals with three to four factors. (i want more than three)
+
+eig_vals <- total_PCA_v1_5_6$sdev^2
+barplot(eig_vals) + points(eig_vals) + lines(eig_vals)
+
+datatable(formattable(as.data.frame(eig_vals)))
+
+
+##run models: for 3.2 and the lipsmack/motion/direyecontact grouping which would ultimately be a 2.3 group.. bc these behaviors share this self-grooming trait. 
+
 
 ```
 
