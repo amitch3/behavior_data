@@ -1,0 +1,260 @@
+---
+title: "pcas and sems for hfd"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, warning=FALSE, message=FALSE, echo=FALSE}
+library(tidyselect)
+library(ggplot2)
+library(broom)
+library(dplyr)
+library(corrplot)
+library(kableExtra)
+library(knitr)
+library(Hmisc)
+library(infer)
+library(plotly) 
+library(skimr)
+library(stringr)
+library(reshape2)
+library(som)
+library(manipulate)
+library(lavaan)
+library(semPlot)
+library(FactoMineR)
+library(factoextra)
+library(readxl)
+library(formattable)
+library(DT)
+library(xtable)
+library(wesanderson)
+```
+
+
+
+
+```{r loading the data, echo=FALSE, warning=FALSE, message=FALSE}
+normalized_ffostare_v1 <- read_excel("znormed_ffostare_v1.xlsx")
+#skim(znormed_ffostare_v1)
+#znormed+ffostare and normalized are the same data set just renamed to reduce confusion; normalzied will be the Df moving forward with new data
+
+#the znormed_ffostare_v1 is corrected output of ffo_corrected_spssout_full. then, for demographic information use selected_norms_composites_demgrafs_v1_use
+normalized_ffostare_selectvars_v1 <- znormed_ffostare_v1 %>%
+  select(-Observations, - ResultContainers, - Intervals, - Zno_sec_behav_ffosta)
+
+View(normalized_ffostare_selectvars_v1)
+```
+
+
+
+```{r}
+total_PCA_v1_5_20 <- prcomp(normalized_ffostare_selectvars_v1)
+
+fviz_screeplot(total_PCA_v1_5_20, addlabels = TRUE)
+
+
+View(eig_vals)
+
+
+fviz_eig(total_PCA_v1_5_6)
+
+datatable(formattable(as.data.frame(eig_vals)))
+
+fviz_pca_ind(total_PCA_v1_5_6,
+            col.ind = "cos2",
+            repel = TRUE)
+
+fviz_pca_ind(total_PCA_v1_5_6,
+         geom.ind = "point",
+         col.ind = as.factor("cos2"), 
+         gradient = "Dark2",
+         repel = F,
+         addEllipses = TRUE
+         )
+
+total_PCA_var <- get_pca_var(total_PCA_v1_5_20)
+
+eig_vals <- total_PCA_v1_5_20$sdev^2
+barplot(eig_vals) + points(eig_vals) + lines(eig_vals)
+
+datatable(formattable(as.data.frame(eig_vals)))
+
+View(eig_vals)
+
+```
+
+
+
+
+```{r copy of original - do not use; use next chunk}
+comp1_indi <- selected_norms_ffostare_v1 %>%
+  select(Zstationary_middle_percent_butters, Zlocomotion_percent_butters, Zhanging_behaviors_butters, Ztactile_exploration_butters, Zmo_manip_apple_butters, Zstation_fr_ffostare,  Zstation_mid_ffosta, Zlocomote_ffosta, Zmovement_ffosta, Ztac_expl_ffosta,  Zstereo_ffosta, Zteethgrind_ffosta, Zlipsmack_ffosta, Ztouch_app_ffosta, Zmouth_app_ffosta, Zmanip_app_ffosta, Zeat_app_ffosta, Znonvigi_ffosta, Zdir_eye_contact_ffosta)
+
+composite_active_vigilance <- normalized_ffostare_selectvars_v1 %>%
+  select(Zlipsmack_ffosta, Zmovement_ffosta, Zdir_eye_contact_ffosta)
+
+comp2_indi <- selected_norms_ffostare_v1 %>%
+  select(ZStationary_back_butters, Zstereotypy_butters, Zvigilant_percent_butters, Zstation_back_ffostare, Zself_gro_ffosta, Zthreat_stranger_ffosta, Zfreeze_back_ffosta)
+
+comp2.2_indi <- selected_norms_ffostare_v1 %>%
+  select(Zstereotypy_butters, Zstation_back_ffostare, Zself_gro_ffosta, Zthreat_stranger_ffosta, Zfreeze_back_ffosta)
+
+comp3_indi <- selected_norms_ffostare_v1 %>%
+  select(Zstationary_front_percent_butters, Zmovement_percent_butters, Ztouch_butters_percent, Zcrouching_butters, Znonvigilant_percent_butters, Zcrouching_ffosta, Zvigi_ffosta, Zno_response_ffosta)
+
+comp3.2_indi <- selected_norms_ffostare_v1 %>%
+  select(ZStationary_back_butters, Zstationary_front_percent_butters, Zmovement_percent_butters, Zvigilant_percent_butters, Ztouch_butters_percent, Zcrouching_butters, Znonvigilant_percent_butters, Zcrouching_ffosta, Zvigi_ffosta, Zno_response_ffosta)
+
+comp4_indi <- selected_norms_ffostare_v1 %>%
+  select(Zself_groom_percent_butters, Zmouth_butters_percent, Zoral_exploration_butters)
+
+```
+
+
+
+```{r composite groups for PCA}
+#self groom is interchangable with the next group 
+composite_active_vigilance <- normalized_ffostare_selectvars_v1 %>%
+  select(Zlipsmack_ffosta, Zmovement_ffosta, Zdir_eye_contact_ffosta)
+
+##this is the significant variable
+composite_active_anxiety <- normalized_ffostare_selectvars_v1 %>%
+  select(Zstereotypy_butters, Zstation_back_ffostare, Zself_gro_ffosta, Zthreat_stranger_ffosta, Zfreeze_back_ffosta)
+
+composite_inquisitive_vigilance <- normalized_ffostare_selectvars_v1 %>%
+  select(ZStationary_back_butters, Zstationary_front_percent_butters, Zmovement_percent_butters, Zvigilant_percent_butters, Ztouch_butters_percent, Zcrouching_butters, Znonvigilant_percent_butters, Zcrouching_ffosta, Zvigi_ffosta, Zno_response_ffosta)
+
+composite_novel_object_interest <- normalized_ffostare_selectvars_v1 %>%
+  select(Zself_groom_percent_butters, Zmouth_butters_percent, Zoral_exploration_butters)
+```
+
+
+```{r PCA eigenvals and variables}
+pca_composite_active_vigilance <- prcomp(composite_active_vigilance)
+eig_composite_active_vigilance <- get_eig(pca_composite_active_vigilance)
+vars_composite_active_vigilance <- get_pca_var(pca_composite_active_vigilance)
+  
+pca_composite_active_anxiety <- prcomp(composite_active_anxiety)
+eig_composite_active_anxiety <- get_eig(pca_composite_active_anxiety)
+vars_composite_active_anxiety <- get_pca_var(pca_composite_active_anxiety)
+
+pca_composite_inquisitive_vigilance <- prcomp(composite_inquisitive_vigilance)
+eig_composite_inquisitive_vigilance <- get_eig(pca_composite_inquisitive_vigilance)
+vars_composite_inquisitive_vigilance <- get_pca_var(pca_composite_inquisitive_vigilance)
+
+pca_composite_novel_object_interest <- prcomp(composite_novel_object_interest)
+eig_composite_novel_object_interest <- get_eig(pca_composite_novel_object_interest)
+vars_composite_novel_object_interest <- get_pca_var(pca_composite_novel_object_interest)
+```
+
+
+```{r}
+
+corrplot(vars_composite_active_vigilance$contrib, is.corr = FALSE)
+fviz_eig(pca_composite_active_vigilance, addlabels = T)
+#fviz_contrib(pca_composite_active_anxiety, choice = "var", axes = 1:4)
+
+corrplot(vars_composite_active_anxiety$contrib, is.corr = FALSE)
+fviz_eig(pca_composite_active_anxiety, addlabels = T)
+
+corrplot(vars_composite_inquisitive_vigilance$contrib, is.corr = FALSE)
+fviz_eig(pca_composite_inquisitive_vigilance, addlabels = T)
+
+corrplot(vars_composite_novel_object_interest$contrib, is.corr = FALSE)
+fviz_eig(pca_composite_novel_object_interest, addlabels = T)
+
+
+```
+
+
+```{r structural models}
+
+SEM_passive_vigilance <- "latentmodel_passvigi =~ Zdir_eye_contact_ffosta + Zlipsmack_ffosta + Zmovement_ffosta"
+SEM_passive_vigilance_fit <- cfa(SEM_passive_vigilance, estimator = "MLR", data = normalized_ffostare_selectvars_v1)
+summary(SEM_passive_vigilance_fit, standardize = TRUE, fit.measures = TRUE)
+
+
+semPaths(SEM_passive_vigilance_fit,
+         layout = "tree",
+         color = "gray",
+         whatLabels = "std",
+         edge.color = "black",
+         what = "std", 
+         rotation = 2,
+         edge.label.cex = 1.25, 
+         nCharNodes = 8, 
+         sizeLat = 10, 
+         sizeMan = 10, 
+         title = TRUE)
+
+
+SEM_active_anxiety <- 'latentmodel_activeanx =~ Zthreat_stranger_ffosta + Zself_gro_ffosta + Zstereotypy_butters + Zstation_back_ffostare + Zfreeze_back_ffosta'
+SEM_active_anxiety_fit <- cfa(SEM_active_anxiety, estimator = "MLR", data = normalized_ffostare_selectvars_v1)
+summary(SEM_active_anxiety_fit, standardize = TRUE, fit.measures = TRUE)
+#SEM_active_anxiety_table <- parTable(SEM_active_anxiety_fit)
+
+
+
+semPaths(SEM_active_anxiety_fit,
+         layout = "tree",
+         color = "gray",
+         whatLabels = "std",
+         edge.color = "black",
+         what = "std", 
+         rotation = 2,
+         edge.label.cex = 1.25, 
+         nCharNodes = 8, 
+         sizeLat = 10, 
+         sizeMan = 10, 
+         title = TRUE)
+
+SEM_inquisitive_vigilance <- 'latentmodel_inquivigi =~ Zcrouching_ffosta + Zstationary_front_percent_butters + ZStationary_back_butters + Zmovement_percent_butters + Ztouch_butters_percent + Zvigilant_percent_butters + Zcrouching_butters + Znonvigilant_percent_butters + Zvigi_ffosta + Zno_response_ffosta'
+SEM_inquisitive_vigilance_fit <- cfa(model = SEM_inquisitive_vigilance, estimator = "MLR", data = normalized_ffostare_selectvars_v1)
+summary(SEM_inquisitive_vigilance_fit, standardize = TRUE, fit.measures = TRUE)
+
+semPaths(SEM_inquisitive_vigilance_fit,
+         layout = "tree",
+         color = "gray",
+         whatLabels = "std",
+         edge.color = "black",
+         what = "std", 
+         rotation = 2,
+         edge.label.cex = 1.25, 
+         nCharNodes = 8, 
+         sizeLat = 10, 
+         sizeMan = 10, 
+         title = TRUE)
+
+
+SEM_object_oriented <- 'latentmodel_objori =~ Zself_groom_percent_butters + Zmouth_butters_percent + Zoral_exploration_butters'
+SEM_object_oriented_fit <- cfa(model = SEM_object_oriented, estimator = "MLR", data = normalized_ffostare_selectvars_v1)
+summary(SEM_object_oriented_fit, standardize = TRUE, fit.measures = TRUE)
+
+semPaths(SEM_object_oriented_fit,
+         layout = "tree",
+         color = "gray",
+         whatLabels = "std",
+         edge.color = "black",
+         what = "std", 
+         rotation = 2,
+         edge.label.cex = 1.25, 
+         nCharNodes = 8, 
+         sizeLat = 10, 
+         sizeMan = 10, 
+         title = TRUE)
+
+```
+
+
+```{r}
+
+
+
+
+
+
+```
