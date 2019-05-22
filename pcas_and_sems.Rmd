@@ -275,9 +275,17 @@ vars_anon_questions$contrib
 corrplot(vars_anon_questions$contrib, is.corr = FALSE)
 fviz_eig(pca_anon_questions, addlabels = T)
 
+transposed <- read_excel("transposed.xlsx")
+View(transposed)
 
-ggplot(seminar_questions_sp19, aes()) +
-  geom_point(stat = "identity")
+ggplot(transposed, aes(x=Var, y=percentage, fill=percentage)) +
+  order() + 
+  geom_bar(stat = "identity")
+
+
+ggplot(transposed, aes(x = reorder(Var, -percentage), y=percentage, fill = Var)) + 
+  geom_bar(stat = "identity", position = "dodge") +
+  theme_minimal() +
 ```
 
 
