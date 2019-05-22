@@ -282,10 +282,46 @@ ggplot(transposed, aes(x=Var, y=percentage, fill=percentage)) +
   order() + 
   geom_bar(stat = "identity")
 
+library(ggthemes)
 
-ggplot(transposed, aes(x = reorder(Var, -percentage), y=percentage, fill = Var)) + 
-  geom_bar(stat = "identity", position = "dodge") +
+seminar_graph <- ggplot(transposed, aes(x = reorder(Var, -percentage), y=percentage, fill = Var)) + 
+  geom_bar(stat = "identity", position = "dodge") + 
+ # geom_text(aes(label = percentage, y = percentage), size = 3) + 
   theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90)) +
+  coord_flip()
+  
+  
+  
+  theme_foundation() +
+  theme(plot.title = element_text(face = "bold",
+                                         size = rel(1.2), hjust = 0.5),
+               text = element_text(),
+               panel.background = element_rect(colour = NA), #dunno
+               plot.background = element_rect(colour = NA), #colors for overall border of graph
+               panel.border = element_rect(colour = "black"), #colors upper corner of graph
+               axis.title = element_text(face = "bold",size = rel(1)), #controls the size of the x and y axis text
+               axis.title.y = element_text(angle=90,vjust =2), #vjust tells you how far the axis title will stick out from the y axis
+               axis.title.x = element_text(vjust = -0.3), #vjust tells you how far the axis title will stick out from the x axis
+               axis.text = element_text(angle=45), 
+               axis.line = element_line(colour=NA), #y and x axis colors
+               axis.ticks = element_line(), 
+               panel.grid.major = element_line(colour="#f0f0f0"),
+               panel.grid.minor = element_blank(), #horizontal line descriptor 
+               legend.key = element_rect(colour = NA), #legend box color
+               legend.position = "bottom", #placement of the legend
+               legend.direction = "horizontal", #need to figure out
+               legend.key.size= unit(0.2, "cm"), #need to figure out
+               legend.margin = unit(0, "cm"), #need to figure out
+               legend.title = element_text(face="italic"), #need to figure out
+               plot.margin=unit(c(10,5,5,5),"mm"), #need to figure out
+               strip.background=element_rect(colour="#f0f0f0",fill="#f0f0f0"), #need to figure out
+               strip.text = element_text(face="bold") #need to figure out
+          )
+
+library(RColorBrewer)
+seminar_graph + labs(y="Percentage", x="Questions Related To") 
+
 ```
 
 
