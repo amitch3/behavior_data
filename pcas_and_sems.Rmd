@@ -249,12 +249,55 @@ semPaths(SEM_object_oriented_fit,
 
 ```
 
+###################this is for class#######################
+############# seminar spring 19 - questions ###############
+###########################################################
+
 
 ```{r}
+seminar_questions_sp19 <- read_excel("seminar_questions_sp19.xlsx")
+str(seminar_questions_sp19)
+
+anon_questions <- seminar_questions_sp19 %>%
+  select(- person, - avatar) %>%
+  filter()
+
+seminar_questions_sp19$avatar <- as.factor(seminar_questions_sp19$avatar)
+
+skim(anon_questions)
+
+pca_anon_questions <- prcomp(anon_questions)
+eig_anon_questions <- get_eig(pca_anon_questions)
+vars_anon_questions <- get_pca_var(pca_anon_questions) 
+
+vars_anon_questions$contrib
+
+corrplot(vars_anon_questions$contrib, is.corr = FALSE)
+fviz_eig(pca_anon_questions, addlabels = T)
 
 
+ggplot(seminar_questions_sp19, aes()) +
+  geom_point(stat = "identity")
+```
 
 
+```{r}
+seminar_questions_sp19_nototals <- read_excel("seminar_questions_sp19_nototals.xlsx")
+#View(seminar_questions_sp19_nototals)
 
+anon_nototals <- seminar_questions_sp19_nototals %>%
+  select(- avatar)
+
+pca_anon_nontotals <- prcomp(anon_nototals)
+eig_anon_nototals <- get_eig(pca_anon_nontotals)
+vars_anon_nototals <- get_pca_var(pca_anon_nontotals) 
+
+eigen_vals_pca_nototals <- pca_anon_nontotals$sdev^2
+
+barplot(eigen_vals_pca_nototals)
+
+
+corrplot(vars_anon_nototals$contrib, is.corr = FALSE)
+fviz_eig(pca_anon_nontotals, addlabels = T)
 
 ```
