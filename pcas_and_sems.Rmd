@@ -32,6 +32,7 @@ library(formattable)
 library(DT)
 library(xtable)
 library(wesanderson)
+library(psych)
 ```
 
 
@@ -343,5 +344,47 @@ barplot(eigen_vals_pca_nototals)
 
 corrplot(vars_anon_nototals$contrib, is.corr = FALSE)
 fviz_eig(pca_anon_nontotals, addlabels = T)
+```
 
+===================================================================================
+
+============================ Starting Over ========================================
+
+===================================================================================
+
+
+
+```{r}
+##approach is changing to an efa to create a latent trait
+##based on my previous pca of the data, the amount of factors that explain the majority of variance in the data range from 14-16. thus, the efa should produce 
+
+restart_ffostare_v1 <- read_excel("znormed_ffostare_v1.xlsx")
+
+hitnot_restart_selected_v1 <- restart_ffostare_v1 %>%
+  select(- Observations, - ResultContainers, - Intervals)
+
+
+#outputs between rcorr and cor are the exact same; will move forward with rcorr since it offers more
+#difference between the two is that rcorr uses pairwise deletion whereas cor is a base function that pairwise manipulations have to be specified. 
+rcorr_hitnot_restart_selected_v1 <- rcorr(as.matrix(hitnot_restart_selected_v1))
+cor_hitnot_restart_selected_v1 <- cor(hitnot_restart_selected_v1)
+
+smoothed_rcorr_hitnot_restart_selected_v1 <- cor.smoother(rcorr_hitnot_restart_selected_v1$r)
+
+View(smoothed_rcorr_hitnot_restart_selected_v1$bad)
+
+max(smoothed_rcorr_hitnot_restart_selected_v1)
+
+parallel_hitnot_factors <- fa.parallel(smoothed_rcorr_hitnot_restart_selected_v1, n.obs = 37, fm = "minres", fa = 'fa')
+
+##based on the output of the scree plot, the hit/not data contains 4-6 factors that explain the majority of the variation about the behaviors. 
+##however, i'm using a non-positive matrix and an efa requires a positive matrix and i had to smooth it before preceding?
+
+fa_t1_nonsmoothed <- fa(rcorr_hitnot_restart_selected_v1$r, nfactors = 4, np.obs = 37,rotate = "varimax", fm = "robust")
+
+fa_t2_smoothed <- fa(smoothed_rcorr_hitnot_restart_selected_v1)
+
+print(fa_t1_nonsmoothed$loadings, cutoff=.3) 
+
+hitnot_factanal_restart_v2 <- factanal(as.matrix(rcorr_hitnot_restart_selected_v1$r), factors = 4)
 ```
