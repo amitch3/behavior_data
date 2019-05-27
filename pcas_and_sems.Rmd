@@ -40,11 +40,11 @@ library(psych)
 
 ```{r loading the data, echo=FALSE, warning=FALSE, message=FALSE}
 normalized_ffostare_v1 <- read_excel("znormed_ffostare_v1.xlsx")
-#skim(znormed_ffostare_v1)
+skim(normalized_ffostare_v1)
 #znormed+ffostare and normalized are the same data set just renamed to reduce confusion; normalzied will be the Df moving forward with new data
 
 #the znormed_ffostare_v1 is corrected output of ffo_corrected_spssout_full. then, for demographic information use selected_norms_composites_demgrafs_v1_use
-normalized_ffostare_selectvars_v1 <- znormed_ffostare_v1 %>%
+normalized_ffostare_selectvars_v1 <- normalized_ffostare_v1 %>%
   select(-Observations, - ResultContainers, - Intervals, - Zno_sec_behav_ffosta)
 
 View(normalized_ffostare_selectvars_v1)
@@ -174,10 +174,9 @@ fviz_eig(pca_composite_novel_object_interest, addlabels = T)
 
 ```{r structural models}
 
-SEM_passive_vigilance <- "latentmodel_passvigi =~ Zdir_eye_contact_ffosta + Zlipsmack_ffosta + Zmovement_ffosta"
-SEM_passive_vigilance_fit <- cfa(SEM_passive_vigilance, estimator = "MLR", data = normalized_ffostare_selectvars_v1)
+SEM_passive_vigilance_v2 <- "latentmodel_passvigi =~ Zdir_eye_contact_ffosta + Zlipsmack_ffosta + Zmovement_ffosta + Zself_gro_ffosta"
+SEM_passive_vigilance_fit <- cfa(SEM_passive_vigilance_v2, estimator = "MLR", data = normalized_ffostare_selectvars_v1)
 summary(SEM_passive_vigilance_fit, standardize = TRUE, fit.measures = TRUE)
-
 
 semPaths(SEM_passive_vigilance_fit,
          layout = "tree",
@@ -382,9 +381,54 @@ parallel_hitnot_factors <- fa.parallel(smoothed_rcorr_hitnot_restart_selected_v1
 
 fa_t1_nonsmoothed <- fa(rcorr_hitnot_restart_selected_v1$r, nfactors = 4, np.obs = 37,rotate = "varimax", fm = "robust")
 
+fa_t1_nonsmoothed$loadings %>%
+
 fa_t2_smoothed <- fa(smoothed_rcorr_hitnot_restart_selected_v1)
 
 print(fa_t1_nonsmoothed$loadings, cutoff=.3) 
 
 hitnot_factanal_restart_v2 <- factanal(as.matrix(rcorr_hitnot_restart_selected_v1$r), factors = 4)
+```
+```{r}
+#since i keep seeing the movement, direct eye contact, and lipsmack group i'm going to see how it holds up as a composite rather than a latent variable. 
+library(readr)
+#read in the normalized data with corrected demographic information about diet groups 
+dietgroups_normalized_correct_all <- read_csv("selected_norms_composites_demgraf_v2_use.csv")
+View(dietgroups_normalized_correct_all)
+#filter out subjects that had a post-weaning western style diet
+matdiet_only <- dietgroups_normalized_correct_all %>%
+  filter(new_diet == 1) 
+
+
+#set the desired variables to factors to hinge the analysis on
+matdiet_only$sex <- as.factor(matdiet_only$sex)
+matdiet_only$initial_diet <- as.factor(matdiet_only$initial_diet)
+matdiet_only$new_diet <- as.factor(matdiet_only$new_diet)
+
+#create composite groups based on efa/community detection output- the goal of this step was simply to investigate the subgroup outlined below
+#included self groom in anx2 composite (remember also that these composites will not be in the oringinal data set above); anx1 is the same group minus self groom
+matdiet_only$passive_anxiety1 <- matdiet_only$Zdir_eye_contact_ffosta + matdiet_only$Zlipsmack_ffosta + matdiet_only$Zmovement_ffosta
+
+#check the kurtosis of the new composite(s)
+skim(matdiet_only)
+
+#test ran since it looks possible that it may suffice a distribution test
+#anx1 = .0004
+#anx2 = .0002
+#i was wrong. variables heavily skewed.
+shapiro.test(matdiet_only$passive_anxiety1)
+
+
+#ran wilcox test but did not find desired pval in either case
+#anx1 = .388
+#anx2 = .234
+
+matdiet_passiveanx1_wiltest_comp <- wilcox.test(matdiet_only$passive_anxiety1~matdiet_only$initial_diet)
+matdiet_comp2_wiltest <- wilcox.test(matdiet_only$comp_2.2~matdiet_only$initial_diet)
+
+matdiet_passiveanx2_wiltest_comp$p.value
+
+#look at the data to see is the pvals make sense for each new compostie score
+ggplot(matdiet_only, aes(x=initial_diet, y=passive_anxiety1, color= initial_diet)) + 
+  geom_jitter(stat="identity")
 ```
