@@ -432,3 +432,15 @@ matdiet_passiveanx2_wiltest_comp$p.value
 ggplot(matdiet_only, aes(x=initial_diet, y=passive_anxiety1, color= initial_diet)) + 
   geom_jitter(stat="identity")
 ```
+
+```{r fixing the matrix}
+#the steps below are for fixing the correlation matrix from our behaviors
+##i'm going to make 2 matrices though. 1) will be a matrix using all behaviors from all animals (n=49), regardless of diet group and 2) will be a matrix only consisting of behaviors from mWSD offspring and controls (n=~36).
+###the 'firstpass_newmatrix' below will using all animals
+
+firstpass_newmatrix <- rcorr_hitnot_restart_selected_v1$r
+
+
+
+
+```
