@@ -1,0 +1,116 @@
+---
+title: "gates_data_rr_temp_npi"
+author: "aj_mitchell"
+date: "June 15, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyselect)
+library(ggplot2)
+library(broom)
+library(dplyr)
+library(corrplot)
+library(kableExtra)
+library(knitr)
+library(Hmisc)
+library(infer)
+library(plotly) 
+library(skimr)
+library(stringr)
+library(reshape2)
+library(som)
+library(manipulate)
+library(lavaan)
+library(semPlot)
+library(FactoMineR)
+library(factoextra)
+library(readxl)
+library(formattable)
+library(DT)
+library(xtable)
+library(wesanderson)
+```
+
+
+```{r plotting}
+gates_temp_NPI_combined_v1 <- read_excel("gates_temp_NPI_combined_v1.xlsx")
+
+#View(gates_temp_NPI_combined_v1)
+
+
+selected_gates_temp_NPI_combined_v1 <- gates_temp_NPI_combined_v1 %>%
+  select(- subj_id, - group)
+
+str(selected_gates_temp_NPI_combined_v1)
+
+```
+
+
+```{r}
+
+corr_gates_temp_npi_v1 <- rcorr(as.matrix(selected_gates_temp_NPI_combined_v1))
+
+View(corr_gates_temp_npi_v1$P)
+
+melted_corr_gates_temp_npi_v1 <- melt(corr_gates_temp_npi_v1$r)
+
+
+melted_pval_gates_temp_npi_v1 <- melt(corr_gates_temp_npi_v1$P) %>%
+  filter(value <= .05)
+
+View(melted_pval_gates_temp_npi_v1)
+
+```
+
+
+```{r plotting}
+gplot_corr_temp_npi <- ggplot(melted_corr_gates_temp_npi_v1, aes(x=Var2, y=Var1, fill=value)) +
+  geom_tile() +
+  scale_fill_gradientn(colours = topo.colors(10)) + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(margin = margin(b = .5, t=.5),
+                                   angle = 90,
+                                   vjust =.16,
+                                   size = 10,
+                                   hjust = 1
+                                    )) +
+     theme(axis.text.y = element_text(margin = margin(b = .5, t=.5),
+                                   vjust = 1,
+                                   size = 10,
+                                   hjust = 1
+                                    ))
+#lets just go with this for now but i think since i did not standardize the structural values, i'm not getting the most accurate representations of the relationships about the data. 
+# next step is to find a way to normalize the structural data and add that to the behavioral data. then reasses for changes. 
+gplot_corr_temp_npi
+
+
+gplot_pval_temp_npi <- ggplot(melted_pval_gates_temp_npi_v1, aes(x=Var2, y=Var1, fill=value)) +
+  geom_tile() +
+  scale_fill_gradientn(colours = topo.colors(10)) + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(margin = margin(b = .5, t=.5),
+                                   angle = 90,
+                                   vjust = .16, #this will align the x variables to their resprective lines
+                                   size = 10,
+                                   hjust = 1
+                                    )) +
+     theme(axis.text.y = element_text(margin = margin(b = .5, t=.5),
+                                   vjust = .16,
+                                   size = 7,
+                                   hjust = 1
+                                    ))
+
+gplot_pval_temp_npi
+
+#need to type in temperament to filter data appropriately
+datatable(formattable(melted_pval_gates_temp_npi_v1))
+
+#next steps are to incorporate the rr data with the structure
+#standardize the structural data with temp and NPI data
+
+```
