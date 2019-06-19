@@ -34,17 +34,30 @@ library(formattable)
 library(DT)
 library(xtable)
 library(wesanderson)
+library(lessR)
+library(RColorBrewer)
 ```
 
 
 ```{r plotting}
-gates_temp_NPI_combined_v1 <- read_excel("gates_temp_NPI_combined_v1.xlsx")
+gates_temp_NPI_combined_v1 <- read_excel("gates_temp_NPI_combined_v1.xlsx") 
+#^do not use!! but you can still use the same datafile as long as the subjects with missing data are cleaned like below
+View(gates_temp_NPI_combined_v1)
+gates_temp_NPI_combined_v1$subj_id <- as.factor(gates_temp_NPI_combined_v1$subj_id)
+##the v2 will have the subjects removed that are causing the NA, also stereotypy behaviors were removed becuase they did not have any variance and they were causing their own error
 
-#View(gates_temp_NPI_combined_v1)
+gates_temp_npi_combined_v2 <- gates_temp_NPI_combined_v1 %>%
+  filter(!subj_id %in% c(35408 , 34404 , 34412))
 
+selected_gates_temp_NPI_combined_v2 <- gates_temp_npi_combined_v2 %>%
+  select(- subj_id, - group)
+
+View(gates_temp_npi_combined_v2)
 
 selected_gates_temp_NPI_combined_v1 <- gates_temp_NPI_combined_v1 %>%
   select(- subj_id, - group)
+
+View(selected_gates_temp_NPI_combined_v1)
 
 str(selected_gates_temp_NPI_combined_v1)
 
@@ -53,64 +66,172 @@ str(selected_gates_temp_NPI_combined_v1)
 
 ```{r}
 
-corr_gates_temp_npi_v1 <- rcorr(as.matrix(selected_gates_temp_NPI_combined_v1))
+####everything below should use gates_temp_npi_combined_v2! <<<---
 
-View(corr_gates_temp_npi_v1$P)
+corr_gates_temp_npi_v2 <- rcorr(as.matrix(selected_gates_temp_NPI_combined_v2))
 
-melted_corr_gates_temp_npi_v1 <- melt(corr_gates_temp_npi_v1$r)
+#View(corr_gates_temp_npi_v1$P)
+
+mat_1_v2 <- corr_gates_temp_npi_v2$r
+ordered_mat_1_v2 <- corReorder(mat_1_v2)
+
+npi_temp_structure_allcorrs <- corrplot(mat_1_v2,
+         method = "color",
+         col = brewer.pal(n=10, name ="RdYlBu"),
+         type = "lower",
+         order = "hclust", 
+         tl.col = "black",
+         tl.cex = .7)
+
+npi_temp_structure_allcorrs
+
+View(mat_1_v2)
+
+cor_order <- corReorder(mat_p2, heat_map = T)
+
+melted_corr_gates_temp_npi_v2 <- melt(corr_gates_temp_npi_v2$r)
 
 
-melted_pval_gates_temp_npi_v1 <- melt(corr_gates_temp_npi_v1$P) %>%
+melted_pval_gates_temp_npi_v2 <- melt(corr_gates_temp_npi_v2$P) %>%
   filter(value <= .05)
 
-View(melted_pval_gates_temp_npi_v1)
+View(melted_pval_gates_temp_npi_v2)
+
+mat_p2_v2 <- corr_gates_temp_npi_v2$P
+##this is how to move forward with correlation visuals 
+pvalsonly_npi_temp_structure <- corrplot(corr_gates_temp_npi_v2$r,
+         p.mat = corr_gates_temp_npi_v2$P,
+         insig = "blank",
+         method = "color",
+         col = brewer.pal(n=10, name ="RdYlBu"),
+         type = "lower",
+         order = "hclust", 
+         tl.col = "black",
+         tl.cex = .7)
+
+#View(melted_pval_gates_temp_npi_v1)
 
 ```
 
 
-```{r plotting}
-gplot_corr_temp_npi <- ggplot(melted_corr_gates_temp_npi_v1, aes(x=Var2, y=Var1, fill=value)) +
-  geom_tile() +
-  scale_fill_gradientn(colours = topo.colors(10)) + 
-  theme_minimal() +
-  theme(axis.text.x = element_text(margin = margin(b = .5, t=.5),
-                                   angle = 90,
-                                   vjust =.16,
-                                   size = 10,
-                                   hjust = 1
-                                    )) +
-     theme(axis.text.y = element_text(margin = margin(b = .5, t=.5),
-                                   vjust = 1,
-                                   size = 10,
-                                   hjust = 1
-                                    ))
-#lets just go with this for now but i think since i did not standardize the structural values, i'm not getting the most accurate representations of the relationships about the data. 
-# next step is to find a way to normalize the structural data and add that to the behavioral data. then reasses for changes. 
-gplot_corr_temp_npi
+```{r with normalized structural data}
+#this chunk will be doing the same steps above except with normalized imaging data
+#i want to see if it changes the relationships of the output
+#i will show both to chris if so to see which one is appropriate
+######doesnt matter if structure is normalized or not
 
 
-gplot_pval_temp_npi <- ggplot(melted_pval_gates_temp_npi_v1, aes(x=Var2, y=Var1, fill=value)) +
-  geom_tile() +
-  scale_fill_gradientn(colours = topo.colors(10)) + 
-  theme_minimal() +
-  theme(axis.text.x = element_text(margin = margin(b = .5, t=.5),
-                                   angle = 90,
-                                   vjust = .16, #this will align the x variables to their resprective lines
-                                   size = 10,
-                                   hjust = 1
-                                    )) +
-     theme(axis.text.y = element_text(margin = margin(b = .5, t=.5),
-                                   vjust = .16,
-                                   size = 7,
-                                   hjust = 1
-                                    ))
+###the figures here can be used for the meeting tomorrow
+###these figures contain no composites and are representations of raw relationships. 
 
-gplot_pval_temp_npi
+gates_temp_NPI_combined_ALLNORM_v2 <- read_excel("gates_temp_NPI_combined_ALLNORM_v2.xlsx")
+View(gates_temp_NPI_combined_ALLNORM_v2)
 
-#need to type in temperament to filter data appropriately
-datatable(formattable(melted_pval_gates_temp_npi_v1))
+selected_gates_temp_NPI_combined_ALLNORM_v2 <- gates_temp_NPI_combined_ALLNORM_v2 %>%
+  filter(!subj_id %in% c(35408 , 34404 , 34412)) %>%
+  select(-subj_id, -group, -Sex)
+
+View(selected_gates_temp_NPI_combined_ALLNORM_v2)
+
+corr_gates_ALLNORM_v2 <- rcorr(as.matrix(selected_gates_temp_NPI_combined_ALLNORM_v2))
+
+View(corr_gates_ALLNORM_v2$r)
+
+pval_gates_ALLNORM_v2 <- melt(corr_gates_ALLNORM_v2$P) %>%
+  filter(value <= .05)
+
+View(pval_gates_ALLNORM_v2)
+
+corrplot(corr_gates_ALLNORM_v2$r,
+         method = "color",
+         col = brewer.pal(n=10, name ="RdYlBu"),
+         type = "lower",
+         order = "hclust", 
+         tl.col = "black",
+         tl.srt = 45,
+         tl.cex = .7)
+
+corrplot(corr_gates_ALLNORM_v2$r,
+         p.mat = corr_gates_ALLNORM_v2$P,
+         insig = "blank",
+         method = "color",
+         col = brewer.pal(n=10, name ="RdYlBu"),
+         type = "lower",
+         order = "hclust", 
+         tl.col = "black",
+         tl.srt = 45,
+         tl.cex = .7)
+
+datatable(formattable(pval_gates_ALLNORM_v2))
+#png(filename)
 
 #next steps are to incorporate the rr data with the structure
 #standardize the structural data with temp and NPI data
+
+```
+
+```{r}
+#only use the average just to get an idea of what it looks like with
+#1) structure
+#2) temperament
+#3) novel peer performance
+
+
+#i do the agitation data separate becuase it misses data from different subjects; it's more informative on its own
+agitation_percent_RRdata_plus_structure <- read_excel("agitation_percent_RRdata_plus_structure.xlsx")
+View(agitation_percent_RRdata_plus_structure)
+agitation_percent_RRdata_plus_structure$Sex <- as.factor(agitation_percent_RRdata_plus_structure$Sex)
+agitation_percent_RRdata_plus_structure$Diet <- as.factor(agitation_percent_RRdata_plus_structure$Diet)
+
+selected_agitation <- agitation_percent_RRdata_plus_structure %>%
+  select(-"Monkey_#", -match, - Sex, - Diet)
+
+corr_agitation <- rcorr(as.matrix(selected_agitation))
+
+corrplot(corr_agitation$r,
+         method = "color",
+         col = brewer.pal(n=10, name ="RdYlBu"),
+         type = "lower",
+         order = "hclust", 
+         tl.col = "black",
+         tl.srt = 45,
+         tl.cex = .7)
+
+#%time agitated is interesting
+```
+
+```{r}
+#the rr data
+####heavy grains of salt because i am using averaged classification scores. 
+avg_rr_data_plus_structure <- read_excel("avg_rr_data_plus_structure.xlsx")
+str(avg_rr_data_plus_structure)
+
+avg_rr_data_plus_structure$Sex <- as.factor(avg_rr_data_plus_structure$Sex)
+avg_rr_data_plus_structure$Diet <- as.factor(avg_rr_data_plus_structure$Diet)
+
+selected_rr_and_structure <- avg_rr_data_plus_structure %>%
+  select(-"Monkey_#", - Sex, - Diet, - DOB)
+
+corr_rr_plus_structure <- rcorr(as.matrix(selected_rr_and_structure))
+
+corrplot(corr_rr_plus_structure$r,
+         method = "color",
+         col = brewer.pal(n=10, name ="RdYlBu"),
+         type = "lower",
+         order = "hclust", 
+         tl.col = "black",
+         tl.srt = 45,
+         tl.cex = .7)
+
+corrplot(corr_rr_plus_structure$r,
+         p.mat = corr_rr_plus_structure$P,
+         insig = "blank",
+         method = "color",
+         col = brewer.pal(n=10, name ="RdYlBu"),
+         type = "lower",
+         order = "hclust", 
+         tl.col = "black",
+         tl.srt = 45,
+         tl.cex = .7)
 
 ```

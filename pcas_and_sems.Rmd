@@ -438,9 +438,37 @@ ggplot(matdiet_only, aes(x=initial_diet, y=passive_anxiety1, color= initial_diet
 ##i'm going to make 2 matrices though. 1) will be a matrix using all behaviors from all animals (n=49), regardless of diet group and 2) will be a matrix only consisting of behaviors from mWSD offspring and controls (n=~36).
 ###the 'firstpass_newmatrix' below will using all animals
 
+library(Matrix)
+
 firstpass_newmatrix <- rcorr_hitnot_restart_selected_v1$r
 
+PD_firstpass_newmatrix <- nearPD(firstpass_newmatrix, corr = TRUE, conv.tol = 1e-12, doSym = TRUE)
+
+PD_firstpass_newmatrix$mat@Dimnames
+
+norm(firstpass_newmatrix - PD_firstpass_newmatrix$mat)
+
+#attempting to manually for using cor.smooth again
+smoothcor1 <- cor.smooth(firstpass_newmatrix, eig.tol = 10^-12)
 
 
+#this did not work. at all. ignore.
+resid <- firstpass_newmatrix - smoothcor1
 
+tr(resid %*% t(resid)) /2
+
+resid
+
+paratest1 <- fa.parallel(resid, n.obs = 37, fm = "minres")
+
+##trying posdefify
+library(sfsmisc)
+
+posd_mat1 <- posdefify(firstpass_newmatrix, eps.ev = 1e-07)
+
+View(posd_mat1)
+View(firstpass_newmatrix)
+
+
+fa.parallel(posd_mat1, n.obs = 37, fm = "minres")
 ```
