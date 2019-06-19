@@ -9,7 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r}
+```{r, echo=F, message=FALSE, warning=FALSE}
 library(tidyselect)
 library(ggplot2)
 library(broom)
@@ -57,9 +57,9 @@ View(gates_temp_npi_combined_v2)
 selected_gates_temp_NPI_combined_v1 <- gates_temp_NPI_combined_v1 %>%
   select(- subj_id, - group)
 
-View(selected_gates_temp_NPI_combined_v1)
+View(selected_gates_temp_NPI_combined_v2)
 
-str(selected_gates_temp_NPI_combined_v1)
+str(selected_gates_temp_NPI_combined_v2)
 
 ```
 
@@ -148,8 +148,8 @@ corrplot(corr_gates_ALLNORM_v2$r,
          type = "lower",
          order = "hclust", 
          tl.col = "black",
-         tl.srt = 45,
-         tl.cex = .7)
+         tl.srt = 25,
+         tl.cex = .5)
 
 corrplot(corr_gates_ALLNORM_v2$r,
          p.mat = corr_gates_ALLNORM_v2$P,
@@ -159,8 +159,8 @@ corrplot(corr_gates_ALLNORM_v2$r,
          type = "lower",
          order = "hclust", 
          tl.col = "black",
-         tl.srt = 45,
-         tl.cex = .7)
+         tl.srt = 25,
+         tl.cex = .5)
 
 datatable(formattable(pval_gates_ALLNORM_v2))
 #png(filename)
@@ -194,8 +194,20 @@ corrplot(corr_agitation$r,
          type = "lower",
          order = "hclust", 
          tl.col = "black",
-         tl.srt = 45,
-         tl.cex = .7)
+         tl.srt = 25,
+         tl.cex = .5)
+
+corrplot(corr_agitation$r,
+         p.mat =  corr_agitation$P,
+         insig = "blank",
+         method = "color",
+         col = brewer.pal(n=10, name ="RdYlBu"),
+         type = "lower",
+         order = "hclust", 
+         tl.col = "black",
+         tl.srt = 25,
+         tl.cex = .5)
+
 
 #%time agitated is interesting
 ```
@@ -220,8 +232,8 @@ corrplot(corr_rr_plus_structure$r,
          type = "lower",
          order = "hclust", 
          tl.col = "black",
-         tl.srt = 45,
-         tl.cex = .7)
+         tl.srt = 25,
+         tl.cex = .5)
 
 corrplot(corr_rr_plus_structure$r,
          p.mat = corr_rr_plus_structure$P,
@@ -231,7 +243,15 @@ corrplot(corr_rr_plus_structure$r,
          type = "lower",
          order = "hclust", 
          tl.col = "black",
-         tl.srt = 45,
-         tl.cex = .7)
+         tl.srt = 25,
+         tl.cex = .5)
+
+```
+
+
+
+```{r}
+##next need to do PCAs and SEMs on new outputs using the calculated thresh holds 
+
 
 ```
