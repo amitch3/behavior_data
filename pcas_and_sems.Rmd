@@ -95,6 +95,11 @@ View(eig_vals)
 comp1_indi <- selected_norms_ffostare_v1 %>%
   select(Zstationary_middle_percent_butters, Zlocomotion_percent_butters, Zhanging_behaviors_butters, Ztactile_exploration_butters, Zmo_manip_apple_butters, Zstation_fr_ffostare,  Zstation_mid_ffosta, Zlocomote_ffosta, Zmovement_ffosta, Ztac_expl_ffosta,  Zstereo_ffosta, Zteethgrind_ffosta, Zlipsmack_ffosta, Ztouch_app_ffosta, Zmouth_app_ffosta, Zmanip_app_ffosta, Zeat_app_ffosta, Znonvigi_ffosta, Zdir_eye_contact_ffosta)
 
+
+
+
+
+
 composite_active_vigilance <- normalized_ffostare_selectvars_v1 %>%
   select(Zlipsmack_ffosta, Zmovement_ffosta, Zdir_eye_contact_ffosta)
 
@@ -133,6 +138,26 @@ composite_novel_object_interest <- normalized_ffostare_selectvars_v1 %>%
   select(Zself_groom_percent_butters, Zmouth_butters_percent, Zoral_exploration_butters)
 ```
 
+```{r}
+##this chunk will be remaking the data using the new grouping with the calculated range
+##these groups are based on the grouping with Damien
+### going to recreate the groups like chunk above;then run it like the chunk below ->> this will give me my pca outputs for the new groups in the appropriate range
+###6/19/19
+
+group_d <- normalized_ffostare_selectvars_v1 %>%
+  select(Zlipsmack_ffosta, Zmovement_ffosta, Zdir_eye_contact_ffosta, Zself_gro_ffosta)
+
+group_e <- normalized_ffostare_selectvars_v1 %>%
+  select(Zself_groom_percent_butters, Zmouth_butters_percent, Zoral_exploration_butters)
+
+group_c <- normalized_ffostare_selectvars_v1 %>%
+  select(Zstereotypy_butters, Zstation_back_ffostare, Zmanip_app_ffosta, Zthreat_stranger_ffosta, Zfreeze_back_ffosta, Znonvigi_ffosta)
+
+
+
+
+
+```
 
 ```{r PCA eigenvals and variables}
 pca_composite_active_vigilance <- prcomp(composite_active_vigilance)
@@ -471,4 +496,14 @@ View(firstpass_newmatrix)
 
 
 fa.parallel(posd_mat1, n.obs = 37, fm = "minres")
+```
+
+================
+new sems and pcas
+================
+
+```{r}
+
+
+
 ```

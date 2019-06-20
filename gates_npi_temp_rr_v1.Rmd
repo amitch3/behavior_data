@@ -95,7 +95,7 @@ melted_corr_gates_temp_npi_v2 <- melt(corr_gates_temp_npi_v2$r)
 melted_pval_gates_temp_npi_v2 <- melt(corr_gates_temp_npi_v2$P) %>%
   filter(value <= .05)
 
-View(melted_pval_gates_temp_npi_v2)
+datatable(formattable(melted_pval_gates_temp_npi_v2))
 
 mat_p2_v2 <- corr_gates_temp_npi_v2$P
 ##this is how to move forward with correlation visuals 
@@ -245,6 +245,10 @@ corrplot(corr_rr_plus_structure$r,
          tl.col = "black",
          tl.srt = 25,
          tl.cex = .5)
+melted_rr_pval <- melt(corr_rr_plus_structure$P) %>%
+  filter(value <= .05)
+
+datatable(formattable(melted_rr_pval))
 
 ```
 
