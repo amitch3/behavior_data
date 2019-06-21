@@ -162,7 +162,7 @@ corrplot(corr_gates_ALLNORM_v2$r,
          tl.srt = 25,
          tl.cex = .5)
 
-datatable(formattable(pval_gates_ALLNORM_v2))
+datatable(formattable(corr_gates_ALLNORM_v2$r))
 #png(filename)
 
 #next steps are to incorporate the rr data with the structure

@@ -153,7 +153,14 @@ group_e <- normalized_ffostare_selectvars_v1 %>%
 group_c <- normalized_ffostare_selectvars_v1 %>%
   select(Zstereotypy_butters, Zstation_back_ffostare, Zmanip_app_ffosta, Zthreat_stranger_ffosta, Zfreeze_back_ffosta, Znonvigi_ffosta)
 
+group_b <- normalized_ffostare_selectvars_v1 %>%
+  select(Zstationary_middle_percent_butters, Zlocomotion_percent_butters, Zhanging_behaviors_butters, Zstation_fr_ffostare, Zlocomote_ffosta, Zstereo_ffosta, Zteethgrind_ffosta, Zmouth_app_ffosta, Zeat_app_ffosta)
 
+group_a <- normalized_ffostare_selectvars_v1 %>%
+  select(ZStationary_back_butters, Zstationary_front_percent_butters, Zmovement_percent_butters, Ztactile_exploration_butters, Zvigilant_percent_butters, Zcrouching_ffosta, Zno_response_ffosta, Zvigi_ffosta)
+
+##i'm looking at these composites within themselves ^^^
+### i think they should be done within the context of the data within the whole? but how can i make sure that so i changes it to make that so... the internets say its fine to do it independently but all answers area controversial.
 
 
 
