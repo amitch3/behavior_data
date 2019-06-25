@@ -170,6 +170,8 @@ datatable(formattable(corr_gates_ALLNORM_v2$r))
 
 ```
 
+
+
 ```{r}
 #only use the average just to get an idea of what it looks like with
 #1) structure
@@ -240,11 +242,10 @@ corrplot(corr_rr_plus_structure$r,
          insig = "blank",
          method = "color",
          col = brewer.pal(n=10, name ="RdYlBu"),
-         type = "lower",
          order = "hclust", 
          tl.col = "black",
-         tl.srt = 25,
          tl.cex = .5)
+
 melted_rr_pval <- melt(corr_rr_plus_structure$P) %>%
   filter(value <= .05)
 
@@ -256,6 +257,41 @@ datatable(formattable(melted_rr_pval))
 
 ```{r}
 ##next need to do PCAs and SEMs on new outputs using the calculated thresh holds 
+
+
+```
+
+========
+new post meeting changes - 6/24
+========
+
+```{r}
+#this chunk is for creating the interactive plots to put on box
+Pvalue_matrix_temp_stuct_NPI_interactive <- ggplotly(ggplot(pval_gates_ALLNORM_v2, aes(x=Var2, y=Var1, fill=value)) +
+         geom_tile(stat='identity') +
+    scale_fill_gradientn(colours = topo.colors(5)) + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(margin = margin(b = .5, t=.5),
+                                   angle = 90,
+                                   vjust = .16,
+                                   size = 10,
+                                   hjust = 1
+                                    )) +
+  theme(axis.text.y = element_text(margin = margin(b = .5, t=.5),
+                                   vjust = .16,
+                                   size = 10,
+                                   hjust = 1
+                                    )))
+
+View(pval_gates_ALLNORM_v2)
+
+write.csv(pval_gates_ALLNORM_v2, "pvals_gates_ALLNORM_csv.csv")
+
+```
+
+
+```{r}
+
 
 
 ```
