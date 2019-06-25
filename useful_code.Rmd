@@ -79,3 +79,22 @@ ggplot(playdata1, aes(x=meanings, y=numbers, fill = factor(numbers))) +
 
 
 ```
+
+
+```{r}
+#function for flattenting a matrix and getting both the correlation values and the p values in the same space
+
+cormat1 <- #correlation matrix from rcorr output
+pmat1 <- #pvalue matrix from rcorr output
+
+flattenCorrMatrix1 <- function(cormat1, pmat1) {
+  ut <- upper.tri(cormat1)
+  data.frame(
+    row = rownames(cormat1)[row(cormat1)[ut]],
+    column = rownames(cormat1)[col(cormat1)[ut]],
+    cor  =(cormat1)[ut],
+    p = pmat1[ut]
+    )
+}
+
+```

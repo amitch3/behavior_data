@@ -42,7 +42,7 @@ library(RColorBrewer)
 ```{r plotting}
 gates_temp_NPI_combined_v1 <- read_excel("gates_temp_NPI_combined_v1.xlsx") 
 #^do not use!! but you can still use the same datafile as long as the subjects with missing data are cleaned like below
-View(gates_temp_NPI_combined_v1)
+#View(gates_temp_NPI_combined_v1)
 gates_temp_NPI_combined_v1$subj_id <- as.factor(gates_temp_NPI_combined_v1$subj_id)
 ##the v2 will have the subjects removed that are causing the NA, also stereotypy behaviors were removed becuase they did not have any variance and they were causing their own error
 
@@ -52,14 +52,14 @@ gates_temp_npi_combined_v2 <- gates_temp_NPI_combined_v1 %>%
 selected_gates_temp_NPI_combined_v2 <- gates_temp_npi_combined_v2 %>%
   select(- subj_id, - group)
 
-View(gates_temp_npi_combined_v2)
+#View(gates_temp_npi_combined_v2)
 
 selected_gates_temp_NPI_combined_v1 <- gates_temp_NPI_combined_v1 %>%
   select(- subj_id, - group)
 
-View(selected_gates_temp_NPI_combined_v2)
+#View(selected_gates_temp_NPI_combined_v2)
 
-str(selected_gates_temp_NPI_combined_v2)
+#str(selected_gates_temp_NPI_combined_v2)
 
 ```
 
@@ -92,8 +92,7 @@ cor_order <- corReorder(mat_p2, heat_map = T)
 melted_corr_gates_temp_npi_v2 <- melt(corr_gates_temp_npi_v2$r)
 
 
-melted_pval_gates_temp_npi_v2 <- melt(corr_gates_temp_npi_v2$P) %>%
-  filter(value <= .05)
+melted_pval_gates_temp_npi_v2 <- melt(corr_gates_temp_npi_v2$P) 
 
 datatable(formattable(melted_pval_gates_temp_npi_v2))
 
@@ -125,30 +124,28 @@ pvalsonly_npi_temp_structure <- corrplot(corr_gates_temp_npi_v2$r,
 ###these figures contain no composites and are representations of raw relationships. 
 
 gates_temp_NPI_combined_ALLNORM_v2 <- read_excel("gates_temp_NPI_combined_ALLNORM_v2.xlsx")
-View(gates_temp_NPI_combined_ALLNORM_v2)
+#View(gates_temp_NPI_combined_ALLNORM_v2)
 
 selected_gates_temp_NPI_combined_ALLNORM_v2 <- gates_temp_NPI_combined_ALLNORM_v2 %>%
   filter(!subj_id %in% c(35408 , 34404 , 34412)) %>%
   select(-subj_id, -group, -Sex)
 
-View(selected_gates_temp_NPI_combined_ALLNORM_v2)
+#View(selected_gates_temp_NPI_combined_ALLNORM_v2)
 
 corr_gates_ALLNORM_v2 <- rcorr(as.matrix(selected_gates_temp_NPI_combined_ALLNORM_v2))
 
-View(corr_gates_ALLNORM_v2$r)
+#View(corr_gates_ALLNORM_v2$r)
 
 pval_gates_ALLNORM_v2 <- melt(corr_gates_ALLNORM_v2$P) %>%
   filter(value <= .05)
 
-View(pval_gates_ALLNORM_v2)
+#View(pval_gates_ALLNORM_v2)
 
 corrplot(corr_gates_ALLNORM_v2$r,
          method = "color",
          col = brewer.pal(n=10, name ="RdYlBu"),
-         type = "lower",
          order = "hclust", 
          tl.col = "black",
-         tl.srt = 25,
          tl.cex = .5)
 
 corrplot(corr_gates_ALLNORM_v2$r,
@@ -162,7 +159,7 @@ corrplot(corr_gates_ALLNORM_v2$r,
          tl.srt = 25,
          tl.cex = .5)
 
-datatable(formattable(corr_gates_ALLNORM_v2$r))
+datatable(formattable(corr_gates_ALLNORM_v2$n))
 #png(filename)
 
 #next steps are to incorporate the rr data with the structure
@@ -249,7 +246,12 @@ corrplot(corr_rr_plus_structure$r,
 melted_rr_pval <- melt(corr_rr_plus_structure$P) %>%
   filter(value <= .05)
 
-datatable(formattable(melted_rr_pval))
+melted_rr_corrvals <- melt(corr_rr_plus_structure$r)
+
+
+datatable(formattable(melted_rr_corrvals))
+
+write.csv(melted_rr_pval, "response_reactivity_pvals.csv")
 
 ```
 
@@ -282,16 +284,88 @@ Pvalue_matrix_temp_stuct_NPI_interactive <- ggplotly(ggplot(pval_gates_ALLNORM_v
                                    size = 10,
                                    hjust = 1
                                     )))
+Pvalue_matrix_temp_stuct_NPI_interactive
 
 View(pval_gates_ALLNORM_v2)
 
 write.csv(pval_gates_ALLNORM_v2, "pvals_gates_ALLNORM_csv.csv")
+
+ggplot(pval_gates_ALLNORM_v2, aes(x=Var2, y=Var1, fill=value)) +
+  geom_tile(stat='identity') +
+  scale_fill_gradientn(colours = topo.colors(5)) + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(margin = margin(b = .5, t=.5),
+                                   angle = 90,
+                                   vjust = .16,
+                                   size = 10,
+                                   hjust = 1
+                                    )) +
+  theme(axis.text.y = element_text(margin = margin(b = .5, t=.5),
+                                   vjust = .16,
+                                   size = 10,
+                                   hjust = 1
+                                    ))
+
+melt2gether <- melt(corr_gates_ALLNORM_v2$r, corr_gates_ALLNORM_v2$P)
+
+
+library(PerformanceAnalytics)
+
+chart.Correlation(selected_gates_temp_NPI_combined_v2, histogram = T, pch = 20)
+
+cormat <- corr_gates_ALLNORM_v2$r
+pmat <- corr_gates_ALLNORM_v2$P
+
+flattenCorrMatrix <- function(cormat, pmat) {
+  ut <- upper.tri(cormat)
+  data.frame(
+    row = rownames(cormat)[row(cormat)[ut]],
+    column = rownames(cormat)[col(cormat)[ut]],
+    cor  =(cormat)[ut],
+    p = pmat[ut]
+    )
+}
+
+flatmat_ALL <- flattenCorrMatrix(corr_gates_ALLNORM_v2$r, corr_gates_ALLNORM_v2$P)
+
+View(flatmat_ALL_v2)
+
+flatmat_ALL_v2 <- flatmat_ALL %>%
+  filter(p <= .05)
+
+write.csv(flatmat_ALL_v2, "pval_corrval_stucture_temp_npi.csv")
 
 ```
 
 
 ```{r}
 
+cormat1 <- corr_rr_plus_structure$r
+pmat1 <- corr_rr_plus_structure$P
 
+flattenCorrMatrix1 <- function(cormat1, pmat1) {
+  ut <- upper.tri(cormat1)
+  data.frame(
+    row = rownames(cormat1)[row(cormat1)[ut]],
+    column = rownames(cormat1)[col(cormat1)[ut]],
+    cor  =(cormat1)[ut],
+    p = pmat1[ut]
+    )
+}
+
+flatmat_rr_v1  <- flattenCorrMatrix1(corr_rr_plus_structure$r, corr_rr_plus_structure$P)
+#v2 = pvals > .05 removed
+flatmat_rr_v2 <- flatmat_rr_v1 %>%
+  filter(p <= .05)
+
+View(flatmat_rr_v2)
+
+write.csv(flatmat_rr_v2, "pval_corrval_rr_structure.csv")
+```
+
+
+```{r}
+##here i need to make interactive visuals and submit them to box for chris and elinor
+##when you submit, make some guesses as to what these groups may be.. or highlight general patterns you see
 
 ```
