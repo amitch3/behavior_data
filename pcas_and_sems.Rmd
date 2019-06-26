@@ -538,6 +538,7 @@ var_pca_group_a <- get_pca_var(pca_group_a)
 corrplot(var_pca_group_e$contrib, is.corr = FALSE)
 fviz_eig(pca_group_e, addlabels = T)
 ##i chose to look at the variable contribution because it informs me about how to load the models in the next (SEM) step
+##permuting the variables to create a null distribution, measure the goodness of that model and when we use other variables they give us a worse fit --> this can be done in mplus
 
 corrplot(var_pca_group_d$contrib, is.corr = FALSE)
 fviz_eig(pca_group_d, addlabels = T)
@@ -559,7 +560,40 @@ fviz_eig(pca_group_e, addlabels = T)
 
 
 ```{r}
-##Structural Models
+##Structural Models - 6/26/19
+#the first variable (loading variable) needs to be the heaviest weighted behavior responsible for the most variability that is output in the pca output
+###on that note, i may need to reorder some of theses, i did not have time to do this
 
+cor_normalized_ffostare_selectvars_v1 <- rcorr(as.matrix(normalized_ffostare_selectvars_v1))
+cormat_4_SEMS <- cor_normalized_ffostare_selectvars_v1$r
+
+SEM_group_e <- 'latemod_group_e =~ Zself_groom_percent_butters + Zmouth_butters_percent + Zoral_exploration_butters'
+SEM_group_e_fit <- cfa(model = SEM_group_e, estimator = "MLR", data = normalized_ffostare_selectvars_v1)
+summary(SEM_group_e_fit, standardize = TRUE, fit.measures = TRUE)
+  
+SEM_group_d <- "latemod_group_d =~ Zdir_eye_contact_ffosta + Zlipsmack_ffosta + Zmovement_ffosta + Zself_gro_ffosta"
+SEM_group_d_fit <- cfa(model = SEM_group_d, estimator = "MLR", data = normalized_ffostare_selectvars_v1)
+summary(SEM_group_d_fit, standardize = TRUE, fit.measures = TRUE)
+
+SEM_group_c <- "latemod_group_c =~ Zthreat_stranger_ffosta + Zself_gro_ffosta + Zstereotypy_butters + Zstation_back_ffostare + Zfreeze_back_ffosta + Zmanip_app_ffosta + Znonvigi_ffosta"
+SEM_group_c_fit <- cfa(model = SEM_group_c, estimator = "MLR", data = normalized_ffostare_selectvars_v1)
+summary(SEM_group_c_fit, standardize = TRUE, fit.measures = TRUE)
+
+
+SEM_group_b <- "latemod_group_b =~ Zstationary_middle_percent_butters + Zlocomotion_percent_butters + Zhanging_behaviors_butters + Zstation_fr_ffostare + Zlocomote_ffosta + Zstereo_ffosta + Zteethgrind_ffosta + Zmouth_app_ffosta + Zeat_app_ffosta"
+SEM_group_b_fit <- cfa(model = SEM_group_b, estimator = "MLR", data = normalized_ffostare_selectvars_v1)
+summary(SEM_group_b_fit, standardize = TRUE, fit.measures = TRUE)
+
+SEM_group_a <- "latemod_group_a =~ ZStationary_back_butters + Zstationary_front_percent_butters + Zmovement_percent_butters + Ztactile_exploration_butters + Zvigilant_percent_butters + Zcrouching_ffosta + Zno_response_ffosta + Zvigi_ffosta"
+SEM_group_a_fit <- cfa(model = SEM_group_a, estimator = "MLR", data = normalized_ffostare_selectvars_v1)
+summary(SEM_group_a_fit, standardize = TRUE, fit.measures = TRUE)
+
+SEM_ALLMODELS_interaction <- "latemod_group_e =~ Zself_groom_percent_butters + Zmouth_butters_percent + Zoral_exploration_butters
+latemod_group_d =~ Zdir_eye_contact_ffosta + Zlipsmack_ffosta + Zmovement_ffosta + Zself_gro_ffosta
+latemod_group_c =~ Zthreat_stranger_ffosta + Zself_gro_ffosta + Zstereotypy_butters + Zstation_back_ffostare + Zfreeze_back_ffosta + Zmanip_app_ffosta + Znonvigi_ffosta
+latemod_group_b =~ Zstationary_middle_percent_butters + Zlocomotion_percent_butters + Zhanging_behaviors_butters + Zstation_fr_ffostare + Zlocomote_ffosta + Zstereo_ffosta + Zteethgrind_ffosta + Zmouth_app_ffosta + Zeat_app_ffosta
+latemod_group_a =~ ZStationary_back_butters + Zstationary_front_percent_butters + Zmovement_percent_butters + Ztactile_exploration_butters + Zvigilant_percent_butters + Zcrouching_ffosta + Zno_response_ffosta + Zvigi_ffosta"
+SEM_ALLMODELS_ineraction_fit <- cfa(model = SEM_ALLMODELS_interaction, estimator = "MLR", data = normalized_ffostare_selectvars_v1)
+summary(SEM_ALLMODELS_ineraction_fit, standardize = TRUE, fit.measures = TRUE)
 
 ```
