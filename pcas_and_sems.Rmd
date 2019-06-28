@@ -595,5 +595,130 @@ latemod_group_b =~ Zstationary_middle_percent_butters + Zlocomotion_percent_butt
 latemod_group_a =~ ZStationary_back_butters + Zstationary_front_percent_butters + Zmovement_percent_butters + Ztactile_exploration_butters + Zvigilant_percent_butters + Zcrouching_ffosta + Zno_response_ffosta + Zvigi_ffosta"
 SEM_ALLMODELS_ineraction_fit <- cfa(model = SEM_ALLMODELS_interaction, estimator = "MLR", data = normalized_ffostare_selectvars_v1)
 summary(SEM_ALLMODELS_ineraction_fit, standardize = TRUE, fit.measures = TRUE)
+```
 
+
+#######
+###############
+############################
+        this section will contain t-tests for new data for graphing
+
+                6/27/19
+############################
+################
+#######
+
+
+```{r}
+#removing the previous composites from the demographc information
+##also removing animals that were fed a WSD postweaning
+demographicinfo_34mo_hitnot <- dietgroups_normalized_correct_all %>%
+  select(- comp_1, - comp_2, - comp_2.2, - comp_3, - comp_3.2, - comp_4) %>%
+  filter(!new_diet == 2)
+#View(demographicinfo_34mo_hitnot)
+
+##adding the new composite groups based on correct, calculated thresholds from the community detection output
+demographicinfo_34mo_hitnot$group_e <- demographicinfo_34mo_hitnot$Zlipsmack_ffosta + 
+  demographicinfo_34mo_hitnot$Zmovement_ffosta + 
+  demographicinfo_34mo_hitnot$Zdir_eye_contact_ffosta + 
+  demographicinfo_34mo_hitnot$Zself_gro_ffosta
+
+demographicinfo_34mo_hitnot$group_d <- demographicinfo_34mo_hitnot$Zself_groom_percent_butters + 
+  demographicinfo_34mo_hitnot$Zmouth_butters_percent + 
+  demographicinfo_34mo_hitnot$Zoral_exploration_butters
+
+demographicinfo_34mo_hitnot$group_c <- demographicinfo_34mo_hitnot$Zstereotypy_butters + 
+  demographicinfo_34mo_hitnot$Zstation_back_ffostare + 
+  demographicinfo_34mo_hitnot$Zmanip_app_ffosta + 
+  demographicinfo_34mo_hitnot$Zthreat_stranger_ffosta + 
+  demographicinfo_34mo_hitnot$Zfreeze_back_ffosta + 
+  demographicinfo_34mo_hitnot$Znonvigi_ffosta
+
+demographicinfo_34mo_hitnot$group_b <- demographicinfo_34mo_hitnot$Zstationary_middle_percent_butters +
+  demographicinfo_34mo_hitnot$Zlocomotion_percent_butters + 
+  demographicinfo_34mo_hitnot$Zhanging_behaviors_butters + 
+  demographicinfo_34mo_hitnot$Zstation_fr_ffostare + 
+  demographicinfo_34mo_hitnot$Zlocomote_ffosta + 
+  demographicinfo_34mo_hitnot$Zstereo_ffosta + 
+  demographicinfo_34mo_hitnot$Zteethgrind_ffosta + 
+  demographicinfo_34mo_hitnot$Zmouth_app_ffosta + 
+  demographicinfo_34mo_hitnot$Zeat_app_ffosta
+
+demographicinfo_34mo_hitnot$group_a <- demographicinfo_34mo_hitnot$ZStationary_back_butters +
+  demographicinfo_34mo_hitnot$Zstationary_front_percent_butters +
+  demographicinfo_34mo_hitnot$Zmovement_percent_butters +
+  demographicinfo_34mo_hitnot$Ztactile_exploration_butters +
+  demographicinfo_34mo_hitnot$Zvigilant_percent_butters + 
+  demographicinfo_34mo_hitnot$Zcrouching_ffosta + 
+  demographicinfo_34mo_hitnot$Zno_response_ffosta + 
+  demographicinfo_34mo_hitnot$Zvigi_ffosta
+
+#skim(demographicinfo_34mo_hitnot)
+
+##removing extraneous behaviors to focus on the composite groups for t tests
+
+demographicinfo_compositesonly_34mo_hitnot <- demographicinfo_34mo_hitnot %>%
+  select(Observations, initial_diet, sex, group_a, group_b, group_c, group_d, group_e)
+
+
+demographicinfo_compositesonly_34mo_hitnot$Observations <- as.factor(demographicinfo_compositesonly_34mo_hitnot$Observations)
+demographicinfo_compositesonly_34mo_hitnot$initial_diet <-    as.factor(demographicinfo_compositesonly_34mo_hitnot$initial_diet)
+demographicinfo_compositesonly_34mo_hitnot$sex <- 
+  as.factor(demographicinfo_compositesonly_34mo_hitnot$sex)
+
+skim(demographicinfo_compositesonly_34mo_hitnot)
+
+###this chunk completes the manipulations of the data that put it in a form useful for analysis. 
+###in the next chunk, i will need to do shapiro wilks for normality and run ttest on each group based on initial diet and sex. 
+```
+
+
+
+
+
+
+
+
+```{r}
+##normality test for each composite
+
+shapiro.test(demographicinfo_compositesonly_34mo_hitnot$group_a) ##group a is normally distributed
+shapiro.test(demographicinfo_compositesonly_34mo_hitnot$group_b) ##group b is not normally distributed
+shapiro.test(demographicinfo_compositesonly_34mo_hitnot$group_c) ##group c is not normally distributed
+shapiro.test(demographicinfo_compositesonly_34mo_hitnot$group_d) ##group d is not normally distributed
+shapiro.test(demographicinfo_compositesonly_34mo_hitnot$group_e) ##group e is not normally distributed
+```
+
+
+```{r}
+
+##the top code will reflect diet results
+
+wilco_dietresults_group_a <- t.test(demographicinfo_compositesonly_34mo_hitnot$group_a ~ demographicinfo_compositesonly_34mo_hitnot$initial_diet) 
+wilco_dietresults_group_b <- wilcox.test(demographicinfo_compositesonly_34mo_hitnot$group_b ~ demographicinfo_compositesonly_34mo_hitnot$initial_diet)  
+wilco_dietresults_group_c <- wilcox.test(demographicinfo_compositesonly_34mo_hitnot$group_c ~ demographicinfo_compositesonly_34mo_hitnot$initial_diet)
+wilco_dietresults_group_d <- wilcox.test(demographicinfo_compositesonly_34mo_hitnot$group_d ~ demographicinfo_compositesonly_34mo_hitnot$initial_diet)
+wilco_dietresults_group_e <- wilcox.test(demographicinfo_compositesonly_34mo_hitnot$group_e ~ demographicinfo_compositesonly_34mo_hitnot$initial_diet)
+
+wilco_dietresults_group_b$p.value
+##group_c remains significant 
+
+
+
+##the bottom code will reflect sex results
+
+wilco_sexresults_group_a <- t.test(demographicinfo_compositesonly_34mo_hitnot$group_a ~ demographicinfo_compositesonly_34mo_hitnot$sex) 
+wilco_sexresults_group_b <- wilcox.test(demographicinfo_compositesonly_34mo_hitnot$group_b ~ demographicinfo_compositesonly_34mo_hitnot$sex)  
+wilco_sexresults_group_c <- wilcox.test(demographicinfo_compositesonly_34mo_hitnot$group_c ~ demographicinfo_compositesonly_34mo_hitnot$sex)
+wilco_sexresults_group_d <- wilcox.test(demographicinfo_compositesonly_34mo_hitnot$group_d ~ demographicinfo_compositesonly_34mo_hitnot$sex)
+wilco_sexresults_group_e <- wilcox.test(demographicinfo_compositesonly_34mo_hitnot$group_e ~ demographicinfo_compositesonly_34mo_hitnot$sex)
+
+wilco_sexresults_group_d$p.value
+##group_d is now significant
+
+
+
+##this chunk of determining diet and sex differences is complete
+##i am not considering adding back the new_diet == 2 subjects because the question revolves around maternal diet and anxiety expression
+##next, in order to graph these, i will need to put each in a their own dataset so i can graph the composite scores for each diet group. i will need to add error bars in the form. that code is somewhere ((maybe methods_doc?)) 
 ```
