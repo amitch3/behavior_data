@@ -700,7 +700,7 @@ wilco_dietresults_group_c <- wilcox.test(demographicinfo_compositesonly_34mo_hit
 wilco_dietresults_group_d <- wilcox.test(demographicinfo_compositesonly_34mo_hitnot$group_d ~ demographicinfo_compositesonly_34mo_hitnot$initial_diet)
 wilco_dietresults_group_e <- wilcox.test(demographicinfo_compositesonly_34mo_hitnot$group_e ~ demographicinfo_compositesonly_34mo_hitnot$initial_diet)
 
-wilco_dietresults_group_b$p.value
+wilco_dietresults_group_a$p.value
 ##group_c remains significant 
 
 
@@ -721,4 +721,191 @@ wilco_sexresults_group_d$p.value
 ##this chunk of determining diet and sex differences is complete
 ##i am not considering adding back the new_diet == 2 subjects because the question revolves around maternal diet and anxiety expression
 ##next, in order to graph these, i will need to put each in a their own dataset so i can graph the composite scores for each diet group. i will need to add error bars in the form. that code is somewhere ((maybe methods_doc?)) 
+```
+
+
+```{r}
+##isolating the means for graphing
+##need to also add error bars in the form of standard errors
+##meanval_group_a_1 = meanvalue of the normal diet individuals
+
+
+##############################group_a
+
+group_a1_vals <- demographicinfo_compositesonly_34mo_hitnot %>%
+  filter(initial_diet == 1) %>%
+  select(group_a)
+#View(group_a1_vals)
+mean_group_a1_vals <- mean(group_a1_vals$group_a)
+stder_group_a1_vals <- sd(group_a1_vals$group_a)/sqrt(length(group_a1_vals$group_a))
+#mean_group_a1_vals
+group_a2_vals <- demographicinfo_compositesonly_34mo_hitnot %>%
+  filter(initial_diet == 2) %>%
+  select(group_a)
+#View(group_a1_vals)
+mean_group_a2_vals <- mean(group_a2_vals$group_a)
+stder_group_a2_vals <- sd(group_a2_vals$group_a)/sqrt(length(group_a2_vals$group_a))
+#stder_group_a2_vals
+mean_group_a2_vals
+
+###############################end group_a
+
+##############################start group_b
+
+group_b1_vals <- demographicinfo_compositesonly_34mo_hitnot %>%
+  filter(initial_diet == 1) %>%
+  select(group_b)
+#View(group_a1_vals)
+mean_group_b1_vals <- mean(group_b1_vals$group_b)
+stder_group_b1_vals <- sd(group_b1_vals$group_b)/sqrt(length(group_b1_vals$group_b))
+#mean_group_a1_vals
+group_b2_vals <- demographicinfo_compositesonly_34mo_hitnot %>%
+  filter(initial_diet == 2) %>%
+  select(group_b)
+#View(group_a1_vals)
+mean_group_b2_vals <- mean(group_b2_vals$group_b)
+stder_group_b2_vals <- sd(group_b2_vals$group_b)/sqrt(length(group_b2_vals$group_b))
+#mean_group_a2_vals
+
+###############################end group_b
+
+##############################start group_c
+
+group_c1_vals <- demographicinfo_compositesonly_34mo_hitnot %>%
+  filter(initial_diet == 1) %>%
+  select(group_c)
+#View(group_a1_vals)
+mean_group_c1_vals <- mean(group_c1_vals$group_c)
+stder_group_c1_vals <- sd(group_c1_vals$group_c)/sqrt(length(group_c1_vals$group_c))
+#mean_group_a1_vals
+group_c2_vals <- demographicinfo_compositesonly_34mo_hitnot %>%
+  filter(initial_diet == 2) %>%
+  select(group_c)
+#View(group_a1_vals)
+mean_group_c2_vals <- mean(group_c2_vals$group_c)
+stder_group_c2_vals <- sd(group_c2_vals$group_c)/sqrt(length(group_c2_vals$group_c))
+#mean_group_a2_vals
+
+###############################end group_c
+
+##############################start group_d
+
+group_d1_vals <- demographicinfo_compositesonly_34mo_hitnot %>%
+  filter(initial_diet == 1) %>%
+  select(group_d)
+#View(group_a1_vals)
+mean_group_d1_vals <- mean(group_d1_vals$group_d)
+stder_group_d1_vals <- sd(group_d1_vals$group_d)/sqrt(length(group_d1_vals$group_d))
+#mean_group_a1_vals
+group_d2_vals <- demographicinfo_compositesonly_34mo_hitnot %>%
+  filter(initial_diet == 2) %>%
+  select(group_d)
+#View(group_a1_vals)
+mean_group_d2_vals <- mean(group_d2_vals$group_d)
+stder_group_d2_vals <- sd(group_d2_vals$group_d)/sqrt(length(group_d2_vals$group_d))
+#mean_group_a2_vals
+
+###############################end group_d
+
+##############################start group_e
+
+group_e1_vals <- demographicinfo_compositesonly_34mo_hitnot %>%
+  filter(initial_diet == 1) %>%
+  select(group_e)
+#View(group_a1_vals)
+mean_group_e1_vals <- mean(group_e1_vals$group_e)
+stder_group_e1_vals <- sd(group_e1_vals$group_e)/sqrt(length(group_e1_vals$group_e))
+#mean_group_a1_vals
+group_e2_vals <- demographicinfo_compositesonly_34mo_hitnot %>%
+  filter(initial_diet == 2) %>%
+  select(group_e)
+#View(group_a1_vals)
+mean_group_e2_vals <- mean(group_e2_vals$group_e)
+stder_group_e2_vals <- sd(group_e2_vals$group_e)/sqrt(length(group_e2_vals$group_e))
+sd_e2 <- sd(group_e2_vals$group_e)
+
+se_e2 <- sd_e2/sqrt(length(group_e2_vals$group_e))
+
+se_e2
+stder_group_e2_vals
+#mean_group_a2_vals
+
+###############################end group_e
+
+###end chunk
+### here, we created a mean value and a st.err value that will be used to visualize the data after combining it into a single table
+
+```
+
+
+```{r}
+##make a table
+dietgroup_avg_vals <- c(mean_group_a1_vals, mean_group_b1_vals, mean_group_c1_vals, mean_group_d1_vals, mean_group_e1_vals, mean_group_a2_vals, mean_group_b2_vals, mean_group_c2_vals, mean_group_d2_vals, mean_group_e2_vals) 
+dietgroup_stderr_vals <- c(stder_group_a1_vals, stder_group_b1_vals, stder_group_c1_vals, stder_group_d1_vals, stder_group_e1_vals, stder_group_a2_vals,  stder_group_b2_vals, stder_group_c2_vals, stder_group_d2_vals, stder_group_e2_vals)
+dietgroup_vector_vals <- c(1,1,1,1,1,2,2,2,2,2)
+dietgroup_vector_titles <- c("Group A",
+                             "Group B",
+                             "Group C*",
+                             "Group D",
+                             "Group E",
+                             "Group A",
+                             "Group B",
+                             "Group C*",
+                             "Group D",
+                             "Group E")
+dietgroup_meanvals_table1 <- data.frame(dietgroup_vector_titles, dietgroup_vector_vals, dietgroup_avg_vals, dietgroup_stderr_vals)
+
+dietgroup_meanvals_table1$dietgroup_vector_titles <- as.factor(dietgroup_meanvals_table1$dietgroup_vector_titles)
+dietgroup_meanvals_table1$dietgroup_vector_vals <- as.factor(dietgroup_meanvals_table1$dietgroup_vector_vals)
+#dietgroup_meanvals_table1$dietgroup_stderr_vals <- as.numeric(dietgroup_meanvals_table1$dietgroup_stderr_vals)
+
+View(dietgroup_meanvals_table1)
+
+ggplot(dietgroup_meanvals_table1, aes(x=dietgroup_vector_titles, y= dietgroup_avg_vals, fill=dietgroup_vector_vals)) + geom_boxplot(stat="identity", position = position_dodge())
+
+library(ggthemes)
+
+dietdifferences_plot <- ggplot(dietgroup_meanvals_table1, aes(x=dietgroup_vector_titles, y=dietgroup_avg_vals, fill = dietgroup_vector_vals)) +
+  geom_bar(stat = 'identity', position = position_dodge()) +
+  geom_errorbar(aes(ymin=(dietgroup_avg_vals)-dietgroup_stderr_vals,
+                    ymax=(dietgroup_avg_vals)+dietgroup_stderr_vals),
+                    width = .2,
+                    position = position_dodge(.9),
+                    size = .8) +
+  geom_hline(yintercept = 0) +
+  scale_fill_manual(values= wes_palette(n=2, "Darjeeling1")) +
+  theme_foundation() +
+  theme(plot.title = element_text(face = "bold",
+               size = rel(1.2), hjust = 0.5),
+               text = element_text(),
+               panel.background = element_rect(colour = NA), #dunno
+               plot.background = element_rect(colour = NA), #colors for overall border of graph
+               panel.border = element_rect(colour = "black"), #colors upper corner of graph
+               axis.title = element_text(face = "bold",size = rel(1)), #controls the size of the x and y axis text
+               axis.title.y = element_text(angle=90,vjust =2), #vjust tells you how far the axis title will stick out from the y axis
+               axis.title.x = element_text(vjust = -0.3), #vjust tells you how far the axis title will stick out from the x axis
+               axis.text = element_text(), 
+               axis.line = element_line(colour=NA), #y and x axis colors
+               axis.ticks = element_line(), 
+               panel.grid.major = element_line(colour="#f0f0f0"),
+               panel.grid.minor = element_blank(), #horizontal line descriptor 
+               legend.key = element_rect(colour = NA), #legend box color
+               legend.position = "bottom", #placement of the legend
+               legend.direction = "horizontal", #need to figure out
+               legend.key.size= unit(0.2, "cm"), #need to figure out
+               legend.margin = unit(0, "cm"), #need to figure out
+               legend.title = element_text(face="italic"), #need to figure out
+               plot.margin=unit(c(10,5,5,5),"mm"), #need to figure out
+               strip.background=element_rect(colour="#f0f0f0",fill="#f0f0f0"), #need to figure out
+               strip.text = element_text(face="bold") #need to figure out
+          )
+
+
+diet_diff_final <- dietdifferences_plot + labs(x = 'Composite Group', y = 'Composite Score', title = "Diet Group Differences", caption = "Control = Green / WSD = Orange / *p=.029") + guides(fill=guide_legend(title = ""))
+
+png('diet_diff_final.png')
+print(diet_diff_final)
+dev.off()
+
+ggsave('diet_diff_final.png')
 ```
