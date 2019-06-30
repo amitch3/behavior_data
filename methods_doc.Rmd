@@ -347,7 +347,7 @@ value_matdiet_filtered_v2_avgcomp3.2_d2_err <- stderr(matdiet_filtered_v2_avgcom
 value_matdiet_filtered_v2_avgcomp4_d2_err <- stderr(matdiet_filtered_v2_avgcomp4_d2$comp_4)
 
 
-####calculate standard error for other metrics###
+####calculate standard error for other metrics - error bars###
 ###get elinor the data
 library(Hmisc)
 library(psych)

@@ -700,7 +700,7 @@ wilco_dietresults_group_c <- wilcox.test(demographicinfo_compositesonly_34mo_hit
 wilco_dietresults_group_d <- wilcox.test(demographicinfo_compositesonly_34mo_hitnot$group_d ~ demographicinfo_compositesonly_34mo_hitnot$initial_diet)
 wilco_dietresults_group_e <- wilcox.test(demographicinfo_compositesonly_34mo_hitnot$group_e ~ demographicinfo_compositesonly_34mo_hitnot$initial_diet)
 
-wilco_dietresults_group_a$p.value
+wilco_dietresults_group_e$p.value
 ##group_c remains significant 
 
 
@@ -901,7 +901,7 @@ dietdifferences_plot <- ggplot(dietgroup_meanvals_table1, aes(x=dietgroup_vector
           )
 
 
-diet_diff_final <- dietdifferences_plot + labs(x = 'Composite Group', y = 'Composite Score', title = "Diet Group Differences", caption = "Control = Green / WSD = Orange / *p=.029") + guides(fill=guide_legend(title = ""))
+diet_diff_final <- dietdifferences_plot + labs(x = 'Composite Group', y = 'Composite Score', title = "Diet Group Differences", caption = "Control = Red / WSD = Green / *p=.029") + guides(fill=guide_legend(title = ""))
 
 png('diet_diff_final.png')
 print(diet_diff_final)
