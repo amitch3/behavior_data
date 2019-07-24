@@ -41,7 +41,7 @@ library(RColorBrewer)
 
 ```{r plotting}
 gates_temp_NPI_combined_v1 <- read_excel("gates_temp_NPI_combined_v1.xlsx") 
-#^do not use!! but you can still use the same datafile as long as the subjects with missing data are cleaned like below
+#####^do not use!! but you can still use the same datafile as long as the subjects with missing data are cleaned like below
 #View(gates_temp_NPI_combined_v1)
 gates_temp_NPI_combined_v1$subj_id <- as.factor(gates_temp_NPI_combined_v1$subj_id)
 ##the v2 will have the subjects removed that are causing the NA, also stereotypy behaviors were removed becuase they did not have any variance and they were causing their own error
@@ -51,11 +51,11 @@ gates_temp_npi_combined_v2 <- gates_temp_NPI_combined_v1 %>%
 
 selected_gates_temp_NPI_combined_v2 <- gates_temp_npi_combined_v2 %>%
   select(- subj_id, - group)
+##use selected_gates_temp_NPI_combined_v2 to look at group differences based on composites 
+View(gates_temp_npi_combined_v2)
 
-#View(gates_temp_npi_combined_v2)
-
-selected_gates_temp_NPI_combined_v1 <- gates_temp_NPI_combined_v1 %>%
-  select(- subj_id, - group)
+#selected_gates_temp_NPI_combined_v1 <- gates_temp_NPI_combined_v1 %>%
+  #select(- subj_id, - group)
 
 #View(selected_gates_temp_NPI_combined_v2)
 
@@ -122,6 +122,8 @@ pvalsonly_npi_temp_structure <- corrplot(corr_gates_temp_npi_v2$r,
 
 ###the figures here can be used for the meeting tomorrow
 ###these figures contain no composites and are representations of raw relationships. 
+
+##use this file for raw comparisons ((7/23))
 
 gates_temp_NPI_combined_ALLNORM_v2 <- read_excel("gates_temp_NPI_combined_ALLNORM_v2.xlsx")
 #View(gates_temp_NPI_combined_ALLNORM_v2)
@@ -365,7 +367,7 @@ write.csv(flatmat_rr_v2, "pval_corrval_rr_structure.csv")
 
 
 ```{r}
-##here i need to make interactive visuals and submit them to box for chris and elinor
-##when you submit, make some guesses as to what these groups may be.. or highlight general patterns you see
-
+###goals for 7/23
+####look at group differences for year 1 in temperament
+####look at group differences for cortisol tomorrow morning
 ```
