@@ -370,4 +370,35 @@ write.csv(flatmat_rr_v2, "pval_corrval_rr_structure.csv")
 ###goals for 7/23
 ####look at group differences for year 1 in temperament
 ####look at group differences for cortisol tomorrow morning
+
+
+skim(gates_temp_npi_combined_v2)
+
+skim(gates_temp_NPI_combined_ALLNORM_v2)
+
+subremoved_gates_temp_NPI_combined_ALLNORM_v2 <- gates_temp_NPI_combined_ALLNORM_v2 %>%
+  filter(!subj_id %in% c(35408 , 34404 , 34412))
+
+View(subremoved_gates_temp_NPI_combined_ALLNORM_v2)
+
+
+pr50_gates_temp_NPI_combined_ALLNORM_v2 <- subremoved_gates_temp_NPI_combined_ALLNORM_v2 %>% 
+  filter(subj_id < 35000) %>%
+  select(- ZYawn, - ZPlay, - ZInspect, - ZGroom, - ZManipulate_Object, - ZInspect_Object, - ZFear_Grimace)
+
+View(pr50_gates_temp_NPI_combined_ALLNORM_v2)
+ 
+pr33_gates_temp_NPI_combined_ALLNORM_v2 <- subremoved_gates_temp_NPI_combined_ALLNORM_v2 %>%
+  filter(subj_id > 35000)
+
+#View(pr33_gates_temp_NPI_combined_ALLNORM_v2)
+
+```
+
+```{r}
+year1_ttests <- data.frame(lapply(pr50_gates_temp_NPI_combined_ALLNORM_v2[,4:98], function(i) t.test(i ~ pr50_gates_temp_NPI_combined_ALLNORM_v2$group)$p.value))
+year1_ttests$behavior <- rownames(year1_ttests) # edit: new column for protein_name 
+rownames(year1_ttests) <- NULL           # edit: new column for protein_name
+year1_ttests[year1_ttests$p.value < 0.05/105,]
+
 ```
