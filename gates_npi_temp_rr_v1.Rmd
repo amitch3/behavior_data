@@ -402,3 +402,83 @@ rownames(year1_ttests) <- NULL           # edit: new column for protein_name
 year1_ttests[year1_ttests$p.value < 0.05/105,]
 
 ```
+
+
+```{r}
+###creating composites from the temperament data
+subremoved_gates_temp_NPI_combined_ALLNORM_v2$interact_novelty <- 
+  (subremoved_gates_temp_NPI_combined_ALLNORM_v2$ZInspect_Snake_temperament +  
+  subremoved_gates_temp_NPI_combined_ALLNORM_v2$ZInteract_Snake_temperament + 
+  subremoved_gates_temp_NPI_combined_ALLNORM_v2$ZInteract_Novel_Food_temperament)
+  
+subremoved_gates_temp_NPI_combined_ALLNORM_v2$ZBark_temperament + subremoved_gates_temp_NPI_combined_ALLNORM_v2$ZShriek_temperament + subremoved_gates_temp_NPI_combined_ALLNORM_v2$temera
+
+
+subremoved_gates_temp_NPI_combined_ALLNORM_v2$ <- subremoved_gates_temp_NPI_combined_ALLNORM_v2$ZScratch_temperament + subremoved_gates_temp_NPI_combined_ALLNORM_v2$ZTeeth_Grind_temperament + subremoved_gates_temp_NPI_combined_ALLNORM_v2$ZSelf_Groom_temperament + subremoved_gates_temp_NPI_combined_ALLNORM_v2$tempera
+subremoved_gates_temp_NPI_combined_ALLNORM_v2$anxious_temp <- 
+subremoved_gates_temp_NPI_combined_ALLNORM_v2$_temp <-  
+
+
+
+```
+
+```{r differences in FA}
+
+###below not good, missing groups
+FA_vals <- subremoved_gates_temp_NPI_combined_ALLNORM_v2 %>%
+  select(matches("_FA_" & "subject" & "group"))
+
+View(FA_vals)
+
+
+##lateral ventricles omitted
+FA_vals_withgroup <- subremoved_gates_temp_NPI_combined_ALLNORM_v2 %>%
+  select(subj_id, group, Zfrontal_FA_y2_4mo, Zfrontal_wm_FA_y2_4mo, Zsensory_motor_FA_y2_4mo, Ztemporal_FA_y2_4mo, Ztemporal_wm_FA_y2_4mo, Zparietal_FA_y2_4mo, Zoccipital_FA_y2_4mo, Zoccipital_wm_FA_y2_4mo, Zallocortex_FA_y2_4mo, Zcortex_skeketon_FA_y2_4mo, Zhippocampus_FA_y2_4mo, Zinternal_capsule_wm_FA_y2_4mo, Zexternal_extreme_capsule_wm_FA_y2_4mo, Zslemium_wm_FA_y2_4mo, Zbody_wm_FA_y2_4mo, Zgenu_wm_FA_y2_4mo, Zcerebral_wm_FA_y2_4mo) 
+
+FA_vals_withgroup$group <- as.factor(FA_vals_withgroup$group)
+FA_vals_withgroup$subj_id <- as.factor(FA_vals_withgroup$subj_id)
+
+
+View(FA_vals_withgroup)
+
+occipital_ttest <- t.test(FA_vals_withgroup$Zoccipital_FA_y2_4mo ~ FA_vals_withgroup$group)
+
+
+melted_FA_vals <- melt(FA_vals_withgroup)
+
+View(melted_FA_vals)
+
+ggplot(melted_FA_vals, aes(x=group, y=value, color = group)) +
+geom_boxplot() + geom_jitter() +
+  facet_wrap(~variable, ncol = 3) + 
+  labs(title = "FA Differences; all years")
+
+```
+
+```{r}
+temperament_ttests_data <- subremoved_gates_temp_NPI_combined_ALLNORM_v2 %>%
+  select(subj_id, group, matches("temperament")) 
+
+temperament_ttests_data$subj_id <- as.factor(temperament_ttests_data$subj_id)
+temperament_ttests_data$group <- as.factor(temperament_ttests_data$group)
+
+melted_temp_ttest_data <- melt(temperament_ttests_data)
+
+View(melted_temp_ttest_data)
+
+skim(temperament_ttests_data)
+
+ggplot(melted_temp_ttest_data, aes(x=group, y=value, color = group)) +
+geom_boxplot() + geom_jitter() +
+  facet_wrap(~variable, ncol = 3) + 
+  labs(title = "Behavioral Differences related to Temperament Testing")
+##from the output above, it appears that stationary front, grunt, bark, and movement are the behaviors 
+
+##below then we will look at ttest with that data 
+
+
+stationary_front_ttest <- t.test()
+grunt_ttest <- 
+bark_ttest <- wilcox.test()
+movement_ttest <- 
+```
