@@ -376,6 +376,9 @@ skim(gates_temp_npi_combined_v2)
 
 skim(gates_temp_NPI_combined_ALLNORM_v2)
 
+gates_temp_NPI_combined_ALLNORM_v2 <- read_excel("gates_temp_NPI_combined_ALLNORM_v2.xlsx")
+#View(gates_temp_NPI_combined_ALLNORM_v2)
+
 subremoved_gates_temp_NPI_combined_ALLNORM_v2 <- gates_temp_NPI_combined_ALLNORM_v2 %>%
   filter(!subj_id %in% c(35408 , 34404 , 34412))
 
@@ -424,11 +427,6 @@ subremoved_gates_temp_NPI_combined_ALLNORM_v2$_temp <-
 
 ```{r differences in FA}
 
-###below not good, missing groups
-FA_vals <- subremoved_gates_temp_NPI_combined_ALLNORM_v2 %>%
-  select(matches("_FA_" & "subject" & "group"))
-
-View(FA_vals)
 
 
 ##lateral ventricles omitted
@@ -453,6 +451,9 @@ geom_boxplot() + geom_jitter() +
   facet_wrap(~variable, ncol = 3) + 
   labs(title = "FA Differences; all years")
 
+skim(FA_vals_withgroup)
+
+shapiro.test(FA_vals_withgroup$Zfrontal_wm_FA_y2_4mo)
 ```
 
 ```{r}
@@ -475,10 +476,18 @@ geom_boxplot() + geom_jitter() +
 ##from the output above, it appears that stationary front, grunt, bark, and movement are the behaviors 
 
 ##below then we will look at ttest with that data 
+```
 
-
+```{r}
 stationary_front_ttest <- t.test()
 grunt_ttest <- 
 bark_ttest <- wilcox.test()
 movement_ttest <- 
+```
+
+
+```{r}
+
+
+
 ```
