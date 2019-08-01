@@ -454,6 +454,43 @@ geom_boxplot() + geom_jitter() +
 skim(FA_vals_withgroup)
 
 shapiro.test(FA_vals_withgroup$Zfrontal_wm_FA_y2_4mo)
+
+frontal_wm_FA_ttest <- t.test(FA_vals_withgroup$Zfrontal_wm_FA_y2_4mo~FA_vals_withgroup$group)
+
+hippcampal_wm_FA_ttest <- t.test(FA_vals_withgroup$Zhippocampus_FA_y2_4mo~FA_vals_withgroup$group)
+
+temporal_wm_FA_ttest <- t.test(FA_vals_withgroup$Ztemporal_wm_FA_y2_4mo~FA_vals_withgroup$group)
+
+temporal_FA_ttest <- t.test(FA_vals_withgroup$Ztemporal_FA_y2_4mo~FA_vals_withgroup$group)
+
+sensorymotor_wm_FA_ttest <- t.test(FA_vals_withgroup$Zsensory_motor_FA_y2_4mo~FA_vals_withgroup$group)
+
+occipital_wm_FA_ttest <- t.test(FA_vals_withgroup$Zoccipital_wm_FA_y2_4mo~FA_vals_withgroup$group)
+
+occipital_FA_ttest <- t.test(FA_vals_withgroup$Zoccipital_FA_y2_4mo~FA_vals_withgroup$group)
+
+
+occipital_wm_FA_ttest$p.value
+#occipital not significant
+
+occipital_FA_ttest$p.value
+#not significant
+
+sensorymotor_wm_FA_ttest$p.value
+#not significant
+
+temporal_FA_ttest$p.value
+#not significant
+
+temporal_wm_FA_ttest$p.value
+#.059
+
+hippcampal_wm_FA_ttest$p.value
+
+
+_wm_FA_ttest$p.value
+
+frontal_wm_FA_ttest$p.value
 ```
 
 ```{r}
